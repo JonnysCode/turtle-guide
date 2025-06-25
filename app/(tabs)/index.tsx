@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Calendar, Heart, Target, TrendingUp, Smile, Frown, Meh } from 'lucide-react-native';
+import { Calendar, Heart, Target, TrendingUp, Smile, Frown, Meh, BookOpen } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
@@ -235,38 +235,4 @@ export default function Home() {
                 Gentle movements for today
               </Text>
             </View>
-            <Target size={32} color="white" />
-          </TouchableOpacity>
-
-          <View className="flex-row space-x-4">
-            <TouchableOpacity
-              onPress={() => router.push('/(tabs)/learn')}
-              className="flex-1 bg-white p-4 rounded-xl shadow-sm border border-turtle-teal/10 flex-row items-center"
-            >
-              <View className="w-10 h-10 bg-turtle-amber/10 rounded-lg items-center justify-center mr-3">
-                <BookOpen size={20} color="#F59E0B" />
-              </View>
-              <View>
-                <Text className="text-turtle-slate font-inter-semibold">Learn</Text>
-                <Text className="text-turtle-slate/70 font-inter text-sm">Recovery tips</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => router.push('/(tabs)/progress')}
-              className="flex-1 bg-white p-4 rounded-xl shadow-sm border border-turtle-teal/10 flex-row items-center"
-            >
-              <View className="w-10 h-10 bg-turtle-green/10 rounded-lg items-center justify-center mr-3">
-                <Calendar size={20} color="#10B981" />
-              </View>
-              <View>
-                <Text className="text-turtle-slate font-inter-semibold">Progress</Text>
-                <Text className="text-turtle-slate/70 font-inter text-sm">Your journey</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
+            <Target size={32} color="white
