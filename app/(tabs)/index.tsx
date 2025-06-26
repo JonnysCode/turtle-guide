@@ -6,6 +6,7 @@ import { Calendar, Heart, Target, TrendingUp, Smile, Frown, Meh, BookOpen } from
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleIntroduction from '@/components/TurtleIntroduction';
 import { supabase } from '@/lib/supabase';
 
 interface DailyProgress {
@@ -30,11 +31,41 @@ export default function Home() {
   const [todayProgress, setTodayProgress] = useState<DailyProgress | null>(null);
   const [streak, setStreak] = useState(0);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [showDailyIntro, setShowDailyIntro] = useState(false);
 
   useEffect(() => {
     fetchTodayProgress();
     calculateStreak();
+    checkForDailyIntro();
   }, [user]);
+
+  const checkForDailyIntro = () => {
+    // Check if we should show the daily introduction
+    // This could be based on time of day, user preferences, or random chance
+    const now = new Date();
+    const hour = now.getHours();
+    
+    // Show intro in the morning (7-10 AM) with 30% chance
+    if (hour >= 7 && hour <= 10 && Math.random() < 0.3) {
+      setShowDailyIntro(true);
+    }
+  };
+
+  const handleDailyIntroComplete = (mood: string | null) => {
+    setShowDailyIntro(false);
+    if (mood) {
+      // Convert mood string to rating
+      const moodMap: { [key: string]: number } = {
+        'positive': 5,
+        'hopeful': 4,
+        'neutral': 3,
+        'tired': 2,
+        'frustrated': 1
+      };
+      const rating = moodMap[mood] || 3;
+      updateMood(rating);
+    }
+  };
 
   const fetchTodayProgress = async () => {
     if (!user) return;
@@ -139,20 +170,34 @@ export default function Home() {
     }
   };
 
+  if (showDailyIntro) {
+    return (
+      <TurtleIntroduction onComplete={handleDailyIntroComplete} />
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-turtle-cream">
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         {/* Header with Turtle */}
         <View className="items-center py-6">
-          <TurtleAvatar size={120} mood={getTurtleMood()} />
-          <Text className="text-xl font-inter-bold text-turtle-slate mt-4">
-            Hello, {user?.email?.split('@')[0]}!
-          </Text>
+          <TouchableOpacity 
+            onPress={() => setShowDailyIntro(true)}
+            className="items-center"
+          >
+            <TurtleAvatar size={120} mood={getTurtleMood()} />
+            <Text className="text-xl font-inter-bold text-turtle-slate mt-4">
+              Hello, {user?.email?.split('@')[0]}!
+            </Text>
+          </TouchableOpacity>
           <View className="bg-white px-6 py-4 rounded-2xl mt-4 shadow-sm border border-turtle-teal/10">
             <Text className="text-turtle-slate font-inter text-center">
               {getTurtleMessage()}
             </Text>
           </View>
+          <Text className="text-turtle-slate/50 font-inter text-xs mt-2 text-center">
+            Tap me to chat anytime! 🐢
+          </Text>
         </View>
 
         {/* Mood Check-in */}
