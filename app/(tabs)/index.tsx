@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -31,28 +31,15 @@ export default function Home() {
   const [todayProgress, setTodayProgress] = useState<DailyProgress | null>(null);
   const [streak, setStreak] = useState(0);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
-  const [showDailyIntro, setShowDailyIntro] = useState(false);
+  const [showTurtleChat, setShowTurtleChat] = useState(false);
 
   useEffect(() => {
     fetchTodayProgress();
     calculateStreak();
-    checkForDailyIntro();
   }, [user]);
 
-  const checkForDailyIntro = () => {
-    // Check if we should show the daily introduction
-    // This could be based on time of day, user preferences, or random chance
-    const now = new Date();
-    const hour = now.getHours();
-    
-    // Show intro in the morning (7-10 AM) with 30% chance
-    if (hour >= 7 && hour <= 10 && Math.random() < 0.3) {
-      setShowDailyIntro(true);
-    }
-  };
-
-  const handleDailyIntroComplete = (mood: string | null) => {
-    setShowDailyIntro(false);
+  const handleTurtleChatComplete = async (mood: string | null) => {
+    setShowTurtleChat(false);
     if (mood) {
       // Convert mood string to rating
       const moodMap: { [key: string]: number } = {
@@ -63,7 +50,7 @@ export default function Home() {
         'frustrated': 1
       };
       const rating = moodMap[mood] || 3;
-      updateMood(rating);
+      await updateMood(rating);
     }
   };
 
@@ -170,9 +157,12 @@ export default function Home() {
     }
   };
 
-  if (showDailyIntro) {
+  if (showTurtleChat) {
     return (
-      <TurtleIntroduction onComplete={handleDailyIntroComplete} />
+      <TurtleIntroduction 
+        onComplete={handleTurtleChatComplete}
+        isStartupScreen={false}
+      />
     );
   }
 
@@ -182,7 +172,7 @@ export default function Home() {
         {/* Header with Turtle */}
         <View className="items-center py-6">
           <TouchableOpacity 
-            onPress={() => setShowDailyIntro(true)}
+            onPress={() => setShowTurtleChat(true)}
             className="items-center"
           >
             <TurtleAvatar size={120} mood={getTurtleMood()} />

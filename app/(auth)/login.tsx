@@ -27,6 +27,8 @@ export default function Login() {
     if (error) {
       Alert.alert('Error', error.message);
     } else {
+      // Navigation will be handled by the auth state change
+      // The turtle intro will show automatically
       router.replace('/(tabs)');
     }
   };
