@@ -11,7 +11,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserProvider } from '@/contexts/UserContext';
-import '../global.css';
 
 SplashScreen.preventAutoHideAsync();
 

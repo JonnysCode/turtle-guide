@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react-native';
@@ -32,51 +32,51 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-turtle-cream">
-      <View className="flex-1 px-6">
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
         <TouchableOpacity
           onPress={() => router.back()}
-          className="mt-4 mb-8 w-12 h-12 bg-white rounded-full items-center justify-center shadow-sm"
+          style={styles.backButton}
         >
           <ArrowLeft size={24} color="#1E293B" />
         </TouchableOpacity>
 
-        <View className="items-center mb-8">
+        <View style={styles.header}>
           <TurtleAvatar size={120} mood="welcoming" />
-          <Text className="text-2xl font-inter-bold text-turtle-slate mt-4">
+          <Text style={styles.title}>
             Welcome Back!
           </Text>
-          <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
+          <Text style={styles.subtitle}>
             I'm so happy to see you again
           </Text>
         </View>
 
-        <View className="space-y-4">
-          <View>
-            <Text className="text-turtle-slate font-inter-semibold mb-2">Email</Text>
+        <View style={styles.form}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
             <TextInput
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
               keyboardType="email-address"
               autoCapitalize="none"
-              className="bg-white py-4 px-4 rounded-xl border border-turtle-teal/20 text-turtle-slate font-inter text-lg"
+              style={styles.input}
             />
           </View>
 
-          <View>
-            <Text className="text-turtle-slate font-inter-semibold mb-2">Password</Text>
-            <View className="relative">
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Password</Text>
+            <View style={styles.passwordContainer}>
               <TextInput
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Enter your password"
                 secureTextEntry={!showPassword}
-                className="bg-white py-4 px-4 pr-12 rounded-xl border border-turtle-teal/20 text-turtle-slate font-inter text-lg"
+                style={[styles.input, styles.passwordInput]}
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-4"
+                style={styles.eyeButton}
               >
                 {showPassword ? (
                   <EyeOff size={24} color="#64748B" />
@@ -91,22 +91,128 @@ export default function Login() {
         <TouchableOpacity
           onPress={handleLogin}
           disabled={loading}
-          className="bg-turtle-teal py-4 px-8 rounded-2xl mt-8 shadow-lg disabled:opacity-50"
+          style={[styles.loginButton, loading && styles.loginButtonDisabled]}
         >
-          <Text className="text-white text-lg font-inter-semibold text-center">
+          <Text style={styles.loginButtonText}>
             {loading ? 'Signing In...' : 'Sign In'}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => router.push('/(auth)/register')}
-          className="mt-6"
+          style={styles.registerLink}
         >
-          <Text className="text-turtle-teal font-inter text-center">
-            Don't have an account? <Text className="font-inter-semibold">Sign Up</Text>
+          <Text style={styles.registerText}>
+            Don't have an account? <Text style={styles.registerTextBold}>Sign Up</Text>
           </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FEF7ED',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+  backButton: {
+    marginTop: 16,
+    marginBottom: 32,
+    width: 48,
+    height: 48,
+    backgroundColor: 'white',
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  title: {
+    fontSize: 24,
+    fontFamily: 'Inter-Bold',
+    color: '#1E293B',
+    marginTop: 16,
+  },
+  subtitle: {
+    color: '#64748B',
+    fontFamily: 'Inter-Regular',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  form: {
+    gap: 16,
+  },
+  inputGroup: {
+    gap: 8,
+  },
+  label: {
+    color: '#1E293B',
+    fontFamily: 'Inter-SemiBold',
+  },
+  input: {
+    backgroundColor: 'white',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(20, 184, 166, 0.2)',
+    color: '#1E293B',
+    fontFamily: 'Inter-Regular',
+    fontSize: 16,
+  },
+  passwordContainer: {
+    position: 'relative',
+  },
+  passwordInput: {
+    paddingRight: 48,
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: 16,
+    top: 16,
+  },
+  loginButton: {
+    backgroundColor: '#14B8A6',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 16,
+    marginTop: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  loginButtonDisabled: {
+    opacity: 0.5,
+  },
+  loginButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    textAlign: 'center',
+  },
+  registerLink: {
+    marginTop: 24,
+  },
+  registerText: {
+    color: '#14B8A6',
+    fontFamily: 'Inter-Regular',
+    textAlign: 'center',
+  },
+  registerTextBold: {
+    fontFamily: 'Inter-SemiBold',
+  },
+});
