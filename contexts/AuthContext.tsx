@@ -5,9 +5,11 @@ import type { User } from '@supabase/supabase-js';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  showTurtleIntro: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  completeTurtleIntro: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,11 +17,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showTurtleIntro, setShowTurtleIntro] = useState(false);
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      // Show turtle intro when user logs in
+      if (session?.user) {
+        setShowTurtleIntro(true);
+      }
       setLoading(false);
     });
 
@@ -27,6 +34,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
+        
+        // Show turtle intro on sign in events
+        if (event === 'SIGNED_IN' && session?.user) {
+          setShowTurtleIntro(true);
+        } else if (event === 'SIGNED_OUT') {
+          setShowTurtleIntro(false);
+        }
+        
         setLoading(false);
       }
     );
@@ -51,11 +66,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    setShowTurtleIntro(false);
     await supabase.auth.signOut();
   };
 
+  const completeTurtleIntro = () => {
+    setShowTurtleIntro(false);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      showTurtleIntro,
+      signIn, 
+      signUp, 
+      signOut,
+      completeTurtleIntro
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -6,6 +6,7 @@ import { Calendar, Heart, Target, TrendingUp, Smile, Frown, Meh, BookOpen } from
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleIntroduction from '@/components/TurtleIntroduction';
 import { supabase } from '@/lib/supabase';
 
 interface DailyProgress {
@@ -30,11 +31,28 @@ export default function Home() {
   const [todayProgress, setTodayProgress] = useState<DailyProgress | null>(null);
   const [streak, setStreak] = useState(0);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [showTurtleChat, setShowTurtleChat] = useState(false);
 
   useEffect(() => {
     fetchTodayProgress();
     calculateStreak();
   }, [user]);
+
+  const handleTurtleChatComplete = async (mood: string | null) => {
+    setShowTurtleChat(false);
+    if (mood) {
+      // Convert mood string to rating
+      const moodMap: { [key: string]: number } = {
+        'positive': 5,
+        'hopeful': 4,
+        'neutral': 3,
+        'tired': 2,
+        'frustrated': 1
+      };
+      const rating = moodMap[mood] || 3;
+      await updateMood(rating);
+    }
+  };
 
   const fetchTodayProgress = async () => {
     if (!user) return;
@@ -139,20 +157,37 @@ export default function Home() {
     }
   };
 
+  if (showTurtleChat) {
+    return (
+      <TurtleIntroduction 
+        onComplete={handleTurtleChatComplete}
+        isStartupScreen={false}
+      />
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-turtle-cream">
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         {/* Header with Turtle */}
         <View className="items-center py-6">
-          <TurtleAvatar size={120} mood={getTurtleMood()} />
-          <Text className="text-xl font-inter-bold text-turtle-slate mt-4">
-            Hello, {user?.email?.split('@')[0]}!
-          </Text>
+          <TouchableOpacity 
+            onPress={() => setShowTurtleChat(true)}
+            className="items-center"
+          >
+            <TurtleAvatar size={120} mood={getTurtleMood()} />
+            <Text className="text-xl font-inter-bold text-turtle-slate mt-4">
+              Hello, {user?.email?.split('@')[0]}!
+            </Text>
+          </TouchableOpacity>
           <View className="bg-white px-6 py-4 rounded-2xl mt-4 shadow-sm border border-turtle-teal/10">
             <Text className="text-turtle-slate font-inter text-center">
               {getTurtleMessage()}
             </Text>
           </View>
+          <Text className="text-turtle-slate/50 font-inter text-xs mt-2 text-center">
+            Tap me to chat anytime! 🐢
+          </Text>
         </View>
 
         {/* Mood Check-in */}

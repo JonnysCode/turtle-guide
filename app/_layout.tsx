@@ -11,6 +11,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserProvider } from '@/contexts/UserContext';
+import TurtleStartupScreen from '@/components/TurtleStartupScreen';
 import '../global.css';
 
 SplashScreen.preventAutoHideAsync();
@@ -37,6 +38,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <UserProvider>
+        <TurtleStartupScreen />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

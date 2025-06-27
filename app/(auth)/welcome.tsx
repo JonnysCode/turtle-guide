@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleIntroduction from '@/components/TurtleIntroduction';
 
 export default function Welcome() {
   const router = useRouter();
+  const [showIntroduction, setShowIntroduction] = useState(false);
+
+  const handleIntroductionComplete = (mood: string | null) => {
+    setShowIntroduction(false);
+    // You could save the mood to AsyncStorage or pass it along
+    // For now, we'll just proceed to login
+  };
+
+  const handleGetStarted = () => {
+    setShowIntroduction(true);
+  };
+
+  if (showIntroduction) {
+    return (
+      <TurtleIntroduction 
+        onComplete={handleIntroductionComplete}
+      />
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1">
@@ -35,11 +55,20 @@ export default function Welcome() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => router.push('/(auth)/register')}
+            onPress={handleGetStarted}
             className="bg-white py-4 px-8 rounded-2xl border-2 border-turtle-teal shadow-lg"
           >
             <Text className="text-turtle-teal text-lg font-inter-semibold text-center">
-              Get Started
+              Meet Your Companion
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push('/(auth)/register')}
+            className="bg-turtle-amber/20 py-4 px-8 rounded-2xl border border-turtle-amber shadow-sm"
+          >
+            <Text className="text-turtle-slate text-lg font-inter-semibold text-center">
+              Create Account
             </Text>
           </TouchableOpacity>
         </View>
