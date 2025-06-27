@@ -1,7 +1,22 @@
-import { Tabs } from 'expo-router';
-import { Home, Target, BookOpen, Award, User } from 'lucide-react-native';
+import { useEffect } from 'react';
+import { Tabs, useRouter } from 'expo-router';
+import { Chrome as Home, Target, BookOpen, Award, User } from 'lucide-react-native';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function TabLayout() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/(auth)/welcome');
+    }
+  }, [user, loading]);
+
+  if (loading || !user) {
+    return null;
+  }
+
   return (
     <Tabs
       screenOptions={{
