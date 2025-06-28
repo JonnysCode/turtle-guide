@@ -33,6 +33,7 @@ export default function Index() {
     }
   }, [user, loading, segments, router]);
 
+  // Show loading while determining auth state
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#14B8A6" />

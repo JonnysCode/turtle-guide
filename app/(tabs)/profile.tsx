@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Settings, Heart, Phone, LogOut, LocationEdit as Edit3, Calendar } from 'lucide-react-native';
+import { User, Settings, Heart, Phone, LogOut, Edit3, Calendar } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'expo-router';
@@ -46,11 +46,17 @@ export default function Profile() {
               
               await signOut();
               
-              // On native platforms, manually navigate
-              if (Platform.OS !== 'web') {
+              // Additional fallback for web - if the context doesn't handle it
+              if (Platform.OS === 'web') {
+                setTimeout(() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/';
+                  }
+                }, 500);
+              } else {
+                // On native platforms, manually navigate
                 router.replace('/(auth)/welcome');
               }
-              // On web, the AuthContext will handle the redirect via page reload
               
             } catch (error) {
               console.error('Sign out failed:', error);

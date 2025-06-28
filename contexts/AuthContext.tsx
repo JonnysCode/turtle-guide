@@ -50,11 +50,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setShowTurtleIntro(true);
         } else if (event === 'SIGNED_OUT') {
           setShowTurtleIntro(false);
-          // Clear any cached data on sign out
-          if (Platform.OS === 'web') {
-            // Force a page reload on web to clear all state
-            window.location.href = '/';
-          }
         }
         
         setLoading(false);
@@ -92,37 +87,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      console.log('Signing out...');
-      setShowTurtleIntro(false);
+      console.log('Starting sign out process...');
       
-      // Clear user state immediately
+      // Clear local state immediately
       setUser(null);
+      setShowTurtleIntro(false);
+      setLoading(true);
       
       // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        console.error('Sign out error:', error);
-        throw error;
+        console.error('Supabase sign out error:', error);
+        // Don't throw error, continue with local cleanup
       }
       
-      console.log('Sign out successful');
+      console.log('Sign out completed');
       
-      // On web, force a page reload to clear all state
+      // Platform-specific navigation
       if (Platform.OS === 'web') {
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 100);
+        // Clear any cached data and force navigation
+        if (typeof window !== 'undefined') {
+          // Clear localStorage/sessionStorage if needed
+          try {
+            localStorage.clear();
+            sessionStorage.clear();
+          } catch (e) {
+            console.warn('Could not clear storage:', e);
+          }
+          
+          // Force navigation to welcome page
+          window.location.replace('/');
+        }
       }
+      
     } catch (error) {
       console.error('Error during sign out:', error);
-      // Even if there's an error, clear local state
+      // Even if there's an error, ensure local state is cleared
       setUser(null);
       setShowTurtleIntro(false);
       
-      if (Platform.OS === 'web') {
-        window.location.href = '/';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        window.location.replace('/');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
