@@ -8,16 +8,27 @@ export default function TabLayout() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('TabLayout - User:', user ? 'authenticated' : 'not authenticated', 'Loading:', loading);
+    
     if (!loading && !user) {
-      console.log('Route to welcome page, no user and not loading...')
+      console.log('TabLayout redirecting to welcome - no user');
       router.replace('/(auth)/welcome');
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
-  if (loading || !user) {
-      console.log('Page is loading or does not have a user...')
+  // Don't render anything while loading
+  if (loading) {
+    console.log('TabLayout is loading...');
     return null;
   }
+
+  // Don't render if no user (will redirect)
+  if (!user) {
+    console.log('TabLayout - no user, should redirect');
+    return null;
+  }
+
+  console.log('TabLayout rendering tabs for authenticated user');
 
   return (
     <Tabs
