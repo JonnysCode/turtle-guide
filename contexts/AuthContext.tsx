@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -41,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state change:', event, session?.user ? 'authenticated' : 'not authenticated');
         setUser(session?.user ?? null);
         
         // Show turtle intro on sign in events
@@ -48,6 +50,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setShowTurtleIntro(true);
         } else if (event === 'SIGNED_OUT') {
           setShowTurtleIntro(false);
+          // Clear any cached data on sign out
+          if (Platform.OS === 'web') {
+            // Force a page reload on web to clear all state
+            window.location.href = '/';
+          }
         }
         
         setLoading(false);
@@ -58,24 +65,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error };
+    } catch (error) {
+      console.error('Sign in error:', error);
+      return { error };
+    }
   };
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      return { error };
+    } catch (error) {
+      console.error('Sign up error:', error);
+      return { error };
+    }
   };
 
   const signOut = async () => {
-    setShowTurtleIntro(false);
-    await supabase.auth.signOut();
+    try {
+      console.log('Signing out...');
+      setShowTurtleIntro(false);
+      
+      // Clear user state immediately
+      setUser(null);
+      
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Sign out error:', error);
+        throw error;
+      }
+      
+      console.log('Sign out successful');
+      
+      // On web, force a page reload to clear all state
+      if (Platform.OS === 'web') {
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Error during sign out:', error);
+      // Even if there's an error, clear local state
+      setUser(null);
+      setShowTurtleIntro(false);
+      
+      if (Platform.OS === 'web') {
+        window.location.href = '/';
+      }
+    }
   };
 
   const completeTurtleIntro = () => {

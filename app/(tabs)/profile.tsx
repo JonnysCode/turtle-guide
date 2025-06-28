@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Settings, Heart, Phone, LogOut, LocationEdit as Edit3, Calendar } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,6 +28,7 @@ export default function Profile() {
   const { profile } = useUser();
   const router = useRouter();
   const [showEmergencyContacts, setShowEmergencyContacts] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = () => {
     Alert.alert(
@@ -39,8 +40,24 @@ export default function Profile() {
           text: 'Sign Out', 
           style: 'destructive',
           onPress: async () => {
-            await signOut();
-            router.replace('/(auth)/welcome');
+            try {
+              setIsSigningOut(true);
+              console.log('Profile: Starting sign out process...');
+              
+              await signOut();
+              
+              // On native platforms, manually navigate
+              if (Platform.OS !== 'web') {
+                router.replace('/(auth)/welcome');
+              }
+              // On web, the AuthContext will handle the redirect via page reload
+              
+            } catch (error) {
+              console.error('Sign out failed:', error);
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+            } finally {
+              setIsSigningOut(false);
+            }
           }
         }
       ]
@@ -217,11 +234,14 @@ export default function Profile() {
 
             <TouchableOpacity 
               onPress={handleSignOut}
+              disabled={isSigningOut}
               className="flex-row items-center py-4"
             >
               <LogOut size={20} color="#EF4444" className="mr-4" />
               <View className="flex-1">
-                <Text className="text-red-600 font-inter-semibold">Sign Out</Text>
+                <Text className="text-red-600 font-inter-semibold">
+                  {isSigningOut ? 'Signing Out...' : 'Sign Out'}
+                </Text>
                 <Text className="text-turtle-slate/70 font-inter text-sm">
                   Sign out of your account
                 </Text>
