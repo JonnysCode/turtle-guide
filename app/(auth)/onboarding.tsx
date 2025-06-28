@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert, TextInput } from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, ArrowRight, User } from 'lucide-react-native';
 import { useUser } from '@/contexts/UserContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import Input from '@/components/Input';
 
 const strokeTypes = [
   { id: 'ischemic', name: 'Ischemic Stroke', description: 'Caused by blocked blood flow' },
@@ -35,8 +36,8 @@ export default function Onboarding() {
   const [loading, setLoading] = useState(false);
 
   const toggleGoal = (goalId: string) => {
-    setSelectedGoals(prev => 
-      prev.includes(goalId) 
+    setSelectedGoals(prev =>
+      prev.includes(goalId)
         ? prev.filter(id => id !== goalId)
         : [...prev, goalId]
     );
@@ -83,39 +84,39 @@ export default function Onboarding() {
           <View className="flex-1">
             <View className="items-center mb-8">
               <TurtleAvatar size={100} mood="welcoming" />
-              <Text className="text-2xl font-inter-bold text-turtle-slate mt-4 text-center">
+              <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 Nice to Meet You!
               </Text>
-              <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
+              <Text className="text-royal-palm font-inter mt-2 text-center text-lg">
                 Let's start with your name so I can personalize your journey
               </Text>
             </View>
 
-            <View className="space-y-6">
+            <View className="gap-6">
               <View>
-                <Text className="text-turtle-slate font-inter-semibold mb-3 text-lg">
+                <Text className="text-earie-black font-inter-semibold mb-3 text-lg">
                   What should I call you?
                 </Text>
-                <View className="relative">
-                  <TextInput
+                <View
+                  className="relative bg-turtle-cream-100 py-4 px-4 pl-12 rounded-xl border border-turtle-teal-300 justify-center">
+                  <Input
                     value={patientName}
                     onChangeText={setPatientName}
                     placeholder="Enter your first name"
-                    className="bg-white py-4 px-4 pl-12 rounded-xl border border-turtle-teal/20 text-turtle-slate font-inter text-lg"
                     autoCapitalize="words"
                     autoCorrect={false}
                   />
-                  <View className="absolute left-4 top-4">
-                    <User size={24} color="#64748B" />
+                  <View className="absolute left-4">
+                    <User size={26} color="#418D84" />
                   </View>
                 </View>
               </View>
 
-              <View className="bg-turtle-teal/5 p-4 rounded-xl border border-turtle-teal/20">
-                <Text className="text-turtle-teal font-inter-semibold mb-2">
+              <View className="bg-turtle-cream-100 p-4 rounded-xl border border-turtle-teal-300">
+                <Text className="text-royal-palm font-inter-semibold mb-2">
                   🐢 Privacy Note
                 </Text>
-                <Text className="text-turtle-slate/70 font-inter text-sm">
+                <Text className="text-earie-black font-inter text-sm">
                   Your name helps me create a more personal experience. All your information is kept private and secure.
                 </Text>
               </View>
@@ -128,10 +129,10 @@ export default function Onboarding() {
           <View className="flex-1">
             <View className="items-center mb-8">
               <TurtleAvatar size={100} mood="welcoming" />
-              <Text className="text-2xl font-inter-bold text-turtle-slate mt-4 text-center">
+              <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 {patientName ? `Hello ${patientName}!` : 'Let\'s Get to Know Each Other'}
               </Text>
-              <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
+              <Text className="text-royal-palm font-inter mt-2 text-center">
                 What type of stroke brought us together?
               </Text>
             </View>
@@ -142,18 +143,18 @@ export default function Onboarding() {
                   key={type.id}
                   onPress={() => setStrokeType(type.id)}
                   className={`p-4 rounded-xl border ${
-                    strokeType === type.id 
-                      ? 'bg-turtle-teal border-turtle-teal' 
-                      : 'bg-white border-turtle-teal/20'
+                    strokeType === type.id
+                      ? 'bg-royal-palm border-royal-palm'
+                      : 'bg-turtle-cream-100 border-turtle-teal-300'
                   }`}
                 >
                   <Text className={`font-inter-semibold text-lg ${
-                    strokeType === type.id ? 'text-white' : 'text-turtle-slate'
+                    strokeType === type.id ? 'text-chalk' : 'text-earie-black'
                   }`}>
                     {type.name}
                   </Text>
                   <Text className={`font-inter text-sm ${
-                    strokeType === type.id ? 'text-white/80' : 'text-turtle-slate/70'
+                    strokeType === type.id ? 'text-chalk/80' : 'text-royal-palm'
                   }`}>
                     {type.description}
                   </Text>
@@ -168,24 +169,24 @@ export default function Onboarding() {
           <View className="flex-1">
             <View className="items-center mb-8">
               <TurtleAvatar size={100} mood="encouraging" />
-              <Text className="text-2xl font-inter-bold text-turtle-slate mt-4 text-center">
+              <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 Your Mobility Level
               </Text>
-              <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
+              <Text className="text-royal-palm font-inter mt-2 text-center">
                 Help me understand where you are today (1-10 scale)
               </Text>
             </View>
 
-            <View className="bg-white p-6 rounded-xl border border-turtle-teal/20">
-              <Text className="text-center text-3xl font-inter-bold text-turtle-teal mb-4">
+            <View className="bg-turtle-cream-100 p-6 rounded-xl border border-turtle-teal-300">
+              <Text className="text-center text-3xl font-inter-bold text-royal-palm mb-4">
                 {mobilityLevel}
               </Text>
-              
+
               <View className="flex-row justify-between items-center mb-6">
-                <Text className="text-turtle-slate/70 font-inter text-sm">
+                <Text className="text-earie-black font-inter text-sm">
                   Need help with most activities
                 </Text>
-                <Text className="text-turtle-slate/70 font-inter text-sm">
+                <Text className="text-earie-black font-inter text-sm">
                   Very independent
                 </Text>
               </View>
@@ -196,14 +197,14 @@ export default function Onboarding() {
                     key={level}
                     onPress={() => setMobilityLevel(level)}
                     className={`flex-1 mx-1 h-8 rounded ${
-                      level <= mobilityLevel ? 'bg-turtle-teal' : 'bg-gray-200'
+                      level <= mobilityLevel ? 'bg-royal-palm' : 'bg-blue-glass'
                     }`}
                   />
                 ))}
               </View>
             </View>
 
-            <Text className="text-turtle-slate/60 font-inter text-sm text-center mt-4">
+            <Text className="text-royal-palm font-inter text-sm text-center mt-4">
               Don't worry - this helps me personalize your exercises and we can adjust anytime!
             </Text>
           </View>
@@ -214,10 +215,10 @@ export default function Onboarding() {
           <View className="flex-1">
             <View className="items-center mb-8">
               <TurtleAvatar size={100} mood="thinking" />
-              <Text className="text-2xl font-inter-bold text-turtle-slate mt-4 text-center">
+              <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 What Are Your Goals?
               </Text>
-              <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
+              <Text className="text-royal-palm font-inter mt-2 text-center">
                 Select what matters most to you (choose multiple)
               </Text>
             </View>
@@ -229,13 +230,13 @@ export default function Onboarding() {
                   onPress={() => toggleGoal(goal.id)}
                   className={`p-4 rounded-xl border ${
                     selectedGoals.includes(goal.id)
-                      ? 'bg-turtle-teal border-turtle-teal'
-                      : 'bg-white border-turtle-teal/20'
+                      ? 'bg-royal-palm border-royal-palm'
+                      : 'bg-turtle-cream-100 border-turtle-teal-300'
                   }`}
                 >
                   <Text className="text-2xl mb-2">{goal.icon}</Text>
                   <Text className={`font-inter-semibold ${
-                    selectedGoals.includes(goal.id) ? 'text-white' : 'text-turtle-slate'
+                    selectedGoals.includes(goal.id) ? 'text-chalk' : 'text-earie-black'
                   }`}>
                     {goal.name}
                   </Text>
@@ -250,37 +251,38 @@ export default function Onboarding() {
           <View className="flex-1">
             <View className="items-center mb-8">
               <TurtleAvatar size={120} mood="happy" />
-              <Text className="text-2xl font-inter-bold text-turtle-slate mt-4 text-center">
+              <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 Perfect! I'm {turtleName}
               </Text>
-              <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
-                I'll be your companion, cheerleader, and guide. Together, we'll take recovery one step at a time - just like a wise turtle should!
+              <Text className="text-royal-palm font-inter mt-2 text-center">
+                I'll be your companion, cheerleader, and guide. Together, we'll take recovery one step at a time - just
+                like a wise turtle should!
               </Text>
             </View>
 
-            <View className="bg-white p-6 rounded-xl border border-turtle-teal/20 space-y-4">
+            <View className="bg-turtle-cream-100 p-6 rounded-xl border border-turtle-teal-300 gap-4">
               <View className="flex-row justify-between">
-                <Text className="text-turtle-slate/70 font-inter">Patient Name:</Text>
-                <Text className="text-turtle-slate font-inter-semibold">{patientName}</Text>
+                <Text className="text-royal-palm font-inter">Patient Name:</Text>
+                <Text className="text-earie-black font-inter-semibold">{patientName}</Text>
               </View>
               <View className="flex-row justify-between">
-                <Text className="text-turtle-slate/70 font-inter">Stroke Type:</Text>
-                <Text className="text-turtle-slate font-inter-semibold">
+                <Text className="text-royal-palm font-inter">Stroke Type:</Text>
+                <Text className="text-earie-black font-inter-semibold">
                   {strokeTypes.find(t => t.id === strokeType)?.name}
                 </Text>
               </View>
               <View className="flex-row justify-between">
-                <Text className="text-turtle-slate/70 font-inter">Mobility Level:</Text>
-                <Text className="text-turtle-slate font-inter-semibold">{mobilityLevel}/10</Text>
+                <Text className="text-royal-palm font-inter">Mobility Level:</Text>
+                <Text className="text-earie-black font-inter-semibold">{mobilityLevel}/10</Text>
               </View>
               <View>
-                <Text className="text-turtle-slate/70 font-inter mb-2">Recovery Goals:</Text>
+                <Text className="text-royal-palm font-inter mb-2">Recovery Goals:</Text>
                 <View className="flex-row flex-wrap">
                   {selectedGoals.map(goalId => {
                     const goal = recoveryGoals.find(g => g.id === goalId);
                     return (
-                      <View key={goalId} className="bg-turtle-teal/10 px-3 py-1 rounded-full mr-2 mb-2">
-                        <Text className="text-turtle-teal font-inter text-sm">
+                      <View key={goalId} className="bg-blue-glass px-3 py-1 rounded-full mr-2 mb-2">
+                        <Text className="text-royal-palm font-inter text-sm">
                           {goal?.icon} {goal?.name}
                         </Text>
                       </View>
@@ -290,7 +292,7 @@ export default function Onboarding() {
               </View>
             </View>
 
-            <Text className="text-turtle-slate/60 font-inter text-sm text-center mt-6">
+            <Text className="text-royal-palm font-inter text-sm text-center mt-6">
               🐢 "Remember, slow and steady wins the race. We're in this together, {patientName}!"
             </Text>
           </View>
@@ -299,13 +301,13 @@ export default function Onboarding() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-turtle-cream">
+    <SafeAreaView className="flex-1 bg-chalk">
       {step > 1 && (
         <TouchableOpacity
           onPress={() => setStep(step - 1)}
-          className="mt-4 ml-6 w-12 h-12 bg-white rounded-full items-center justify-center shadow-sm"
+          className="mt-4 ml-6 w-12 h-12 bg-turtle-cream-100 border border-turtle-teal-300 rounded-full items-center justify-center shadow-lg shadow-turtle-teal-300/50"
         >
-          <ArrowLeft size={24} color="#1E293B" />
+          <ArrowLeft size={24} color="#1A1F16" />
         </TouchableOpacity>
       )}
 
@@ -316,7 +318,7 @@ export default function Onboarding() {
             <View
               key={stepNum}
               className={`w-3 h-3 rounded-full mx-1 ${
-                stepNum <= step ? 'bg-turtle-teal' : 'bg-gray-300'
+                stepNum <= step ? 'bg-royal-palm' : 'bg-blue-glass'
               }`}
             />
           ))}
@@ -329,9 +331,9 @@ export default function Onboarding() {
         <TouchableOpacity
           onPress={step === 5 ? handleComplete : () => setStep(step + 1)}
           disabled={loading || (step === 1 && !patientName.trim()) || (step === 2 && !strokeType) || (step === 4 && selectedGoals.length === 0)}
-          className="bg-turtle-teal py-4 px-8 rounded-2xl shadow-lg disabled:opacity-50 flex-row items-center justify-center"
+          className="bg-royal-palm py-4 px-8 rounded-2xl shadow-lg disabled:opacity-50 flex-row items-center justify-center"
         >
-          <Text className="text-white text-lg font-inter-semibold mr-2">
+          <Text className="text-chalk text-lg font-inter-semibold mr-2">
             {loading ? 'Setting up...' : step === 5 ? 'Start My Journey!' : 'Continue'}
           </Text>
           {!loading && <ArrowRight size={20} color="white" />}

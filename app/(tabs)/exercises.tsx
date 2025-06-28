@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Play, Clock, Star, ChevronRight, CheckCircle } from 'lucide-react-native';
+import { CheckCircle, Clock, Play, Star } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import Card from '@/components/Card';
+import Button from '@/components/Button';
 import { supabase } from '@/lib/supabase';
 
 interface Exercise {
@@ -142,7 +144,7 @@ export default function Exercises() {
   }, [user]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: number;
     if (isPerforming && timeRemaining > 0) {
       interval = setInterval(() => {
         setTimeRemaining(prev => prev - 1);
@@ -180,7 +182,7 @@ export default function Exercises() {
     if (!user || !selectedExercise) return;
 
     setIsPerforming(false);
-    
+
     // Record exercise session
     const { error } = await supabase
       .from('exercise_sessions')
@@ -216,7 +218,7 @@ export default function Exercises() {
 
     setCompletedToday(prev => [...prev, selectedExercise.id]);
     setSelectedExercise(null);
-    
+
     Alert.alert(
       'Excellent Work! 🎉',
       'You completed the exercise! I\'m so proud of your dedication.',
@@ -232,7 +234,7 @@ export default function Exercises() {
 
   const getFilteredExercises = () => {
     if (!profile) return exercises;
-    
+
     return exercises.filter(exercise => {
       // Filter by mobility level - show exercises at or below user's level + 1
       const maxDifficulty = Math.min(5, Math.ceil(profile.mobility_level / 2) + 1);
@@ -248,80 +250,97 @@ export default function Exercises() {
 
   if (selectedExercise) {
     return (
-      <SafeAreaView className="flex-1 bg-turtle-cream">
-        <View className="flex-1 px-6 py-6">
-          <View className="items-center mb-8">
-            <TurtleAvatar size={100} mood="encouraging" animate={isPerforming} />
-            <Text className="text-2xl font-inter-bold text-turtle-slate mt-4 text-center">
+      <SafeAreaView className="flex-1 bg-chalk">
+        <View className="flex-1 px-6 py-8">
+          <View className="items-center mb-10">
+            <View className={isPerforming ? 'animate-breathe' : 'animate-float'}>
+              <TurtleAvatar size={120} mood="encouraging" animate={isPerforming} />
+            </View>
+            <Text className="text-3xl font-inter-bold text-earie-black mt-6 text-center">
               {selectedExercise.name}
             </Text>
-            <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
-              {isPerforming ? "You're doing great! Keep going!" : "Get ready to begin"}
+            <Text className="text-royal-palm font-inter mt-3 text-center text-lg">
+              {isPerforming ? 'You\'re doing great! Keep going!' : 'Get ready to begin'}
             </Text>
           </View>
 
           {isPerforming && (
-            <View className="bg-white rounded-2xl p-8 mb-6 items-center shadow-sm">
-              <Text className="text-6xl font-inter-bold text-turtle-teal mb-2">
-                {formatTime(timeRemaining)}
-              </Text>
-              <Text className="text-turtle-slate/70 font-inter">Time remaining</Text>
-            </View>
+            <Card variant="glow"
+                  className="mb-8 bg-blue-glass border-2 border-royal-palm">
+              <View className="items-center">
+                <Text className="text-7xl font-inter-bold text-royal-palm mb-3 animate-pulse">
+                  {formatTime(timeRemaining)}
+                </Text>
+                <Text className="text-earie-black font-inter-semibold text-lg">Time remaining</Text>
+              </View>
+            </Card>
           )}
 
-          <ScrollView className="flex-1 bg-white rounded-2xl p-6 shadow-sm">
-            <Text className="text-lg font-inter-bold text-turtle-slate mb-4">
-              Instructions
-            </Text>
-            {selectedExercise.instructions.map((instruction, index) => (
-              <View key={index} className="flex-row mb-3">
-                <Text className="text-turtle-teal font-inter-bold mr-3">
-                  {index + 1}.
-                </Text>
-                <Text className="text-turtle-slate font-inter flex-1">
-                  {instruction}
-                </Text>
-              </View>
-            ))}
-            
-            <View className="bg-turtle-teal/5 p-4 rounded-xl mt-4">
-              <Text className="text-turtle-teal font-inter-semibold mb-2">
-                💡 Benefits
+          <Card variant="elevated" className="flex-1 bg-chalk">
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text className="text-2xl font-inter-bold text-earie-black mb-6">
+                Instructions
               </Text>
-              <Text className="text-turtle-slate font-inter">
-                {selectedExercise.benefits}
-              </Text>
-            </View>
-          </ScrollView>
+              {selectedExercise.instructions.map((instruction, index) => (
+                <View key={index} className="flex-row mb-4 p-3 bg-flaxseed rounded-xl">
+                  <View className="w-8 h-8 bg-royal-palm rounded-full items-center justify-center mr-4">
+                    <Text className="text-chalk font-inter-bold">
+                      {index + 1}
+                    </Text>
+                  </View>
+                  <Text className="text-earie-black font-inter flex-1 text-base leading-relaxed">
+                    {instruction}
+                  </Text>
+                </View>
+              ))}
 
-          <View className="flex-row space-x-4 mt-6">
-            <TouchableOpacity
+              <Card variant="flat"
+                    className="bg-blue-glass border-royal-palm mt-6">
+                <View className="flex-row items-start">
+                  <Text className="text-2xl mr-3">💡</Text>
+                  <View className="flex-1">
+                    <Text className="text-royal-palm font-inter-bold mb-3 text-lg">
+                      Benefits
+                    </Text>
+                    <Text className="text-earie-black font-inter text-base leading-relaxed">
+                      {selectedExercise.benefits}
+                    </Text>
+                  </View>
+                </View>
+              </Card>
+            </ScrollView>
+          </Card>
+
+          <View className="flex-row gap-4 mt-8">
+            <Button
               onPress={stopExercise}
-              className="flex-1 bg-gray-200 py-4 rounded-2xl"
+              variant="outline"
+              size="lg"
+              className="flex-1"
             >
-              <Text className="text-turtle-slate font-inter-semibold text-center">
-                Stop
-              </Text>
-            </TouchableOpacity>
-            
+              Stop
+            </Button>
+
             {!isPerforming ? (
-              <TouchableOpacity
+              <Button
                 onPress={() => startExercise(selectedExercise)}
-                className="flex-1 bg-turtle-teal py-4 rounded-2xl"
+                variant="primary"
+                size="lg"
+                className="flex-1 shadow-nature"
+                leftIcon={<Play size={20} color="white" />}
               >
-                <Text className="text-white font-inter-semibold text-center">
-                  Start Exercise
-                </Text>
-              </TouchableOpacity>
+                Start Exercise
+              </Button>
             ) : (
-              <TouchableOpacity
+              <Button
                 onPress={completeExercise}
-                className="flex-1 bg-turtle-green py-4 rounded-2xl"
+                variant="success"
+                size="lg"
+                className="flex-1 shadow-nature"
+                leftIcon={<CheckCircle size={20} color="white" />}
               >
-                <Text className="text-white font-inter-semibold text-center">
-                  Complete Early
-                </Text>
-              </TouchableOpacity>
+                Complete Early
+              </Button>
             )}
           </View>
         </View>
@@ -330,64 +349,69 @@ export default function Exercises() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-turtle-cream">
+    <SafeAreaView className="flex-1 bg-chalk">
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-6">
           <View className="items-center mb-6">
             <TurtleAvatar size={80} mood="encouraging" />
-            <Text className="text-2xl font-inter-bold text-turtle-slate mt-3">
+            <Text className="text-2xl font-inter-bold text-earie-black mt-3">
               Exercise Time!
             </Text>
-            <Text className="text-turtle-slate/70 font-inter text-center mt-1">
+            <Text className="text-royal-palm font-inter text-center mt-1">
               Choose an exercise that feels right for you today
             </Text>
           </View>
 
           {completedToday.length > 0 && (
-            <View className="bg-turtle-green/10 p-4 rounded-xl mb-6 border border-turtle-green/20">
-              <Text className="text-turtle-green font-inter-semibold mb-1">
-                🎉 Great job today!
-              </Text>
-              <Text className="text-turtle-slate font-inter">
+            <View
+              className="bg-emerald-50 border border-emerald-300 px-6 py-4 rounded-2xl mb-6">
+              <View className="flex-row items-center mb-2">
+                <Text className="text-emerald-700 font-inter-bold text-lg flex-1">
+                  🎉 Great job today!
+                </Text>
+              </View>
+              <Text className="text-emerald-600 font-inter ml-13">
                 You've completed {completedToday.length} exercise{completedToday.length > 1 ? 's' : ''} already
               </Text>
             </View>
           )}
 
-          <Text className="text-lg font-inter-bold text-turtle-slate mb-4">
+          <Text className="text-lg font-inter-bold text-earie-black mb-4">
             Recommended for You
           </Text>
 
-          <View className="space-y-4">
+          <View className="gap-4">
             {getFilteredExercises().map((exercise) => {
               const isCompleted = completedToday.includes(exercise.id);
               const categoryColor = categoryColors[exercise.category];
-              
+
               return (
                 <TouchableOpacity
                   key={exercise.id}
                   onPress={() => setSelectedExercise(exercise)}
-                  className="bg-white rounded-2xl p-6 shadow-sm border border-turtle-teal/10"
+                  className={`bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-4 shadow-lg shadow-turtle-teal-300/50 ${
+                    isCompleted ? 'bg-blue-glass border-royal-palm' : ''
+                  }`}
                 >
-                  <View className="flex-row items-start justify-between mb-3">
-                    <View className="flex-1">
+                  <View className="flex-row justify-between">
+                    <View className="flex-1 gap-2">
                       <View className="flex-row items-center mb-2">
                         <Text className="text-2xl mr-2">
                           {categoryIcons[exercise.category]}
                         </Text>
-                        <Text className="text-lg font-inter-bold text-turtle-slate">
+                        <Text className="text-lg font-inter-bold text-earie-black pr-2">
                           {exercise.name}
                         </Text>
                         {isCompleted && (
-                          <CheckCircle size={20} color="#10B981" className="ml-2" />
+                          <CheckCircle size={20} color="#418D84" className="ml-2" />
                         )}
                       </View>
-                      <Text className="text-turtle-slate/70 font-inter text-sm mb-2">
+                      <Text className="text-royal-palm font-inter text-sm mb-2">
                         {exercise.description}
                       </Text>
                       <View className="flex-row items-center">
-                        <Clock size={16} color="#64748B" />
-                        <Text className="text-turtle-slate/70 font-inter text-sm ml-1 mr-4">
+                        <Clock size={16} color="#418D84" />
+                        <Text className="text-royal-palm font-inter text-sm ml-1 mr-4">
                           {Math.ceil(exercise.duration / 60)} min
                         </Text>
                         <View className="flex-row">
@@ -395,51 +419,61 @@ export default function Exercises() {
                             <Star
                               key={i}
                               size={14}
-                              color={i < exercise.difficulty ? categoryColor : '#E5E7EB'}
-                              fill={i < exercise.difficulty ? categoryColor : 'none'}
+                              color={i < exercise.difficulty ? categoryColor : '#B8DCDC'}
+                              fill={i < exercise.difficulty ? categoryColor : 'white'}
                             />
                           ))}
                         </View>
                       </View>
+                      <View className="flex-row justify-between items-center mt-2">
+                        <View
+                          className="px-3 py-1 rounded-full"
+                          style={{ backgroundColor: `${categoryColor}20` }}
+                        >
+                          <Text
+                            className="font-inter text-sm capitalize"
+                            style={{ color: categoryColor }}
+                          >
+                            {exercise.category.replace('-', ' ')}
+                          </Text>
+                        </View>
+                      </View>
                     </View>
-                    <View className="items-center">
+                    <View className="items-center justify-end">
                       {isCompleted ? (
-                        <View className="w-12 h-12 bg-turtle-green/10 rounded-full items-center justify-center">
-                          <CheckCircle size={24} color="#10B981" />
+                        <View
+                          className="w-14 h-14 bg-royal-palm rounded-full items-center justify-center shadow-lg shadow-turtle-cream-300/70">
+                          <CheckCircle size={26} color="#F6F4F1" />
                         </View>
                       ) : (
-                        <View className="w-12 h-12 bg-turtle-teal/10 rounded-full items-center justify-center">
-                          <Play size={20} color="#14B8A6" />
+                        <View
+                          className="w-14 h-14 rounded-full items-center justify-center shadow-lg shadow-turtle-cream-300/70"
+                          style={{ backgroundColor: categoryColor }}
+                        >
+                          <Play size={22} color="#F6F4F1" />
                         </View>
                       )}
                     </View>
                   </View>
-                  
-                  <View className="flex-row justify-between items-center">
-                    <View 
-                      className="px-3 py-1 rounded-full"
-                      style={{ backgroundColor: `${categoryColor}20` }}
-                    >
-                      <Text 
-                        className="font-inter text-sm capitalize"
-                        style={{ color: categoryColor }}
-                      >
-                        {exercise.category.replace('-', ' ')}
-                      </Text>
-                    </View>
-                    <ChevronRight size={20} color="#64748B" />
-                  </View>
+
                 </TouchableOpacity>
               );
             })}
           </View>
 
-          <View className="bg-white rounded-2xl p-6 mt-6 shadow-sm border border-turtle-teal/10">
-            <Text className="text-turtle-slate font-inter-semibold mb-2">
-              🐢 Turtle Wisdom
-            </Text>
-            <Text className="text-turtle-slate/70 font-inter">
-              "Remember, progress isn't about speed - it's about consistency. Even the smallest movement forward is a victory worth celebrating!"
+          <View
+            className="bg-turtle-indigo-50 border border-turtle-indigo-200 rounded-3xl px-6 py-4 mt-8">
+            <View className="flex-row items-start mb-2">
+              <View className="flex-1">
+                <Text className="text-turtle-indigo-700 font-inter-bold text-lg ml-1">
+                  🐢 Turtle Wisdom
+                </Text>
+              </View>
+            </View>
+            <Text
+              className="text-turtle-indigo-700 font-inter text-base leading-relaxed italic">
+              "Remember, progress isn't about speed - it's about consistency. Even the smallest movement forward is a
+              victory worth celebrating!"
             </Text>
           </View>
         </View>

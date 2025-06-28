@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Tabs, useRouter } from 'expo-router';
-import { Chrome as Home, Target, BookOpen, Award, User } from 'lucide-react-native';
+import { Award, BookOpen, Home, Target, User } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function TabLayout() {
@@ -9,7 +9,7 @@ export default function TabLayout() {
 
   useEffect(() => {
     console.log('TabLayout - User:', user ? 'authenticated' : 'not authenticated', 'Loading:', loading);
-    
+
     if (!loading && !user) {
       console.log('TabLayout redirecting to welcome - no user');
       router.replace('/(auth)/welcome');
@@ -40,15 +40,15 @@ export default function TabLayout() {
           borderTopWidth: 1,
           paddingBottom: 8,
           paddingTop: 8,
-          height: 88,
+          height: 88
         },
-        tabBarActiveTintColor: '#14B8A6',
+        tabBarActiveTintColor: '#418D84',
         tabBarInactiveTintColor: '#64748B',
         tabBarLabelStyle: {
           fontSize: 12,
           fontFamily: 'Inter-SemiBold',
-          marginTop: 4,
-        },
+          marginTop: 4
+        }
       }}
     >
       <Tabs.Screen
@@ -57,7 +57,7 @@ export default function TabLayout() {
           title: 'Home',
           tabBarIcon: ({ size, color }) => (
             <Home size={size} color={color} />
-          ),
+          )
         }}
       />
       <Tabs.Screen
@@ -66,7 +66,7 @@ export default function TabLayout() {
           title: 'Exercises',
           tabBarIcon: ({ size, color }) => (
             <Target size={size} color={color} />
-          ),
+          )
         }}
       />
       <Tabs.Screen
@@ -75,7 +75,7 @@ export default function TabLayout() {
           title: 'Learn',
           tabBarIcon: ({ size, color }) => (
             <BookOpen size={size} color={color} />
-          ),
+          )
         }}
       />
       <Tabs.Screen
@@ -84,7 +84,7 @@ export default function TabLayout() {
           title: 'Progress',
           tabBarIcon: ({ size, color }) => (
             <Award size={size} color={color} />
-          ),
+          )
         }}
       />
       <Tabs.Screen
@@ -93,7 +93,7 @@ export default function TabLayout() {
           title: 'Profile',
           tabBarIcon: ({ size, color }) => (
             <User size={size} color={color} />
-          ),
+          )
         }}
       />
     </Tabs>

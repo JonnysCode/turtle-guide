@@ -26,7 +26,7 @@ export default function Index() {
       // Redirect to main app if authenticated
       console.log('Index redirecting to tabs (authenticated)');
       router.replace('/(tabs)');
-    } else if (user && segments.length === 0) {
+    } else if (user && !segments[0]) {
       // If user is authenticated but at root, go to tabs
       console.log('Index redirecting authenticated user to tabs from root');
       router.replace('/(tabs)');

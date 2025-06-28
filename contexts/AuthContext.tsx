@@ -25,38 +25,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log('AuthProvider useEffect running...');
     
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Supabase session:', session?.user ? 'authenticated' : 'not authenticated');
-      setUser(session?.user ?? null);
-      // Show turtle intro when user logs in
-      if (session?.user) {
-        setShowTurtleIntro(true);
+    // Get initial session with proper error handling
+    const initializeAuth = async () => {
+      try {
+        console.log('Checking for existing session...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        if (session?.user) {
+          console.log('Found existing session for user:', session.user.email);
+          setUser(session.user);
+          // Don't show turtle intro for restored sessions, only for fresh logins
+        } else {
+          console.log('No existing session found');
+          setUser(null);
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
-    }).catch((error) => {
-      console.error('Supabase session error:', error);
-      setLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state change:', event, session?.user ? 'authenticated' : 'not authenticated');
+        console.log('Auth state change:', event, session?.user ? `authenticated (${session.user.email})` : 'not authenticated');
+        
         setUser(session?.user ?? null);
         
-        // Show turtle intro on sign in events
+        // Show turtle intro only on fresh sign ins, not on session restore
         if (event === 'SIGNED_IN' && session?.user) {
+          console.log('Fresh sign in detected, showing turtle intro');
           setShowTurtleIntro(true);
         } else if (event === 'SIGNED_OUT') {
+          console.log('Sign out detected');
           setShowTurtleIntro(false);
         }
+        // TOKEN_REFRESHED events don't need turtle intro
         
         setLoading(false);
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log('Cleaning up auth subscription');
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -94,17 +119,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setShowTurtleIntro(false);
       setLoading(true);
       
-      // Sign out from Supabase
+      // Sign out from Supabase - this will also clear AsyncStorage
       const { error } = await supabase.auth.signOut();
       
       if (error) {
         console.error('Supabase sign out error:', error);
         // Don't throw error, continue with local cleanup
+      } else {
+        console.log('Successfully signed out from Supabase');
       }
       
-      console.log('Sign out completed');
-      
-      // Platform-specific navigation
+      // Platform-specific cleanup
       if (Platform.OS === 'web') {
         // Clear any cached data and force navigation
         if (typeof window !== 'undefined') {
@@ -119,6 +144,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Force navigation to welcome page
           window.location.replace('/');
         }
+      } else {
+        // On mobile, Supabase should have cleared AsyncStorage automatically
+        console.log('Mobile sign out completed');
       }
       
     } catch (error) {
