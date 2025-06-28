@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, Easing } from 'react-native';
-import { Svg, Circle, Ellipse, Path, Defs, LinearGradient, Stop } from 'react-native-svg';
+import { Animated, Easing, View } from 'react-native';
+import { Circle, Defs, Ellipse, LinearGradient, Path, Stop, Svg } from 'react-native-svg';
 
 interface TurtleAvatarProps {
   size?: number;
@@ -8,11 +8,11 @@ interface TurtleAvatarProps {
   animate?: boolean;
 }
 
-export default function TurtleAvatar({ 
-  size = 100, 
-  mood = 'happy', 
-  animate = true 
-}: TurtleAvatarProps) {
+export default function TurtleAvatar({
+                                       size = 100,
+                                       mood = 'happy',
+                                       animate = true
+                                     }: TurtleAvatarProps) {
   const bounceAnim = useRef(new Animated.Value(0)).current;
   const blinkAnim = useRef(new Animated.Value(1)).current;
   const shellRotateAnim = useRef(new Animated.Value(0)).current;
@@ -27,14 +27,14 @@ export default function TurtleAvatar({
           toValue: 1,
           duration: 2000,
           easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
+          useNativeDriver: true
         }),
         Animated.timing(bounceAnim, {
           toValue: 0,
           duration: 2000,
           easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
+          useNativeDriver: true
+        })
       ])
     );
 
@@ -44,26 +44,26 @@ export default function TurtleAvatar({
         Animated.timing(blinkAnim, {
           toValue: 0,
           duration: 150,
-          useNativeDriver: true,
+          useNativeDriver: true
         }),
         Animated.timing(blinkAnim, {
           toValue: 1,
           duration: 150,
-          useNativeDriver: true,
+          useNativeDriver: true
         }),
-        Animated.delay(3000),
+        Animated.delay(3000)
       ])
     );
 
     // Shell shimmer for celebrating mood
-    let shellAnimation;
+    let shellAnimation: Animated.CompositeAnimation;
     if (mood === 'celebrating') {
       shellAnimation = Animated.loop(
         Animated.timing(shellRotateAnim, {
           toValue: 1,
           duration: 2000,
           easing: Easing.linear,
-          useNativeDriver: true,
+          useNativeDriver: true
         })
       );
       shellAnimation.start();
@@ -81,17 +81,17 @@ export default function TurtleAvatar({
 
   const bounceTransform = bounceAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -5],
+    outputRange: [0, -5]
   });
 
   const shellRotation = shellRotateAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: ['0deg', '360deg']
   });
 
   const eyeScale = blinkAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.1, 1],
+    outputRange: [0.1, 1]
   });
 
   // Eye expressions based on mood
@@ -118,8 +118,8 @@ export default function TurtleAvatar({
         style={{
           transform: [
             { translateY: bounceTransform },
-            ...(mood === 'celebrating' ? [{ rotate: shellRotation }] : []),
-          ],
+            ...(mood === 'celebrating' ? [{ rotate: shellRotation }] : [])
+          ]
         }}
       >
         <Svg width={size} height={size} viewBox="0 0 120 120">
@@ -145,7 +145,7 @@ export default function TurtleAvatar({
             stroke={mood === 'celebrating' ? '#F59E0B' : '#0F766E'}
             strokeWidth="2"
           />
-          
+
           {/* Shell pattern */}
           <Path
             d="M35,40 Q60,25 85,40 M35,55 Q60,40 85,55 M35,70 Q60,55 85,70"
@@ -154,7 +154,7 @@ export default function TurtleAvatar({
             fill="none"
             opacity="0.6"
           />
-          
+
           {/* Head */}
           <Circle
             cx="60"
@@ -164,16 +164,14 @@ export default function TurtleAvatar({
             stroke="#0F766E"
             strokeWidth="1"
           />
-          
+
           {/* Eyes */}
-          <Animated.View style={{ transform: [{ scaleY: eyeScale }] }}>
-            <Circle cx="54" cy="30" r="3" fill="#134E4A" />
-            <Circle cx="66" cy="30" r="3" fill="#134E4A" />
-            {/* Eye shine */}
-            <Circle cx="55" cy="29" r="1" fill="#FFF" />
-            <Circle cx="67" cy="29" r="1" fill="#FFF" />
-          </Animated.View>
-          
+          <Circle cx="54" cy="30" r="3" fill="#134E4A" />
+          <Circle cx="66" cy="30" r="3" fill="#134E4A" />
+          {/* Eye shine */}
+          <Circle cx="55" cy="29" r="1" fill="#FFF" />
+          <Circle cx="67" cy="29" r="1" fill="#FFF" />
+
           {/* Mouth based on mood */}
           <Path
             d={mood === 'celebrating' ? 'M52,40 Q60,46 68,40' : 'M54,40 Q60,44 66,40'}
@@ -182,18 +180,18 @@ export default function TurtleAvatar({
             fill="none"
             strokeLinecap="round"
           />
-          
+
           {/* Front legs */}
           <Ellipse cx="45" cy="65" rx="6" ry="12" fill="url(#bodyGradient)" stroke="#0F766E" strokeWidth="1" />
           <Ellipse cx="75" cy="65" rx="6" ry="12" fill="url(#bodyGradient)" stroke="#0F766E" strokeWidth="1" />
-          
+
           {/* Back legs */}
           <Ellipse cx="40" cy="80" rx="5" ry="10" fill="url(#bodyGradient)" stroke="#0F766E" strokeWidth="1" />
           <Ellipse cx="80" cy="80" rx="5" ry="10" fill="url(#bodyGradient)" stroke="#0F766E" strokeWidth="1" />
-          
+
           {/* Tail */}
           <Ellipse cx="60" cy="85" rx="4" ry="8" fill="url(#bodyGradient)" stroke="#0F766E" strokeWidth="1" />
-          
+
           {/* Celebration sparkles */}
           {mood === 'celebrating' && (
             <>

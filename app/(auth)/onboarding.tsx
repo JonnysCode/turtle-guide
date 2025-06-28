@@ -84,7 +84,7 @@ export default function Onboarding() {
               </Text>
             </View>
 
-            <View className="space-y-3">
+            <View className="gap-2">
               {strokeTypes.map((type) => (
                 <TouchableOpacity
                   key={type.id}
@@ -170,7 +170,7 @@ export default function Onboarding() {
               </Text>
             </View>
 
-            <View className="grid grid-cols-2 gap-3">
+            <View className="grid grid-cols-2 gap-3 mb-8">
               {recoveryGoals.map((goal) => (
                 <TouchableOpacity
                   key={goal.id}

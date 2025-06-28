@@ -15,18 +15,26 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  console.log('AuthProvider rendering...');
+  
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showTurtleIntro, setShowTurtleIntro] = useState(false);
 
   useEffect(() => {
+    console.log('AuthProvider useEffect running...');
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Supabase session:', session?.user ? 'authenticated' : 'not authenticated');
       setUser(session?.user ?? null);
       // Show turtle intro when user logs in
       if (session?.user) {
         setShowTurtleIntro(true);
       }
+      setLoading(false);
+    }).catch((error) => {
+      console.error('Supabase session error:', error);
       setLoading(false);
     });
 

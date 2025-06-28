@@ -4,7 +4,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "EXPO_NO_TELEMETRY=1 npx expo start",
+    "dev": "EXPO_NO_TELEMETRY=1 npx expo start --port 8082",
+    "android": "EXPO_NO_TELEMETRY=1 npx expo start --port 8082 --android",
+    "ios": "EXPO_NO_TELEMETRY=1 npx expo start --port 8082 --ios",
+    "web": "EXPO_NO_TELEMETRY=1 npx expo start --port 8082 --web",
+    "clear": "EXPO_NO_TELEMETRY=1 npx expo start --port 8082 --clear",
     "build:web": "expo export --platform web",
     "lint": "expo lint"
   },
@@ -34,8 +38,8 @@
     "expo-web-browser": "~14.1.5",
     "lucide-react-native": "^0.523.0",
     "nativewind": "^4.1.23",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "react-native": "0.79.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "~3.17.4",
@@ -50,7 +54,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~19.0.0",
+    "@types/react": "^19.0.0",
+    "babel-plugin-module-resolver": "^5.0.2",
     "typescript": "~5.8.3"
   }
 }
