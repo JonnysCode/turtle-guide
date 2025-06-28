@@ -215,6 +215,8 @@ export default function Exercises() {
         user_id: user.id,
         date: today,
         exercises_completed: (existingProgress?.exercises_completed || 0) + 1
+      }, { 
+        onConflict: 'user_id,date' 
       });
 
     setCompletedToday(prev => [...prev, selectedExercise.id]);

@@ -138,6 +138,8 @@ export default function Home() {
           date: today,
           mood_rating: rating,
           exercises_completed: todayProgress?.exercises_completed || 0
+        }, { 
+          onConflict: 'user_id,date' 
         });
 
       if (error) {
