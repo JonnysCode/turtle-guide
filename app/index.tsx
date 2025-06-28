@@ -8,16 +8,23 @@ export default function Index() {
   const router = useRouter();
   const segments = useSegments();
 
+  console.log('Index - User:', user ? 'authenticated' : 'not authenticated', 'Loading:', loading, 'Segments:', segments);
+
   useEffect(() => {
+    console.log('Index useEffect - Loading:', loading, 'User:', user ? 'authenticated' : 'not authenticated');
+    
     if (loading) return;
 
     const inAuthGroup = segments[0] === '(auth)';
+    console.log('In auth group:', inAuthGroup, 'Segments:', segments);
 
     if (!user && !inAuthGroup) {
       // Redirect to auth if not authenticated
+      console.log('Redirecting to welcome (not authenticated)');
       router.replace('/(auth)/welcome');
     } else if (user && inAuthGroup) {
       // Redirect to main app if authenticated
+      console.log('Redirecting to tabs (authenticated)');
       router.replace('/(tabs)');
     }
   }, [user, loading, segments]);
