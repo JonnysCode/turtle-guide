@@ -58,16 +58,26 @@ export default function Home() {
     if (!user) return;
 
     const today = new Date().toISOString().split('T')[0];
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('daily_progress')
       .select('*')
       .eq('user_id', user.id)
       .eq('date', today)
-      .single();
+      .maybeSingle();
+
+    // Handle the case where no entry exists for today (normal scenario)
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching daily progress:', error);
+      return;
+    }
 
     if (data) {
       setTodayProgress(data);
       setSelectedMood(data.mood_rating);
+    } else {
+      // No entry for today yet - this is normal
+      setTodayProgress(null);
+      setSelectedMood(null);
     }
   };
 
