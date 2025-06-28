@@ -5,7 +5,7 @@ import { Calendar, Heart, LocationEdit as Edit3, LogOut, Phone, Settings, User }
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'expo-router';
-import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleCompanion from '@/components/TurtleCompanion';
 
 const strokeTypes = {
   ischemic: 'Ischemic Stroke',
@@ -76,12 +76,18 @@ export default function Profile() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-chalk">
+    <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-6">
           {/* Profile Header */}
           <View className="items-center mb-8">
-            <TurtleAvatar size={120} mood="happy" />
+            <TurtleCompanion
+              size={120}
+              mood="writing"
+              showMessage={false}
+              animate={false}
+              className="mb-4"
+            />
             <Text className="text-2xl font-inter-bold text-earie-black mt-4">
               {profile?.patient_name || user?.email?.split('@')[0] || 'Friend'}
             </Text>

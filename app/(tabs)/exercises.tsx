@@ -251,7 +251,7 @@ export default function Exercises() {
 
   if (selectedExercise) {
     return (
-      <SafeAreaView className="flex-1 bg-chalk">
+      <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
         <View className="flex-1 px-6 py-8">
           <View className="items-center mb-10">
             <TurtleCompanion
@@ -354,7 +354,7 @@ export default function Exercises() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-chalk">
+    <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-6">
           <View className="items-center mb-6">

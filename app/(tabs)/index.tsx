@@ -2,14 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { BookOpen, Calendar, Frown, Heart, Meh, Smile, Target, TrendingUp, Sparkles } from 'lucide-react-native';
+import { BookOpen, Calendar, Frown, Heart, Meh, Smile, Target, TrendingUp } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
-import TurtleAvatar from '@/components/TurtleAvatar';
-import TurtleCompanion, { getTurtleMoodForContext, TurtleCompanionPresets } from '@/components/TurtleCompanion';
+import TurtleCompanion from '@/components/TurtleCompanion';
 import TurtleIntroduction from '@/components/TurtleIntroduction';
-import Card from '@/components/Card';
-import Button from '@/components/Button';
 import { supabase } from '@/lib/supabase';
 
 interface DailyProgress {
@@ -197,12 +194,12 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-chalk">
+    <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         {/* Header with Turtle Companion */}
         <View className="items-center py-6">
           <TurtleCompanion
-            size={140}
+            size={180}
             mood={getTurtleMood()}
             message={getTurtleMessage()}
             onTap={() => setShowTurtleChat(true)}
@@ -210,18 +207,19 @@ export default function Home() {
             animate={true}
             className="mb-4"
           />
-          
+
           <Text className="text-xl font-inter-bold text-earie-black">
             Hello, {profile?.patient_name || user?.email?.split('@')[0] || 'friend'}!
           </Text>
-          
+
           <Text className="text-royal-palm font-inter text-sm mt-2 text-center">
             Tap your turtle companion for a chat! 🐢
           </Text>
         </View>
 
         {/* Mood Check-in */}
-        <View className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+        <View
+          className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
           <Text className="text-lg font-inter-bold text-earie-black mb-4">
             How are you feeling today?
           </Text>
@@ -249,7 +247,8 @@ export default function Home() {
         </View>
 
         {/* Today's Progress */}
-        <View className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+        <View
+          className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
           <Text className="text-lg font-inter-bold text-earie-black mb-4">
             Today's Progress
           </Text>

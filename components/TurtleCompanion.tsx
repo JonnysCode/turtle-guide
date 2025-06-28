@@ -270,28 +270,30 @@ export default function TurtleCompanion({
             }}
           >
             <View className="relative">
-              <Image
-                source={turtleImages[mood]}
-                style={{
-                  width: imageWidth,
-                  height: imageHeight
-                }}
-                resizeMode="contain"
-              />
-
-              {/* Subtle glow effect */}
+              {/* Subtle glow effect behind the turtle */}
               <View
-                className="absolute inset-0 rounded-full opacity-20"
+                className="absolute inset-0 rounded-full opacity-15"
                 style={{
                   backgroundColor: '#418D84',
                   width: imageWidth,
                   height: imageHeight,
                   shadowColor: '#418D84',
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 10,
-                  elevation: 5
+                  shadowOpacity: 0.4,
+                  shadowRadius: 15,
+                  elevation: 5,
+                  zIndex: -1
                 }}
+              />
+              
+              <Image
+                source={turtleImages[mood]}
+                style={{
+                  width: imageWidth,
+                  height: imageHeight,
+                  zIndex: 1
+                }}
+                resizeMode="contain"
               />
             </View>
           </Animated.View>

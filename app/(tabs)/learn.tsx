@@ -247,7 +247,7 @@ export default function Learn() {
     const isLastSection = currentSection === selectedLesson.content.sections.length - 1;
 
     return (
-      <SafeAreaView className="flex-1 bg-chalk">
+      <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
         <View className="flex-1">
           {/* Header */}
           <View className="px-6 py-4 bg-chalk shadow-sm">
@@ -390,7 +390,7 @@ export default function Learn() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-chalk">
+    <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-6">
           <View className="items-center mb-6">
