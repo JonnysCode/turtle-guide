@@ -220,27 +220,30 @@ export default function Home() {
         </View>
 
         {/* Mood Check-in */}
-        <View
-          className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+        <View className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
           <Text className="text-lg font-inter-bold text-earie-black mb-4">
             How are you feeling today?
           </Text>
-          <View className="flex-row justify-between">
+          <View className="flex-row justify-between items-center">
             {moodIcons.map(({ rating, icon: Icon, color, label }) => (
               <TouchableOpacity
                 key={rating}
                 onPress={() => updateMood(rating)}
-                className={`items-center p-3 rounded-xl ${
+                className={`items-center flex-1 mx-1 py-3 px-2 rounded-xl ${
                   selectedMood === rating ? 'bg-blue-glass' : ''
                 }`}
               >
                 <Icon
-                  size={32}
+                  size={28}
                   color={selectedMood === rating ? '#418D84' : color}
                 />
-                <Text className={`text-xs font-inter mt-1 ${
-                  selectedMood === rating ? 'text-royal-palm' : 'text-earie-black'
-                }`}>
+                <Text 
+                  className={`text-xs font-inter mt-2 text-center leading-tight ${
+                    selectedMood === rating ? 'text-royal-palm' : 'text-earie-black'
+                  }`}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
                   {label}
                 </Text>
               </TouchableOpacity>
@@ -249,38 +252,43 @@ export default function Home() {
         </View>
 
         {/* Today's Progress */}
-        <View
-          className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+        <View className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
           <Text className="text-lg font-inter-bold text-earie-black mb-4">
             Today's Progress
           </Text>
-          <View className="flex-row justify-between">
-            <View className="items-center">
+          <View className="flex-row justify-between items-center">
+            <View className="items-center flex-1">
               <View className="w-12 h-12 bg-royal-palm rounded-xl items-center justify-center mb-2">
                 <Target size={24} color="#F6F4F1" />
               </View>
               <Text className="text-2xl font-inter-bold text-earie-black">
                 {todayProgress?.exercises_completed || 0}
               </Text>
-              <Text className="text-royal-palm font-inter text-sm">Exercises</Text>
+              <Text className="text-royal-palm font-inter text-sm text-center leading-tight">
+                Exercises
+              </Text>
             </View>
 
-            <View className="items-center">
+            <View className="items-center flex-1">
               <View className="w-12 h-12 bg-tropical-indigo rounded-xl items-center justify-center mb-2">
                 <TrendingUp size={24} color="#F6F4F1" />
               </View>
               <Text className="text-2xl font-inter-bold text-earie-black">{streak}</Text>
-              <Text className="text-royal-palm font-inter text-sm">Day Streak</Text>
+              <Text className="text-royal-palm font-inter text-sm text-center leading-tight">
+                Day Streak
+              </Text>
             </View>
 
-            <View className="items-center">
+            <View className="items-center flex-1">
               <View className="w-12 h-12 bg-blue-glass rounded-xl items-center justify-center mb-2">
                 <Heart size={24} color="#418D84" />
               </View>
               <Text className="text-2xl font-inter-bold text-earie-black">
                 {selectedMood ? moodIcons.find(m => m.rating === selectedMood)?.label : '-'}
               </Text>
-              <Text className="text-royal-palm font-inter text-sm">Mood</Text>
+              <Text className="text-royal-palm font-inter text-sm text-center leading-tight">
+                Mood
+              </Text>
             </View>
           </View>
         </View>
@@ -312,7 +320,7 @@ export default function Home() {
               <View className="w-10 h-10 bg-tropical-indigo rounded-lg items-center justify-center mr-3">
                 <BookOpen size={20} color="#F6F4F1" />
               </View>
-              <View>
+              <View className="flex-1">
                 <Text className="text-earie-black font-inter-semibold">Learn</Text>
                 <Text className="text-royal-palm font-inter text-sm">Recovery tips</Text>
               </View>
@@ -325,7 +333,7 @@ export default function Home() {
               <View className="w-10 h-10 bg-blue-glass rounded-lg items-center justify-center mr-3">
                 <Calendar size={20} color="#418D84" />
               </View>
-              <View>
+              <View className="flex-1">
                 <Text className="text-earie-black font-inter-semibold">Progress</Text>
                 <Text className="text-royal-palm font-inter text-sm">Your journey</Text>
               </View>
