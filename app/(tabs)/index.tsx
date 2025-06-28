@@ -201,7 +201,7 @@ export default function Home() {
         {/* Header with Turtle Companion */}
         <View className="items-center py-6">
           <TurtleCompanion
-            size={180}
+            size={160}
             mood={getTurtleMood()}
             message={getTurtleMessage()}
             onTap={() => setShowTurtleChat(true)}
@@ -219,75 +219,47 @@ export default function Home() {
           </Text>
         </View>
 
-        {/* Mood Check-in */}
-        <View className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
-          <Text className="text-lg font-inter-bold text-earie-black mb-4">
+        {/* Compact Mood Check-in */}
+        <View className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-4 mb-6 shadow-lg shadow-turtle-teal-300/50">
+          <Text className="text-base font-inter-bold text-earie-black mb-3">
             How are you feeling today?
           </Text>
           
-          {/* Mobile-first: Stack layout for small screens */}
-          <View className="space-y-3 sm:hidden">
-            {moodIcons.map(({ rating, icon: Icon, color, label, description }) => (
-              <TouchableOpacity
-                key={rating}
-                onPress={() => updateMood(rating)}
-                className={`flex-row items-center p-4 rounded-xl border-2 ${
-                  selectedMood === rating 
-                    ? 'bg-blue-glass border-royal-palm' 
-                    : 'bg-chalk border-transparent'
-                }`}
-              >
-                <Icon
-                  size={32}
-                  color={selectedMood === rating ? '#418D84' : color}
-                />
-                <View className="ml-4 flex-1">
-                  <Text className={`font-inter-semibold text-lg ${
-                    selectedMood === rating ? 'text-royal-palm' : 'text-earie-black'
-                  }`}>
-                    {label}
-                  </Text>
-                  <Text className={`font-inter text-sm ${
-                    selectedMood === rating ? 'text-royal-palm/80' : 'text-earie-black/70'
-                  }`}>
-                    {description}
-                  </Text>
-                </View>
-                {selectedMood === rating && (
-                  <View className="w-6 h-6 bg-royal-palm rounded-full items-center justify-center">
-                    <Text className="text-chalk text-xs font-inter-bold">✓</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Desktop/tablet: Horizontal layout for larger screens */}
-          <View className="hidden sm:flex flex-row justify-between items-center">
+          {/* Compact horizontal layout for all screen sizes */}
+          <View className="flex-row justify-between items-center">
             {moodIcons.map(({ rating, icon: Icon, color, label }) => (
               <TouchableOpacity
                 key={rating}
                 onPress={() => updateMood(rating)}
-                className={`items-center flex-1 mx-1 py-3 px-2 rounded-xl ${
+                className={`items-center flex-1 py-2 px-1 rounded-lg ${
                   selectedMood === rating ? 'bg-blue-glass' : ''
                 }`}
               >
                 <Icon
-                  size={28}
+                  size={24}
                   color={selectedMood === rating ? '#418D84' : color}
                 />
                 <Text 
-                  className={`text-xs font-inter mt-2 text-center leading-tight ${
-                    selectedMood === rating ? 'text-royal-palm' : 'text-earie-black'
+                  className={`text-xs font-inter mt-1 text-center ${
+                    selectedMood === rating ? 'text-royal-palm font-inter-semibold' : 'text-earie-black'
                   }`}
                   numberOfLines={1}
-                  adjustsFontSizeToFit
                 >
                   {label}
                 </Text>
+                {selectedMood === rating && (
+                  <View className="w-1 h-1 bg-royal-palm rounded-full mt-1" />
+                )}
               </TouchableOpacity>
             ))}
           </View>
+          
+          {/* Show selected mood description */}
+          {selectedMood && (
+            <Text className="text-royal-palm/80 font-inter text-sm text-center mt-2">
+              {moodIcons.find(m => m.rating === selectedMood)?.description}
+            </Text>
+          )}
         </View>
 
         {/* Today's Progress */}
