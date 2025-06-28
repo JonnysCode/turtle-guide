@@ -17,11 +17,11 @@ interface DailyProgress {
 }
 
 const moodIcons = [
-  { rating: 1, icon: Frown, color: '#EF4444', label: 'Struggling' },
-  { rating: 2, icon: Frown, color: '#F97316', label: 'Difficult' },
-  { rating: 3, icon: Meh, color: '#F59E0B', label: 'Okay' },
-  { rating: 4, icon: Smile, color: '#10B981', label: 'Good' },
-  { rating: 5, icon: Smile, color: '#14B8A6', label: 'Great' }
+  { rating: 1, icon: Frown, color: '#EF4444', label: 'Hard', description: 'Having a tough day' },
+  { rating: 2, icon: Frown, color: '#F97316', label: 'Rough', description: 'Feeling challenged' },
+  { rating: 3, icon: Meh, color: '#F59E0B', label: 'Okay', description: 'Getting by' },
+  { rating: 4, icon: Smile, color: '#10B981', label: 'Good', description: 'Feeling positive' },
+  { rating: 5, icon: Smile, color: '#14B8A6', label: 'Great', description: 'Having a wonderful day' }
 ];
 
 export default function Home() {
@@ -224,7 +224,46 @@ export default function Home() {
           <Text className="text-lg font-inter-bold text-earie-black mb-4">
             How are you feeling today?
           </Text>
-          <View className="flex-row justify-between items-center">
+          
+          {/* Mobile-first: Stack layout for small screens */}
+          <View className="space-y-3 sm:hidden">
+            {moodIcons.map(({ rating, icon: Icon, color, label, description }) => (
+              <TouchableOpacity
+                key={rating}
+                onPress={() => updateMood(rating)}
+                className={`flex-row items-center p-4 rounded-xl border-2 ${
+                  selectedMood === rating 
+                    ? 'bg-blue-glass border-royal-palm' 
+                    : 'bg-chalk border-transparent'
+                }`}
+              >
+                <Icon
+                  size={32}
+                  color={selectedMood === rating ? '#418D84' : color}
+                />
+                <View className="ml-4 flex-1">
+                  <Text className={`font-inter-semibold text-lg ${
+                    selectedMood === rating ? 'text-royal-palm' : 'text-earie-black'
+                  }`}>
+                    {label}
+                  </Text>
+                  <Text className={`font-inter text-sm ${
+                    selectedMood === rating ? 'text-royal-palm/80' : 'text-earie-black/70'
+                  }`}>
+                    {description}
+                  </Text>
+                </View>
+                {selectedMood === rating && (
+                  <View className="w-6 h-6 bg-royal-palm rounded-full items-center justify-center">
+                    <Text className="text-chalk text-xs font-inter-bold">✓</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Desktop/tablet: Horizontal layout for larger screens */}
+          <View className="hidden sm:flex flex-row justify-between items-center">
             {moodIcons.map(({ rating, icon: Icon, color, label }) => (
               <TouchableOpacity
                 key={rating}
