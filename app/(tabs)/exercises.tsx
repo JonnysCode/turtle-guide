@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CheckCircle, Clock, Play, Star } from 'lucide-react-native';
+import { CircleCheck as CheckCircle, Clock, Play, Star } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
