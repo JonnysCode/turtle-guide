@@ -9,11 +9,13 @@ export default function TabLayout() {
 
   useEffect(() => {
     if (!loading && !user) {
+      console.log('Route to welcome page, no user and not loading...')
       router.replace('/(auth)/welcome');
     }
   }, [user, loading]);
 
   if (loading || !user) {
+      console.log('Page is loading or does not have a user...')
     return null;
   }
 
