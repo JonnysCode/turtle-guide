@@ -34,8 +34,10 @@ export default function Home() {
   const [showTurtleChat, setShowTurtleChat] = useState(false);
 
   useEffect(() => {
-    fetchTodayProgress();
-    calculateStreak();
+    if (user) {
+      fetchTodayProgress();
+      calculateStreak();
+    }
   }, [user]);
 
   const handleTurtleChatComplete = async (mood: string | null) => {
@@ -57,82 +59,96 @@ export default function Home() {
   const fetchTodayProgress = async () => {
     if (!user) return;
 
-    const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await supabase
-      .from('daily_progress')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('date', today)
-      .maybeSingle();
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('daily_progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('date', today)
+        .maybeSingle();
 
-    // Handle the case where no entry exists for today (normal scenario)
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching daily progress:', error);
-      return;
-    }
+      // Handle the case where no entry exists for today (normal scenario)
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching daily progress:', error);
+        return;
+      }
 
-    if (data) {
-      setTodayProgress(data);
-      setSelectedMood(data.mood_rating);
-    } else {
-      // No entry for today yet - this is normal
-      setTodayProgress(null);
-      setSelectedMood(null);
+      if (data) {
+        setTodayProgress(data);
+        setSelectedMood(data.mood_rating);
+      } else {
+        // No entry for today yet - this is normal
+        setTodayProgress(null);
+        setSelectedMood(null);
+      }
+    } catch (error) {
+      console.error('Error in fetchTodayProgress:', error);
     }
   };
 
   const calculateStreak = async () => {
     if (!user) return;
 
-    const { data } = await supabase
-      .from('daily_progress')
-      .select('date')
-      .eq('user_id', user.id)
-      .order('date', { ascending: false })
-      .limit(30);
+    try {
+      const { data } = await supabase
+        .from('daily_progress')
+        .select('date')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .limit(30);
 
-    if (!data || data.length === 0) {
-      setStreak(0);
-      return;
-    }
-
-    let currentStreak = 0;
-    const today = new Date();
-    
-    for (let i = 0; i < data.length; i++) {
-      const progressDate = new Date(data[i].date);
-      const expectedDate = new Date(today);
-      expectedDate.setDate(today.getDate() - i);
-      
-      if (progressDate.toDateString() === expectedDate.toDateString()) {
-        currentStreak++;
-      } else {
-        break;
+      if (!data || data.length === 0) {
+        setStreak(0);
+        return;
       }
-    }
 
-    setStreak(currentStreak);
+      let currentStreak = 0;
+      const today = new Date();
+      
+      for (let i = 0; i < data.length; i++) {
+        const progressDate = new Date(data[i].date);
+        const expectedDate = new Date(today);
+        expectedDate.setDate(today.getDate() - i);
+        
+        if (progressDate.toDateString() === expectedDate.toDateString()) {
+          currentStreak++;
+        } else {
+          break;
+        }
+      }
+
+      setStreak(currentStreak);
+    } catch (error) {
+      console.error('Error calculating streak:', error);
+    }
   };
 
   const updateMood = async (rating: number) => {
     if (!user) return;
 
-    setSelectedMood(rating);
-    
-    const today = new Date().toISOString().split('T')[0];
-    const { error } = await supabase
-      .from('daily_progress')
-      .upsert({
-        user_id: user.id,
-        date: today,
-        mood_rating: rating,
-        exercises_completed: todayProgress?.exercises_completed || 0
-      });
+    try {
+      setSelectedMood(rating);
+      
+      const today = new Date().toISOString().split('T')[0];
+      const { error } = await supabase
+        .from('daily_progress')
+        .upsert({
+          user_id: user.id,
+          date: today,
+          mood_rating: rating,
+          exercises_completed: todayProgress?.exercises_completed || 0
+        });
 
-    if (error) {
+      if (error) {
+        Alert.alert('Error', 'Failed to save mood. Please try again.');
+        console.error('Error updating mood:', error);
+      } else {
+        fetchTodayProgress();
+      }
+    } catch (error) {
+      console.error('Error in updateMood:', error);
       Alert.alert('Error', 'Failed to save mood. Please try again.');
-    } else {
-      fetchTodayProgress();
     }
   };
 
@@ -188,7 +204,7 @@ export default function Home() {
           >
             <TurtleAvatar size={120} mood={getTurtleMood()} />
             <Text className="text-xl font-inter-bold text-turtle-slate mt-4">
-              Hello, {profile?.patient_name || user?.email?.split('@')[0]}!
+              Hello, {profile?.patient_name || user?.email?.split('@')[0] || 'friend'}!
             </Text>
           </TouchableOpacity>
           <View className="bg-white px-6 py-4 rounded-2xl mt-4 shadow-sm border border-turtle-teal/10">

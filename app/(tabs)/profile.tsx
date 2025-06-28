@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Settings, Heart, Phone, LogOut, LocationEdit as Edit3, Calendar } from 'lucide-react-native';
+import { User, Settings, Heart, Phone, LogOut, Edit3, Calendar } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'expo-router';
