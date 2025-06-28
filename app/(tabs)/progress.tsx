@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Award, Smile, Target, TrendingUp } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleCompanion from '@/components/TurtleCompanion';
 import { supabase } from '@/lib/supabase';
 
 interface ProgressData {
@@ -163,7 +164,13 @@ export default function Progress() {
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-6">
           <View className="items-center mb-6">
-            <TurtleAvatar size={80} mood="celebrating" />
+            <TurtleCompanion 
+              size={100} 
+              mood="great" 
+              message="Look at all you've accomplished! Your progress makes my shell sparkle with pride!"
+              showMessage={false}
+              animate={true}
+            />
             <Text className="text-2xl font-inter-bold text-earie-black mt-3">
               Your Progress
             </Text>

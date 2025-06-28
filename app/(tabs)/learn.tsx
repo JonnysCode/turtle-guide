@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BookOpen, Brain, CheckCircle, ChevronRight, Heart, Moon, Play } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleCompanion from '@/components/TurtleCompanion';
 import { supabase } from '@/lib/supabase';
 
 interface Lesson {
@@ -280,10 +281,13 @@ export default function Learn() {
               // Introduction
               <View>
                 <View className="items-center mb-6">
-                  <TurtleAvatar size={100} mood="thinking" />
-                  <Text className="text-lg font-inter text-royal-palm text-center mt-4">
-                    {selectedLesson.content.introduction}
-                  </Text>
+                  <TurtleCompanion 
+                    size={120} 
+                    mood="idea" 
+                    message={selectedLesson.content.introduction}
+                    showMessage={true}
+                    animate={true}
+                  />
                 </View>
               </View>
             ) : currentSection <= selectedLesson.content.sections.length ? (
@@ -314,7 +318,13 @@ export default function Learn() {
               // Summary page
               <View>
                 <View className="items-center mb-6">
-                  <TurtleAvatar size={120} mood="celebrating" />
+                  <TurtleCompanion 
+                    size={140} 
+                    mood="great" 
+                    message="Fantastic! You completed another lesson. Your dedication to learning is inspiring!"
+                    showMessage={true}
+                    animate={true}
+                  />
                   <Text className="text-2xl font-inter-bold text-earie-black mt-4">
                     Lesson Complete! 🎉
                   </Text>
@@ -384,7 +394,13 @@ export default function Learn() {
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-6">
           <View className="items-center mb-6">
-            <TurtleAvatar size={80} mood="thinking" />
+            <TurtleCompanion 
+              size={100} 
+              mood="idea" 
+              message="Learning something new today? I love discovering things together with you!"
+              showMessage={false}
+              animate={true}
+            />
             <Text className="text-2xl font-inter-bold text-earie-black mt-3">
               Learning Center
             </Text>

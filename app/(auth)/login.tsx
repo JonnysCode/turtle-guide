@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleCompanion from '@/components/TurtleCompanion';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 
@@ -45,12 +46,18 @@ export default function Login() {
         </TouchableOpacity>
 
         <View className="items-center mb-8">
-          <TurtleAvatar size={120} mood="welcoming" />
+          <TurtleCompanion 
+            size={140}
+            mood="hi"
+            message="Welcome back! I'm so happy to see you again. Ready to continue our journey together?"
+            showMessage={true}
+            animate={true}
+          />
           <Text className="text-2xl font-inter-bold text-earie-black mt-4">
             Welcome Back!
           </Text>
           <Text className="text-royal-palm font-inter mt-2 text-center">
-            I'm so happy to see you again
+            Let's continue your recovery journey
           </Text>
         </View>
 

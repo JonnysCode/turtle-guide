@@ -5,6 +5,7 @@ import { CheckCircle, Clock, Play, Star } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import { supabase } from '@/lib/supabase';
@@ -253,9 +254,13 @@ export default function Exercises() {
       <SafeAreaView className="flex-1 bg-chalk">
         <View className="flex-1 px-6 py-8">
           <View className="items-center mb-10">
-            <View className={isPerforming ? 'animate-breathe' : 'animate-float'}>
-              <TurtleAvatar size={120} mood="encouraging" animate={isPerforming} />
-            </View>
+            <TurtleCompanion
+              size={140}
+              mood={isPerforming ? "excited" : "meditation"}
+              message={isPerforming ? "You're doing amazing! Keep going strong!" : "Take your time and breathe. I believe in you!"}
+              showMessage={isPerforming}
+              animate={true}
+            />
             <Text className="text-3xl font-inter-bold text-earie-black mt-6 text-center">
               {selectedExercise.name}
             </Text>
@@ -353,7 +358,13 @@ export default function Exercises() {
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-6">
           <View className="items-center mb-6">
-            <TurtleAvatar size={80} mood="encouraging" />
+            <TurtleCompanion 
+              size={100} 
+              mood="excited" 
+              message="Ready to move and grow stronger? Let's do this together!"
+              showMessage={false}
+              animate={true}
+            />
             <Text className="text-2xl font-inter-bold text-earie-black mt-3">
               Exercise Time!
             </Text>

@@ -6,6 +6,7 @@ import { BookOpen, Calendar, Frown, Heart, Meh, Smile, Target, TrendingUp, Spark
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleCompanion, { getTurtleMoodForContext, TurtleCompanionPresets } from '@/components/TurtleCompanion';
 import TurtleIntroduction from '@/components/TurtleIntroduction';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
@@ -155,10 +156,10 @@ export default function Home() {
   };
 
   const getTurtleMood = () => {
-    if (!selectedMood) return 'welcoming';
-    if (selectedMood >= 4) return 'happy';
-    if (selectedMood >= 3) return 'encouraging';
-    return 'concerned';
+    if (!selectedMood) return 'hi';
+    if (selectedMood >= 4) return 'great';
+    if (selectedMood >= 3) return 'main';
+    return 'sad';
   };
 
   const getTurtleMessage = () => {
@@ -198,26 +199,24 @@ export default function Home() {
   return (
     <SafeAreaView className="flex-1 bg-chalk">
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
-        {/* Header with Turtle */}
+        {/* Header with Turtle Companion */}
         <View className="items-center py-6">
-          <TouchableOpacity
-            onPress={() => setShowTurtleChat(true)}
-            className="items-center"
-          >
-            <TurtleAvatar size={120} mood={getTurtleMood()} />
-            <Text className="text-xl font-inter-bold text-earie-black mt-4">
-              Hello, {profile?.patient_name || user?.email?.split('@')[0] || 'friend'}!
-            </Text>
-          </TouchableOpacity>
+          <TurtleCompanion
+            size={140}
+            mood={getTurtleMood()}
+            message={getTurtleMessage()}
+            onTap={() => setShowTurtleChat(true)}
+            showMessage={true}
+            animate={true}
+            className="mb-4"
+          />
           
-          <View className="bg-turtle-cream-100 border border-turtle-teal-300 px-6 py-4 rounded-2xl mt-4 shadow-lg shadow-turtle-teal-300/50">
-            <Text className="text-earie-black font-inter text-center">
-              {getTurtleMessage()}
-            </Text>
-          </View>
+          <Text className="text-xl font-inter-bold text-earie-black">
+            Hello, {profile?.patient_name || user?.email?.split('@')[0] || 'friend'}!
+          </Text>
           
           <Text className="text-royal-palm font-inter text-sm mt-2 text-center">
-            Tap me to chat anytime! 🐢
+            Tap your turtle companion for a chat! 🐢
           </Text>
         </View>
 

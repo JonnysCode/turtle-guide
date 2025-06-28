@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import TurtleCompanion, { TurtleCompanionPresets } from '@/components/TurtleCompanion';
 
 export default function Welcome() {
   console.log('Welcome page rendering...');
@@ -11,7 +12,18 @@ export default function Welcome() {
   return (
     <SafeAreaView className="flex-1 bg-chalk">
       <View className="flex-1 justify-center items-center px-6">
-        <Text className="text-4xl font-inter-bold text-earie-black text-center mb-8">
+        <View className="items-center mb-8">
+          <TurtleCompanion 
+            size={160}
+            mood="wave-left"
+            message="Welcome to TurtleGuide! I'm here to be your gentle companion on this recovery journey. Together, we'll take it one step at a time."
+            showMessage={true}
+            animate={true}
+            className="mb-6"
+          />
+        </View>
+        
+        <Text className="text-4xl font-inter-bold text-earie-black text-center mb-4">
           Welcome to TurtleGuide
         </Text>
         

@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, ArrowRight, User } from 'lucide-react-native';
 import { useUser } from '@/contexts/UserContext';
-import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleCompanion from '@/components/TurtleCompanion';
 import Input from '@/components/Input';
 
 const strokeTypes = [
@@ -83,12 +83,18 @@ export default function Onboarding() {
         return (
           <View className="flex-1">
             <View className="items-center mb-8">
-              <TurtleAvatar size={100} mood="welcoming" />
+              <TurtleCompanion
+                size={120}
+                mood="hi"
+                message="Nice to meet you! I'm so happy you're here. Let's start with your name so I can personalize your recovery journey."
+                showMessage={true}
+                animate={true}
+              />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 Nice to Meet You!
               </Text>
               <Text className="text-royal-palm font-inter mt-2 text-center text-lg">
-                Let's start with your name so I can personalize your journey
+                What should I call you?
               </Text>
             </View>
 
@@ -128,16 +134,22 @@ export default function Onboarding() {
         return (
           <View className="flex-1">
             <View className="items-center mb-8">
-              <TurtleAvatar size={100} mood="welcoming" />
+              <TurtleCompanion
+                size={120}
+                mood="questioning"
+                message={patientName ? `Hello ${patientName}! To help me support you better, could you tell me what type of stroke brought us together?` : 'Let\'s get to know each other better. What type of stroke brought us together?'}
+                showMessage={true}
+                animate={true}
+              />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 {patientName ? `Hello ${patientName}!` : 'Let\'s Get to Know Each Other'}
               </Text>
               <Text className="text-royal-palm font-inter mt-2 text-center">
-                What type of stroke brought us together?
+                This helps me understand your journey
               </Text>
             </View>
 
-            <View className="gap-2">
+            <View className="gap-2 mb-8">
               {strokeTypes.map((type) => (
                 <TouchableOpacity
                   key={type.id}
@@ -166,14 +178,20 @@ export default function Onboarding() {
 
       case 3:
         return (
-          <View className="flex-1">
+          <View className="flex-1 pb-8">
             <View className="items-center mb-8">
-              <TurtleAvatar size={100} mood="encouraging" />
+              <TurtleCompanion
+                size={120}
+                mood="meditation"
+                message="Now, help me understand your current mobility level on a scale of 1-10. This helps me suggest the right exercises for you. Remember, every level is perfect - we're just starting where you are!"
+                showMessage={true}
+                animate={true}
+              />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 Your Mobility Level
               </Text>
               <Text className="text-royal-palm font-inter mt-2 text-center">
-                Help me understand where you are today (1-10 scale)
+                Help me understand where you are today
               </Text>
             </View>
 
@@ -214,12 +232,18 @@ export default function Onboarding() {
         return (
           <View className="flex-1">
             <View className="items-center mb-8">
-              <TurtleAvatar size={100} mood="thinking" />
+              <TurtleCompanion
+                size={120}
+                mood="idea"
+                message="What matters most to you in your recovery? Choose any goals that resonate with you - these will help me personalize your experience and celebrate your progress!"
+                showMessage={true}
+                animate={true}
+              />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 What Are Your Goals?
               </Text>
               <Text className="text-royal-palm font-inter mt-2 text-center">
-                Select what matters most to you (choose multiple)
+                Select what matters most to you
               </Text>
             </View>
 
@@ -248,15 +272,20 @@ export default function Onboarding() {
 
       case 5:
         return (
-          <View className="flex-1">
+          <View className="flex-1 pb-8">
             <View className="items-center mb-8">
-              <TurtleAvatar size={120} mood="happy" />
+              <TurtleCompanion
+                size={140}
+                mood="love"
+                message={`Perfect! I'm ${turtleName}, and I'm so honored to be your companion, cheerleader, and guide. Together, we'll take recovery one step at a time - just like a wise turtle should! ${patientName}, I believe in you completely.`}
+                showMessage={true}
+                animate={true}
+              />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 Perfect! I'm {turtleName}
               </Text>
               <Text className="text-royal-palm font-inter mt-2 text-center">
-                I'll be your companion, cheerleader, and guide. Together, we'll take recovery one step at a time - just
-                like a wise turtle should!
+                Your dedicated recovery companion
               </Text>
             </View>
 
