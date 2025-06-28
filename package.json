@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "EXPO_NO_TELEMETRY=1 npx expo start --port 8082",
+    "dev": "EXPO_NO_TELEMETRY=1 npx expo start",
     "android": "EXPO_NO_TELEMETRY=1 npx expo start --port 8082 --android",
     "ios": "EXPO_NO_TELEMETRY=1 npx expo start --port 8082 --ios",
     "web": "EXPO_NO_TELEMETRY=1 npx expo start --port 8082 --web",
