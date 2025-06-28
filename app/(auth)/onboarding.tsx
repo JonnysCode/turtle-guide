@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, ArrowRight } from 'lucide-react-native';
+import { ArrowLeft, ArrowRight, User } from 'lucide-react-native';
 import { useUser } from '@/contexts/UserContext';
 import TurtleAvatar from '@/components/TurtleAvatar';
 
@@ -26,6 +26,7 @@ export default function Onboarding() {
   const router = useRouter();
   const { updateProfile } = useUser();
   const [step, setStep] = useState(1);
+  const [patientName, setPatientName] = useState('');
   const [strokeType, setStrokeType] = useState('');
   const [strokeDate, setStrokeDate] = useState('');
   const [mobilityLevel, setMobilityLevel] = useState(5);
@@ -42,6 +43,11 @@ export default function Onboarding() {
   };
 
   const handleComplete = async () => {
+    if (!patientName.trim()) {
+      Alert.alert('Please enter your name');
+      return;
+    }
+
     if (!strokeType) {
       Alert.alert('Please select your stroke type or "Not Sure"');
       return;
@@ -55,6 +61,7 @@ export default function Onboarding() {
     setLoading(true);
     try {
       await updateProfile({
+        patient_name: patientName.trim(),
         stroke_type: strokeType,
         stroke_date: strokeDate || null,
         mobility_level: mobilityLevel,
@@ -77,7 +84,52 @@ export default function Onboarding() {
             <View className="items-center mb-8">
               <TurtleAvatar size={100} mood="welcoming" />
               <Text className="text-2xl font-inter-bold text-turtle-slate mt-4 text-center">
-                Let's Get to Know Each Other
+                Nice to Meet You!
+              </Text>
+              <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
+                Let's start with your name so I can personalize your journey
+              </Text>
+            </View>
+
+            <View className="space-y-6">
+              <View>
+                <Text className="text-turtle-slate font-inter-semibold mb-3 text-lg">
+                  What should I call you?
+                </Text>
+                <View className="relative">
+                  <TextInput
+                    value={patientName}
+                    onChangeText={setPatientName}
+                    placeholder="Enter your first name"
+                    className="bg-white py-4 px-4 pl-12 rounded-xl border border-turtle-teal/20 text-turtle-slate font-inter text-lg"
+                    autoCapitalize="words"
+                    autoCorrect={false}
+                  />
+                  <View className="absolute left-4 top-4">
+                    <User size={24} color="#64748B" />
+                  </View>
+                </View>
+              </View>
+
+              <View className="bg-turtle-teal/5 p-4 rounded-xl border border-turtle-teal/20">
+                <Text className="text-turtle-teal font-inter-semibold mb-2">
+                  🐢 Privacy Note
+                </Text>
+                <Text className="text-turtle-slate/70 font-inter text-sm">
+                  Your name helps me create a more personal experience. All your information is kept private and secure.
+                </Text>
+              </View>
+            </View>
+          </View>
+        );
+
+      case 2:
+        return (
+          <View className="flex-1">
+            <View className="items-center mb-8">
+              <TurtleAvatar size={100} mood="welcoming" />
+              <Text className="text-2xl font-inter-bold text-turtle-slate mt-4 text-center">
+                {patientName ? `Hello ${patientName}!` : 'Let\'s Get to Know Each Other'}
               </Text>
               <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
                 What type of stroke brought us together?
@@ -111,7 +163,7 @@ export default function Onboarding() {
           </View>
         );
 
-      case 2:
+      case 3:
         return (
           <View className="flex-1">
             <View className="items-center mb-8">
@@ -157,7 +209,7 @@ export default function Onboarding() {
           </View>
         );
 
-      case 3:
+      case 4:
         return (
           <View className="flex-1">
             <View className="items-center mb-8">
@@ -193,7 +245,7 @@ export default function Onboarding() {
           </View>
         );
 
-      case 4:
+      case 5:
         return (
           <View className="flex-1">
             <View className="items-center mb-8">
@@ -207,6 +259,10 @@ export default function Onboarding() {
             </View>
 
             <View className="bg-white p-6 rounded-xl border border-turtle-teal/20 space-y-4">
+              <View className="flex-row justify-between">
+                <Text className="text-turtle-slate/70 font-inter">Patient Name:</Text>
+                <Text className="text-turtle-slate font-inter-semibold">{patientName}</Text>
+              </View>
               <View className="flex-row justify-between">
                 <Text className="text-turtle-slate/70 font-inter">Stroke Type:</Text>
                 <Text className="text-turtle-slate font-inter-semibold">
@@ -235,7 +291,7 @@ export default function Onboarding() {
             </View>
 
             <Text className="text-turtle-slate/60 font-inter text-sm text-center mt-6">
-              🐢 "Remember, slow and steady wins the race. We're in this together!"
+              🐢 "Remember, slow and steady wins the race. We're in this together, {patientName}!"
             </Text>
           </View>
         );
@@ -256,7 +312,7 @@ export default function Onboarding() {
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         {/* Progress indicator */}
         <View className="flex-row justify-center mb-8 mt-4">
-          {[1, 2, 3, 4].map((stepNum) => (
+          {[1, 2, 3, 4, 5].map((stepNum) => (
             <View
               key={stepNum}
               className={`w-3 h-3 rounded-full mx-1 ${
@@ -271,12 +327,12 @@ export default function Onboarding() {
 
       <View className="px-6 pb-6">
         <TouchableOpacity
-          onPress={step === 4 ? handleComplete : () => setStep(step + 1)}
-          disabled={loading || (step === 1 && !strokeType) || (step === 3 && selectedGoals.length === 0)}
+          onPress={step === 5 ? handleComplete : () => setStep(step + 1)}
+          disabled={loading || (step === 1 && !patientName.trim()) || (step === 2 && !strokeType) || (step === 4 && selectedGoals.length === 0)}
           className="bg-turtle-teal py-4 px-8 rounded-2xl shadow-lg disabled:opacity-50 flex-row items-center justify-center"
         >
           <Text className="text-white text-lg font-inter-semibold mr-2">
-            {loading ? 'Setting up...' : step === 4 ? 'Start My Journey!' : 'Continue'}
+            {loading ? 'Setting up...' : step === 5 ? 'Start My Journey!' : 'Continue'}
           </Text>
           {!loading && <ArrowRight size={20} color="white" />}
         </TouchableOpacity>

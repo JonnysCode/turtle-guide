@@ -60,7 +60,7 @@ export default function Profile() {
           <View className="items-center mb-8">
             <TurtleAvatar size={120} mood="happy" />
             <Text className="text-2xl font-inter-bold text-turtle-slate mt-4">
-              {user?.email?.split('@')[0] || 'Friend'}
+              {profile?.patient_name || user?.email?.split('@')[0] || 'Friend'}
             </Text>
             <Text className="text-turtle-slate/70 font-inter mt-1">
               Recovery companion: {profile?.turtle_name || 'Shelly'}
@@ -82,6 +82,13 @@ export default function Profile() {
             </View>
 
             <View className="space-y-4">
+              <View className="flex-row justify-between">
+                <Text className="text-turtle-slate/70 font-inter">Patient Name</Text>
+                <Text className="text-turtle-slate font-inter-semibold">
+                  {profile?.patient_name || 'Not specified'}
+                </Text>
+              </View>
+
               <View className="flex-row justify-between">
                 <Text className="text-turtle-slate/70 font-inter">Stroke Type</Text>
                 <Text className="text-turtle-slate font-inter-semibold">
@@ -228,7 +235,7 @@ export default function Profile() {
               🐢 From {profile?.turtle_name || 'Shelly'}
             </Text>
             <Text className="text-turtle-slate/70 font-inter">
-              "I'm so grateful to be part of your recovery journey! Remember, every day you show up and try is a day worth celebrating. Keep being amazing, my friend!"
+              "I'm so grateful to be part of your recovery journey, {profile?.patient_name || 'my friend'}! Remember, every day you show up and try is a day worth celebrating. Keep being amazing!"
             </Text>
           </View>
         </View>

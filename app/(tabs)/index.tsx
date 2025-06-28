@@ -136,24 +136,25 @@ export default function Home() {
   const getTurtleMessage = () => {
     const hour = new Date().getHours();
     const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    const patientName = profile?.patient_name || 'friend';
     
     if (!selectedMood) {
-      return `${timeGreeting}! How are you feeling today?`;
+      return `${timeGreeting}, ${patientName}! How are you feeling today?`;
     }
     
     switch (selectedMood) {
       case 5:
-        return "Wonderful! Your positive energy makes my shell sparkle!";
+        return `Wonderful, ${patientName}! Your positive energy makes my shell sparkle!`;
       case 4:
-        return "That's great to hear! Let's keep this good momentum going!";
+        return `That's great to hear, ${patientName}! Let's keep this good momentum going!`;
       case 3:
-        return "Every day doesn't have to be perfect. You're doing just fine!";
+        return `Every day doesn't have to be perfect, ${patientName}. You're doing just fine!`;
       case 2:
-        return "I understand today is challenging. Let's take it slow together.";
+        return `I understand today is challenging, ${patientName}. Let's take it slow together.`;
       case 1:
-        return "I'm here with you through the tough times. You're not alone.";
+        return `I'm here with you through the tough times, ${patientName}. You're not alone.`;
       default:
-        return `${timeGreeting}! Ready for another day of gentle progress?`;
+        return `${timeGreeting}, ${patientName}! Ready for another day of gentle progress?`;
     }
   };
 
@@ -177,7 +178,7 @@ export default function Home() {
           >
             <TurtleAvatar size={120} mood={getTurtleMood()} />
             <Text className="text-xl font-inter-bold text-turtle-slate mt-4">
-              Hello, {user?.email?.split('@')[0]}!
+              Hello, {profile?.patient_name || user?.email?.split('@')[0]}!
             </Text>
           </TouchableOpacity>
           <View className="bg-white px-6 py-4 rounded-2xl mt-4 shadow-sm border border-turtle-teal/10">

@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 
 interface UserProfile {
   id: string;
+  patient_name: string;
   stroke_date: string | null;
   stroke_type: string | null;
   mobility_level: number;
