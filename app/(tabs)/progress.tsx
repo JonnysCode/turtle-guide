@@ -298,27 +298,6 @@ export default function Progress() {
             </View>
           </Card>
 
-          {/* Period Selection */}
-          <Card variant="flat" className="mb-6 bg-turtle-cream-100 border-turtle-teal-300">
-            <View className="flex-row">
-              {(['week', 'month', 'all'] as const).map((period) => (
-                <TouchableOpacity
-                  key={period}
-                  onPress={() => setSelectedPeriod(period)}
-                  className={`flex-1 py-3 rounded-xl mx-1 ${
-                    selectedPeriod === period ? 'bg-royal-palm' : 'bg-blue-glass'
-                  }`}
-                >
-                  <Text className={`text-center font-inter-semibold ${
-                    selectedPeriod === period ? 'text-chalk' : 'text-earie-black'
-                  }`}>
-                    {period === 'week' ? 'Week' : period === 'month' ? 'Month' : 'All Time'}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </Card>
-
           {/* Key Stats */}
           <Card variant="elevated" className="mb-6">
             <Text className="text-lg font-inter-bold text-earie-black mb-4">
