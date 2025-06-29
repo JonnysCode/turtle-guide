@@ -465,7 +465,7 @@ export default function ExerciseDetail() {
                 Pause Exercise
               </Button>
             </View>
-          </div>
+          </View>
         </View>
       )}
     </SafeAreaView>
