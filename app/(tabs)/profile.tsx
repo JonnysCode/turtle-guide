@@ -77,7 +77,11 @@ export default function Profile() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        className="flex-1 px-6" 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
+      >
         <View className="py-6">
           {/* Profile Header */}
           <View className="items-center mb-8">

@@ -197,7 +197,11 @@ export default function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        className="flex-1 px-6" 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
+      >
         {/* Header with Turtle Companion */}
         <View className="items-center py-6">
           <TurtleCompanion

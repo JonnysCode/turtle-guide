@@ -283,7 +283,10 @@ export default function Exercises() {
           )}
 
           <Card variant="elevated" className="flex-1 bg-chalk">
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView 
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 20 }}
+            >
               <Text className="text-2xl font-inter-bold text-earie-black mb-6">
                 Instructions
               </Text>
@@ -317,7 +320,7 @@ export default function Exercises() {
             </ScrollView>
           </Card>
 
-          <View className="flex-row gap-4 mt-8">
+          <View className="flex-row gap-4 mt-8 mb-8">
             <Button
               onPress={stopExercise}
               variant="outline"
@@ -356,7 +359,11 @@ export default function Exercises() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        className="flex-1 px-6" 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
+      >
         <View className="py-6">
           <View className="items-center mb-6">
             <TurtleCompanion

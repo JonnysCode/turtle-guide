@@ -275,7 +275,11 @@ export default function Learn() {
             </View>
           </View>
 
-          <ScrollView className="flex-1 px-6 py-6" showsVerticalScrollIndicator={false}>
+          <ScrollView 
+            className="flex-1 px-6 py-6" 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
+          >
             {currentSection === 0 ? (
               // Introduction
               <View>
@@ -355,7 +359,7 @@ export default function Learn() {
 
           {/* Navigation */}
           <View className="px-6 pb-6 bg-chalk">
-            <View className="flex-row gap-4">
+            <View className="flex-row gap-4 mb-8">
               {currentSection > 0 && (
                 <TouchableOpacity
                   onPress={() => setCurrentSection(prev => prev - 1)}
@@ -390,7 +394,11 @@ export default function Learn() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        className="flex-1 px-6" 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
+      >
         <View className="py-6">
           <View className="items-center mb-6">
             <TurtleCompanion
