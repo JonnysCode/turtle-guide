@@ -185,7 +185,7 @@ export default function Learn() {
                       <View className="flex-row items-center">
                         <View className="flex-row items-center bg-blue-glass px-2 py-1 rounded mr-3">
                           <Clock size={10} color="#418D84" />
-                          <Text className="text-royal-palm font-inter text-xs">
+                          <Text className="text-royal-palm font-inter text-xs ml-1">
                              {lesson.duration} min
                           </Text>
                         </View>
