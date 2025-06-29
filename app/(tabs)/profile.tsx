@@ -170,7 +170,7 @@ export default function Profile() {
 
             <TouchableOpacity
               onPress={() => setShowEmergencyContacts(!showEmergencyContacts)}
-              className="flex-row items-center py-4 border-b border-gray-100"
+              className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
             >
               <View className="w-10 h-10 bg-red-100 rounded-lg items-center justify-center mr-4">
                 <Phone size={20} color="#EF4444" />
@@ -199,7 +199,7 @@ export default function Profile() {
               </View>
             )}
 
-            <TouchableOpacity className="flex-row items-center py-4 border-b border-turtle-teal-300">
+            <TouchableOpacity className="flex-row items-center py-4 border-b border-turtle-cream-300/70">
               <View className="w-10 h-10 bg-tropical-indigo/10 rounded-lg items-center justify-center mr-4">
                 <Calendar size={20} color="#9381FF" />
               </View>
