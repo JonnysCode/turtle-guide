@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Linking, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Edit3, Mail, MapPin, Phone, Plus, Star, Trash2, User, X } from 'lucide-react-native';
+import { ArrowLeft, LocationEdit as Edit3, Mail, MapPin, Phone, Plus, Star, Trash2, User, X } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
