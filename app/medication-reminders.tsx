@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Bell, Calendar, CheckCircle, Clock, Plus, Pill, X } from 'lucide-react-native';
+import { ArrowLeft, Bell, Calendar, CircleCheck as CheckCircle, Clock, Plus, Pill, X } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
