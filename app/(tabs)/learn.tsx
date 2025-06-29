@@ -185,7 +185,23 @@ export default function Learn() {
                       <View className="flex-row items-center">
                         <View className="bg-blue-glass px-2 py-1 rounded mr-3">
                           <Text className="text-royal-palm font-inter text-xs">
-                            <Clock size={12} color="#418D84" /> {lesson.duration} min read
+                            <Clock size={10} color="#418D84" /> {lesson.duration} min read
+                          </Text>
+                        </View>
+                        <View
+                          className="px-2 py-1 rounded"
+                          style={{ backgroundColor: `${categoryColor}25` }}
+                        >
+                          <Text
+                            className="font-inter text-xs capitalize"
+                            style={{ color: categoryColor }}
+                          >
+                            {lesson.category.replace('-', ' ')}
+                          </Text>
+                        </View>
+                        <View className="bg-blue-glass px-2 py-1 rounded ml-2">
+                          <Text className="text-royal-palm font-inter text-xs capitalize">
+                            {lesson.difficulty}
                           </Text>
                         </View>
                       </View>
