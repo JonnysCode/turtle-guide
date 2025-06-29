@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Calendar, Heart, LocationEdit as Edit3, LogOut, Phone, Settings, User, Activity, Pill } from 'lucide-react-native';
+import { Calendar, Heart, LocationEdit as Edit3, Phone, Settings, User, Activity, Pill, ChevronRight } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'expo-router';
@@ -24,50 +24,9 @@ const recoveryGoalLabels = {
 };
 
 export default function Profile() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { profile } = useUser();
   const router = useRouter();
-  const [isSigningOut, setIsSigningOut] = useState(false);
-
-  const handleSignOut = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setIsSigningOut(true);
-              console.log('Profile: Starting sign out process...');
-
-              await signOut();
-
-              // Additional fallback for web - if the context doesn't handle it
-              if (Platform.OS === 'web') {
-                setTimeout(() => {
-                  if (typeof window !== 'undefined') {
-                    window.location.href = '/';
-                  }
-                }, 500);
-              } else {
-                // On native platforms, manually navigate
-                router.replace('/(auth)/welcome');
-              }
-
-            } catch (error) {
-              console.error('Sign out failed:', error);
-              Alert.alert('Error', 'Failed to sign out. Please try again.');
-            } finally {
-              setIsSigningOut(false);
-            }
-          }
-        }
-      ]
-    );
-  };
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'Not specified';
@@ -180,6 +139,7 @@ export default function Profile() {
                   Set up daily medication alerts and track adherence
                 </Text>
               </View>
+              <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -195,6 +155,7 @@ export default function Profile() {
                   Log vital signs, symptoms, and health metrics
                 </Text>
               </View>
+              <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
           </View>
 
@@ -218,6 +179,7 @@ export default function Profile() {
                   Manage family, friends, and medical team contacts
                 </Text>
               </View>
+              <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
           </View>
 
@@ -228,17 +190,21 @@ export default function Profile() {
               App Settings
             </Text>
 
-            <TouchableOpacity className="flex-row items-center py-4 border-b border-turtle-cream-300/70">
+            <TouchableOpacity 
+              onPress={() => router.push('/settings')}
+              className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
+            >
               <Settings size={20} color="#418D84" />
               <View className="flex-1 ml-4">
                 <Text className="text-earie-black font-inter-semibold">Preferences</Text>
                 <Text className="text-royal-palm font-inter text-sm">
-                  Customize your experience
+                  Customize your app experience
                 </Text>
               </View>
+              <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center py-4 border-b border-turtle-cream-300/70">
+            <TouchableOpacity className="flex-row items-center py-4">
               <User size={20} color="#418D84" />
               <View className="flex-1 ml-4">
                 <Text className="text-earie-black font-inter-semibold">Account Settings</Text>
@@ -246,22 +212,7 @@ export default function Profile() {
                   Manage your account details
                 </Text>
               </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleSignOut}
-              disabled={isSigningOut}
-              className="flex-row items-center py-4"
-            >
-              <LogOut size={20} color="#EF4444" />
-              <View className="flex-1 ml-4">
-                <Text className="text-red-600 font-inter-semibold">
-                  {isSigningOut ? 'Signing Out...' : 'Sign Out'}
-                </Text>
-                <Text className="text-royal-palm font-inter text-sm">
-                  Sign out of your account
-                </Text>
-              </View>
+              <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
           </View>
 
