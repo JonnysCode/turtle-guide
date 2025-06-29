@@ -382,37 +382,46 @@ export default function Progress() {
                     const badgeImage = badgeImages[achievement.id as keyof typeof badgeImages];
                     
                     return (
-                      <View key={achievement.id} className="bg-flaxseed rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center">
-                        <View className="w-16 h-16 mb-3 items-center justify-center">
-                          <Image 
-                            source={badgeImage}
-                            style={{
-                              width: 64,
-                              height: 64,
-                              maxWidth: 64,
-                              maxHeight: 64
-                            }}
-                            resizeMode="contain"
-                          />
+                      <View key={achievement.id} className="bg-white rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center border-2 border-royal-palm shadow-lg">
+                        {/* Earned Badge Glow Effect */}
+                        <View className="relative">
+                          <View className="absolute inset-0 bg-royal-palm/20 rounded-full blur-lg" />
+                          <View className="w-20 h-20 mb-3 items-center justify-center relative">
+                            <Image 
+                              source={badgeImage}
+                              style={{
+                                width: 80,
+                                height: 80,
+                                maxWidth: 80,
+                                maxHeight: 80
+                              }}
+                              resizeMode="contain"
+                            />
+                          </View>
                         </View>
-                        <Text className="font-inter-bold text-earie-black text-center mb-1 text-sm">
+                        
+                        <Text className="font-inter-bold text-earie-black text-center mb-1 text-base">
                           {achievement.title}
                         </Text>
-                        <Text className="text-royal-palm font-inter text-xs text-center mb-2 leading-tight">
+                        <Text className="text-royal-palm font-inter text-xs text-center mb-3 leading-tight">
                           {achievement.description}
                         </Text>
-                        <View 
-                          className="px-2 py-1 rounded-full"
-                          style={{ backgroundColor: `${categoryColors[achievement.category]}20` }}
-                        >
-                          <Text 
-                            className="font-inter text-xs"
-                            style={{ color: categoryColors[achievement.category] }}
+                        
+                        <View className="flex-row items-center gap-2 mb-2">
+                          <View 
+                            className="px-3 py-1 rounded-full"
+                            style={{ backgroundColor: categoryColors[achievement.category] }}
                           >
-                            +{achievement.points} pts
+                            <Text className="text-white font-inter-bold text-xs">
+                              +{achievement.points} pts
+                            </Text>
+                          </View>
+                          <Text className="text-emerald-600 font-inter-bold text-xs">
+                            ✓ EARNED
                           </Text>
                         </View>
-                        <Text className="text-earie-black/60 font-inter text-xs mt-1">
+                        
+                        <Text className="text-earie-black/60 font-inter text-xs">
                           {unlockedDate}
                         </Text>
                       </View>
@@ -434,52 +443,65 @@ export default function Progress() {
                     const progressPercent = Math.round(achievement.progress * 100);
                     
                     return (
-                      <View key={achievement.id} className="bg-blue-glass/50 rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center opacity-75">
-                        <View className="w-16 h-16 mb-3 items-center justify-center">
+                      <View key={achievement.id} className="bg-gray-50 rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center border border-gray-200">
+                        <View className="w-20 h-20 mb-3 items-center justify-center relative">
+                          {/* Grayscale overlay for locked badges */}
                           <Image 
                             source={badgeImage}
                             style={{
-                              width: 64,
-                              height: 64,
-                              maxWidth: 64,
-                              maxHeight: 64,
-                              opacity: 0.5
+                              width: 80,
+                              height: 80,
+                              maxWidth: 80,
+                              maxHeight: 80,
+                              opacity: 0.4
                             }}
                             resizeMode="contain"
                           />
+                          <View className="absolute inset-0 bg-gray-400/30 rounded-full" />
+                          <View className="absolute inset-0 items-center justify-center">
+                            <Text className="text-gray-600 font-inter-bold text-xs">
+                              LOCKED
+                            </Text>
+                          </View>
                         </View>
-                        <Text className="font-inter-bold text-earie-black text-center mb-1 text-sm">
+                        
+                        <Text className="font-inter-bold text-gray-700 text-center mb-1 text-base">
                           {achievement.title}
                         </Text>
-                        <Text className="text-royal-palm font-inter text-xs text-center mb-2 leading-tight">
+                        <Text className="text-gray-600 font-inter text-xs text-center mb-3 leading-tight">
                           {achievement.description}
                         </Text>
-                        <Text className="text-earie-black/60 font-inter text-xs text-center mb-2">
+                        <Text className="text-gray-500 font-inter-semibold text-xs text-center mb-3">
                           {achievement.requirement}
                         </Text>
                         
                         {/* Progress bar for locked achievements */}
                         {progressPercent > 0 && (
-                          <View className="w-full bg-blue-glass rounded-full h-2 mb-2">
-                            <View 
-                              className="h-2 rounded-full"
-                              style={{ 
-                                width: `${progressPercent}%`,
-                                backgroundColor: categoryColors[achievement.category] 
-                              }}
-                            />
+                          <View className="w-full mb-3">
+                            <View className="w-full bg-gray-200 rounded-full h-2 mb-1">
+                              <View 
+                                className="h-2 rounded-full"
+                                style={{ 
+                                  width: `${progressPercent}%`,
+                                  backgroundColor: categoryColors[achievement.category] 
+                                }}
+                              />
+                            </View>
+                            <Text className="text-gray-600 font-inter text-xs text-center">
+                              {progressPercent}% complete
+                            </Text>
                           </View>
                         )}
                         
                         <View 
-                          className="px-2 py-1 rounded-full"
+                          className="px-3 py-1 rounded-full"
                           style={{ backgroundColor: `${categoryColors[achievement.category]}20` }}
                         >
                           <Text 
-                            className="font-inter text-xs"
+                            className="font-inter-bold text-xs"
                             style={{ color: categoryColors[achievement.category] }}
                           >
-                            {progressPercent > 0 ? `${progressPercent}% • ` : ''}+{achievement.points} pts
+                            +{achievement.points} pts
                           </Text>
                         </View>
                       </View>
