@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 
 interface UserProfile {
   id: string;
+  patient_name: string;
   stroke_date: string | null;
   stroke_type: string | null;
   mobility_level: number;
@@ -28,7 +29,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   const fetchProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      setProfile(null);
+      return;
+    }
     
     setLoading(true);
     try {
@@ -36,12 +40,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching profile:', error);
       } else if (data) {
         setProfile(data);
+      } else {
+        // No profile exists yet - this is normal for new users
+        setProfile(null);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -53,20 +60,25 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!user) return;
 
-    const { error } = await supabase
-      .from('user_profiles')
-      .upsert({
-        id: user.id,
-        ...updates,
-        updated_at: new Date().toISOString(),
-      });
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .upsert({
+          id: user.id,
+          ...updates,
+          updated_at: new Date().toISOString(),
+        });
 
-    if (error) {
-      console.error('Error updating profile:', error);
+      if (error) {
+        console.error('Error updating profile:', error);
+        throw error;
+      }
+
+      await fetchProfile();
+    } catch (error) {
+      console.error('Error in updateProfile:', error);
       throw error;
     }
-
-    await fetchProfile();
   };
 
   const refreshProfile = async () => {
@@ -78,6 +90,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       fetchProfile();
     } else {
       setProfile(null);
+      setLoading(false);
     }
   }, [user]);
 

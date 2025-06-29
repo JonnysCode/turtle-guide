@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Play, Clock, Star, ChevronRight, CheckCircle } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { CircleCheck as CheckCircle, Clock, Play, Star } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
-import TurtleAvatar from '@/components/TurtleAvatar';
+import TurtleCompanion from '@/components/TurtleCompanion';
 import { supabase } from '@/lib/supabase';
 
 interface Exercise {
@@ -130,28 +131,14 @@ const categoryColors = {
 };
 
 export default function Exercises() {
+  const router = useRouter();
   const { user } = useAuth();
   const { profile } = useUser();
   const [completedToday, setCompletedToday] = useState<string[]>([]);
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
-  const [isPerforming, setIsPerforming] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(0);
 
   useEffect(() => {
     fetchTodayCompletions();
   }, [user]);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPerforming && timeRemaining > 0) {
-      interval = setInterval(() => {
-        setTimeRemaining(prev => prev - 1);
-      }, 1000);
-    } else if (isPerforming && timeRemaining === 0) {
-      completeExercise();
-    }
-    return () => clearInterval(interval);
-  }, [isPerforming, timeRemaining]);
 
   const fetchTodayCompletions = async () => {
     if (!user) return;
@@ -170,69 +157,13 @@ export default function Exercises() {
     }
   };
 
-  const startExercise = (exercise: Exercise) => {
-    setSelectedExercise(exercise);
-    setTimeRemaining(exercise.duration);
-    setIsPerforming(true);
-  };
-
-  const completeExercise = async () => {
-    if (!user || !selectedExercise) return;
-
-    setIsPerforming(false);
-    
-    // Record exercise session
-    const { error } = await supabase
-      .from('exercise_sessions')
-      .insert({
-        user_id: user.id,
-        exercise_type: selectedExercise.id,
-        duration: selectedExercise.duration,
-        difficulty_level: selectedExercise.difficulty,
-        completed: true
-      });
-
-    if (error) {
-      Alert.alert('Error', 'Failed to record exercise completion');
-      return;
-    }
-
-    // Update daily progress
-    const today = new Date().toISOString().split('T')[0];
-    const { data: existingProgress } = await supabase
-      .from('daily_progress')
-      .select('exercises_completed')
-      .eq('user_id', user.id)
-      .eq('date', today)
-      .single();
-
-    await supabase
-      .from('daily_progress')
-      .upsert({
-        user_id: user.id,
-        date: today,
-        exercises_completed: (existingProgress?.exercises_completed || 0) + 1
-      });
-
-    setCompletedToday(prev => [...prev, selectedExercise.id]);
-    setSelectedExercise(null);
-    
-    Alert.alert(
-      'Excellent Work! 🎉',
-      'You completed the exercise! I\'m so proud of your dedication.',
-      [{ text: 'Thank you!', style: 'default' }]
-    );
-  };
-
-  const stopExercise = () => {
-    setIsPerforming(false);
-    setSelectedExercise(null);
-    setTimeRemaining(0);
+  const navigateToExercise = (exerciseId: string) => {
+    router.push(`/exercise/${exerciseId}`);
   };
 
   const getFilteredExercises = () => {
     if (!profile) return exercises;
-    
+
     return exercises.filter(exercise => {
       // Filter by mobility level - show exercises at or below user's level + 1
       const maxDifficulty = Math.min(5, Math.ceil(profile.mobility_level / 2) + 1);
@@ -240,207 +171,208 @@ export default function Exercises() {
     });
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const getCategoryStats = () => {
+    const categories = ['mobility', 'speech', 'cognitive', 'fine-motor'] as const;
+    return categories.map(category => {
+      const categoryExercises = getFilteredExercises().filter(ex => ex.category === category);
+      const completedCount = categoryExercises.filter(ex => completedToday.includes(ex.id)).length;
+      return {
+        category,
+        total: categoryExercises.length,
+        completed: completedCount,
+        icon: categoryIcons[category],
+        color: categoryColors[category]
+      };
+    }).filter(stat => stat.total > 0);
   };
 
-  if (selectedExercise) {
-    return (
-      <SafeAreaView className="flex-1 bg-turtle-cream">
-        <View className="flex-1 px-6 py-6">
-          <View className="items-center mb-8">
-            <TurtleAvatar size={100} mood="encouraging" animate={isPerforming} />
-            <Text className="text-2xl font-inter-bold text-turtle-slate mt-4 text-center">
-              {selectedExercise.name}
-            </Text>
-            <Text className="text-turtle-slate/70 font-inter mt-2 text-center">
-              {isPerforming ? "You're doing great! Keep going!" : "Get ready to begin"}
-            </Text>
-          </View>
-
-          {isPerforming && (
-            <View className="bg-white rounded-2xl p-8 mb-6 items-center shadow-sm">
-              <Text className="text-6xl font-inter-bold text-turtle-teal mb-2">
-                {formatTime(timeRemaining)}
-              </Text>
-              <Text className="text-turtle-slate/70 font-inter">Time remaining</Text>
-            </View>
-          )}
-
-          <ScrollView className="flex-1 bg-white rounded-2xl p-6 shadow-sm">
-            <Text className="text-lg font-inter-bold text-turtle-slate mb-4">
-              Instructions
-            </Text>
-            {selectedExercise.instructions.map((instruction, index) => (
-              <View key={index} className="flex-row mb-3">
-                <Text className="text-turtle-teal font-inter-bold mr-3">
-                  {index + 1}.
-                </Text>
-                <Text className="text-turtle-slate font-inter flex-1">
-                  {instruction}
-                </Text>
-              </View>
-            ))}
-            
-            <View className="bg-turtle-teal/5 p-4 rounded-xl mt-4">
-              <Text className="text-turtle-teal font-inter-semibold mb-2">
-                💡 Benefits
-              </Text>
-              <Text className="text-turtle-slate font-inter">
-                {selectedExercise.benefits}
-              </Text>
-            </View>
-          </ScrollView>
-
-          <View className="flex-row space-x-4 mt-6">
-            <TouchableOpacity
-              onPress={stopExercise}
-              className="flex-1 bg-gray-200 py-4 rounded-2xl"
-            >
-              <Text className="text-turtle-slate font-inter-semibold text-center">
-                Stop
-              </Text>
-            </TouchableOpacity>
-            
-            {!isPerforming ? (
-              <TouchableOpacity
-                onPress={() => startExercise(selectedExercise)}
-                className="flex-1 bg-turtle-teal py-4 rounded-2xl"
-              >
-                <Text className="text-white font-inter-semibold text-center">
-                  Start Exercise
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                onPress={completeExercise}
-                className="flex-1 bg-turtle-green py-4 rounded-2xl"
-              >
-                <Text className="text-white font-inter-semibold text-center">
-                  Complete Early
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView className="flex-1 bg-turtle-cream">
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+    <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
+      <ScrollView 
+        className="flex-1 px-6" 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
+      >
         <View className="py-6">
-          <View className="items-center mb-6">
-            <TurtleAvatar size={80} mood="encouraging" />
-            <Text className="text-2xl font-inter-bold text-turtle-slate mt-3">
+          {/* Header */}
+          <View className="items-center mb-8">
+            <TurtleCompanion
+              size={120}
+              mood="excited"
+              message="Ready to move and grow stronger? Let's do this together!"
+              showMessage={false}
+              animate={true}
+            />
+            <Text className="text-3xl font-inter-bold text-earie-black mt-4">
               Exercise Time!
             </Text>
-            <Text className="text-turtle-slate/70 font-inter text-center mt-1">
+            <Text className="text-royal-palm font-inter text-center mt-2 text-lg">
               Choose an exercise that feels right for you today
             </Text>
           </View>
 
+          {/* Progress Summary */}
           {completedToday.length > 0 && (
-            <View className="bg-turtle-green/10 p-4 rounded-xl mb-6 border border-turtle-green/20">
-              <Text className="text-turtle-green font-inter-semibold mb-1">
-                🎉 Great job today!
-              </Text>
-              <Text className="text-turtle-slate font-inter">
+            <View className="bg-emerald-50 border border-emerald-300 px-6 py-4 rounded-2xl mb-6">
+              <View className="flex-row items-center mb-2">
+                <Text className="text-emerald-700 font-inter-bold text-lg flex-1">
+                  🎉 Great job today!
+                </Text>
+                <Text className="text-emerald-600 font-inter-bold text-lg">
+                  {completedToday.length}
+                </Text>
+              </View>
+              <Text className="text-emerald-600 font-inter">
                 You've completed {completedToday.length} exercise{completedToday.length > 1 ? 's' : ''} already
               </Text>
             </View>
           )}
 
-          <Text className="text-lg font-inter-bold text-turtle-slate mb-4">
+          {/* Category Overview */}
+          <View className="mb-6">
+            <Text className="text-lg font-inter-bold text-earie-black mb-4">
+              Categories Overview
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {getCategoryStats().map((stat) => (
+                <View 
+                  key={stat.category}
+                  className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-xl p-4 flex-1 min-w-[45%]"
+                >
+                  <View className="flex-row items-center mb-2">
+                    <Text className="text-2xl mr-2">{stat.icon}</Text>
+                    <Text className="text-earie-black font-inter-semibold text-sm capitalize flex-1">
+                      {stat.category.replace('-', ' ')}
+                    </Text>
+                  </View>
+                  <Text className="text-royal-palm font-inter text-sm">
+                    {stat.completed}/{stat.total} completed
+                  </Text>
+                  <View className="bg-turtle-cream-200 rounded-full h-2 mt-2">
+                    <View 
+                      className="h-2 rounded-full"
+                      style={{ 
+                        width: `${(stat.completed / stat.total) * 100}%`,
+                        backgroundColor: stat.color 
+                      }}
+                    />
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Exercise List */}
+          <Text className="text-lg font-inter-bold text-earie-black mb-4">
             Recommended for You
           </Text>
 
-          <View className="space-y-4">
+          <View className="gap-4">
             {getFilteredExercises().map((exercise) => {
               const isCompleted = completedToday.includes(exercise.id);
               const categoryColor = categoryColors[exercise.category];
-              
+
               return (
                 <TouchableOpacity
                   key={exercise.id}
-                  onPress={() => setSelectedExercise(exercise)}
-                  className="bg-white rounded-2xl p-6 shadow-sm border border-turtle-teal/10"
+                  onPress={() => navigateToExercise(exercise.id)}
+                  activeOpacity={0.7}
+                  className={`bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 shadow-lg shadow-turtle-teal-300/50 ${
+                    isCompleted ? 'bg-blue-glass border-royal-palm' : ''
+                  }`}
                 >
-                  <View className="flex-row items-start justify-between mb-3">
-                    <View className="flex-1">
-                      <View className="flex-row items-center mb-2">
-                        <Text className="text-2xl mr-2">
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-1 mr-4">
+                      {/* Exercise Header */}
+                      <View className="flex-row items-center mb-3">
+                        <Text className="text-2xl mr-3">
                           {categoryIcons[exercise.category]}
                         </Text>
-                        <Text className="text-lg font-inter-bold text-turtle-slate">
-                          {exercise.name}
-                        </Text>
+                        <View className="flex-1">
+                          <Text className="text-lg font-inter-bold text-earie-black">
+                            {exercise.name}
+                          </Text>
+                          <Text className="text-royal-palm font-inter text-sm capitalize">
+                            {exercise.category.replace('-', ' ')}
+                          </Text>
+                        </View>
                         {isCompleted && (
-                          <CheckCircle size={20} color="#10B981" className="ml-2" />
+                          <CheckCircle size={24} color="#418D84" />
                         )}
                       </View>
-                      <Text className="text-turtle-slate/70 font-inter text-sm mb-2">
+
+                      {/* Description */}
+                      <Text className="text-earie-black font-inter text-base mb-3 leading-relaxed">
                         {exercise.description}
                       </Text>
-                      <View className="flex-row items-center">
-                        <Clock size={16} color="#64748B" />
-                        <Text className="text-turtle-slate/70 font-inter text-sm ml-1 mr-4">
-                          {Math.ceil(exercise.duration / 60)} min
-                        </Text>
-                        <View className="flex-row">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={14}
-                              color={i < exercise.difficulty ? categoryColor : '#E5E7EB'}
-                              fill={i < exercise.difficulty ? categoryColor : 'none'}
-                            />
-                          ))}
+
+                      {/* Exercise Details */}
+                      <View className="flex-row items-center justify-between">
+                        <View className="flex-row items-center">
+                          <Clock size={16} color="#418D84" />
+                          <Text className="text-royal-palm font-inter text-sm ml-1 mr-4">
+                            {Math.ceil(exercise.duration / 60)} min
+                          </Text>
+                          <View className="flex-row">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={14}
+                                color={i < exercise.difficulty ? categoryColor : '#B8DCDC'}
+                                fill={i < exercise.difficulty ? categoryColor : 'white'}
+                              />
+                            ))}
+                          </View>
+                        </View>
+
+                        <View
+                          className="px-3 py-1 rounded-full"
+                          style={{ backgroundColor: `${categoryColor}20` }}
+                        >
+                          <Text
+                            className="font-inter text-xs"
+                            style={{ color: categoryColor }}
+                          >
+                            Level {exercise.difficulty}
+                          </Text>
                         </View>
                       </View>
                     </View>
+
+                    {/* Action Button */}
                     <View className="items-center">
                       {isCompleted ? (
-                        <View className="w-12 h-12 bg-turtle-green/10 rounded-full items-center justify-center">
-                          <CheckCircle size={24} color="#10B981" />
+                        <View className="w-16 h-16 bg-royal-palm rounded-full items-center justify-center shadow-lg">
+                          <CheckCircle size={28} color="#F6F4F1" />
                         </View>
                       ) : (
-                        <View className="w-12 h-12 bg-turtle-teal/10 rounded-full items-center justify-center">
-                          <Play size={20} color="#14B8A6" />
+                        <View 
+                          className="w-16 h-16 rounded-full items-center justify-center shadow-lg"
+                          style={{ backgroundColor: categoryColor }}
+                        >
+                          <Play size={24} color="#F6F4F1" />
                         </View>
                       )}
                     </View>
-                  </View>
-                  
-                  <View className="flex-row justify-between items-center">
-                    <View 
-                      className="px-3 py-1 rounded-full"
-                      style={{ backgroundColor: `${categoryColor}20` }}
-                    >
-                      <Text 
-                        className="font-inter text-sm capitalize"
-                        style={{ color: categoryColor }}
-                      >
-                        {exercise.category.replace('-', ' ')}
-                      </Text>
-                    </View>
-                    <ChevronRight size={20} color="#64748B" />
                   </View>
                 </TouchableOpacity>
               );
             })}
           </View>
 
-          <View className="bg-white rounded-2xl p-6 mt-6 shadow-sm border border-turtle-teal/10">
-            <Text className="text-turtle-slate font-inter-semibold mb-2">
-              🐢 Turtle Wisdom
-            </Text>
-            <Text className="text-turtle-slate/70 font-inter">
-              "Remember, progress isn't about speed - it's about consistency. Even the smallest movement forward is a victory worth celebrating!"
-            </Text>
+          {/* Motivational Message */}
+          <View className="bg-turtle-indigo-50 border border-turtle-indigo-200 rounded-3xl px-6 py-5 mt-8">
+            <View className="flex-row items-start">
+              <Text className="text-3xl mr-3">🐢</Text>
+              <View className="flex-1">
+                <Text className="text-turtle-indigo-700 font-inter-bold text-lg mb-2">
+                  Turtle Wisdom
+                </Text>
+                <Text className="text-turtle-indigo-700 font-inter text-base leading-relaxed italic">
+                  "Remember, progress isn't about speed - it's about consistency. Even the smallest movement forward is a victory worth celebrating!"
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>

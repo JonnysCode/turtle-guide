@@ -20,23 +20,20 @@ export default function Index() {
 
     if (!user && !inAuthGroup) {
       // Redirect to auth if not authenticated
-      console.log('Redirecting to welcome (not authenticated)');
+      console.log('Index redirecting to welcome (not authenticated)');
       router.replace('/(auth)/welcome');
     } else if (user && inAuthGroup) {
       // Redirect to main app if authenticated
-      console.log('Redirecting to tabs (authenticated)');
+      console.log('Index redirecting to tabs (authenticated)');
+      router.replace('/(tabs)');
+    } else if (user && !segments[0]) {
+      // If user is authenticated but at root, go to tabs
+      console.log('Index redirecting authenticated user to tabs from root');
       router.replace('/(tabs)');
     }
-  }, [user, loading, segments]);
+  }, [user, loading, segments, router]);
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#14B8A6" />
-      </View>
-    );
-  }
-
+  // Show loading while determining auth state
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#14B8A6" />

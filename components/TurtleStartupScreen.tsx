@@ -30,6 +30,8 @@ export default function TurtleStartupScreen() {
             date: today,
             mood_rating: rating,
             exercises_completed: 0
+          }, { 
+            onConflict: 'user_id,date' 
           });
       } catch (error) {
         console.error('Error saving mood:', error);

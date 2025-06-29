@@ -422,7 +422,7 @@ export default function TurtleIntroduction({ onComplete, isStartupScreen = false
             {/* Response Options */}
             {currentPhase === 'listening' && (
               <Animated.View 
-                className="w-full space-y-8"
+                className="w-full gap-8"
                 style={{ opacity: fadeAnim }}
               >
                 
