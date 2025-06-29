@@ -222,7 +222,9 @@ export default function ExerciseDetail() {
     setIsPerforming(false);
 
     try {
-      // Record exercise session
+      console.log('Starting exercise completion process...');
+
+      // Record exercise session FIRST
       const { error: sessionError } = await supabase
         .from('exercise_sessions')
         .insert({
@@ -243,7 +245,9 @@ export default function ExerciseDetail() {
         return;
       }
 
-      // Update daily progress
+      console.log('Exercise session recorded successfully');
+
+      // Update daily progress SECOND
       const today = new Date().toISOString().split('T')[0];
       const { data: existingProgress } = await supabase
         .from('daily_progress')
@@ -264,10 +268,14 @@ export default function ExerciseDetail() {
 
       if (progressError) {
         console.error('Error updating daily progress:', progressError);
+      } else {
+        console.log('Daily progress updated successfully');
       }
 
-      // Check for new achievements
+      // Check for new achievements THIRD - after all data is saved
+      console.log('Checking for achievements...');
       const newAchievements = await checkAndAwardAchievements(user.id);
+      console.log('Achievement check complete, new achievements:', newAchievements);
 
       // Mark as completed locally
       setIsCompleted(true);

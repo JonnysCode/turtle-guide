@@ -116,12 +116,16 @@ export const achievementDefinitions: AchievementDefinition[] = [
 
 export async function getUserStats(userId: string): Promise<UserStats> {
   try {
-    // Get total exercises
+    console.log('Getting user stats for:', userId);
+
+    // Get total exercises - this is the most important for "First Steps"
     const { count: totalExercises } = await supabase
       .from('exercise_sessions')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('completed', true);
+
+    console.log('Total exercises found:', totalExercises);
 
     // Get total lessons
     const { count: totalLessons } = await supabase
@@ -138,28 +142,35 @@ export async function getUserStats(userId: string): Promise<UserStats> {
       .order('date', { ascending: false })
       .limit(30);
 
-    // Calculate current streak
+    // Calculate streaks and mood tracking
     let currentStreak = 0;
     let longestStreak = 0;
     let tempStreak = 0;
     let moodTrackingDays = 0;
 
-    if (progressData) {
+    if (progressData && progressData.length > 0) {
       const today = new Date();
       const sortedData = [...progressData].sort((a, b) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
       );
 
-      // Calculate current streak
+      // Calculate current streak - only count days with exercises > 0
       for (let i = 0; i < sortedData.length; i++) {
         const progressDate = new Date(sortedData[i].date);
         const expectedDate = new Date(today);
         expectedDate.setDate(today.getDate() - i);
 
+        // Check if this is the expected consecutive day AND has exercises
         if (progressDate.toDateString() === expectedDate.toDateString() && 
             sortedData[i].exercises_completed > 0) {
           currentStreak++;
-        } else {
+        } else if (progressDate.toDateString() === expectedDate.toDateString() && 
+                   sortedData[i].exercises_completed === 0) {
+          // If it's the expected day but no exercises, break the streak
+          break;
+        }
+        // If it's not the expected day, we might have a gap, so break
+        else if (progressDate.toDateString() !== expectedDate.toDateString()) {
           break;
         }
       }
@@ -199,7 +210,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
       .eq('completed', true)
       .gte('completed_at', weekStart.toISOString());
 
-    return {
+    const stats = {
       totalExercises: totalExercises || 0,
       totalLessons: totalLessons || 0,
       currentStreak,
@@ -209,6 +220,9 @@ export async function getUserStats(userId: string): Promise<UserStats> {
       lessonsThisWeek: lessonsThisWeek || 0,
       userId
     };
+
+    console.log('Final user stats:', stats);
+    return stats;
   } catch (error) {
     console.error('Error getting user stats:', error);
     return {
@@ -226,8 +240,11 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 
 export async function checkAndAwardAchievements(userId: string): Promise<string[]> {
   try {
+    console.log('Checking achievements for user:', userId);
+
     // Get current user stats
     const stats = await getUserStats(userId);
+    console.log('User stats for achievement check:', stats);
 
     // Get already unlocked achievements
     const { data: existingAchievements } = await supabase
@@ -236,13 +253,23 @@ export async function checkAndAwardAchievements(userId: string): Promise<string[
       .eq('user_id', userId);
 
     const unlockedAchievementIds = existingAchievements?.map(a => a.achievement_type) || [];
+    console.log('Already unlocked achievements:', unlockedAchievementIds);
 
     // Check which achievements should be unlocked
     const newAchievements: string[] = [];
 
     for (const achievement of achievementDefinitions) {
-      if (!unlockedAchievementIds.includes(achievement.id) && 
-          achievement.checkCondition(stats)) {
+      const isAlreadyUnlocked = unlockedAchievementIds.includes(achievement.id);
+      const shouldBeUnlocked = achievement.checkCondition(stats);
+      
+      console.log(`Checking ${achievement.id}:`, {
+        isAlreadyUnlocked,
+        shouldBeUnlocked,
+        condition: achievement.checkCondition.toString()
+      });
+
+      if (!isAlreadyUnlocked && shouldBeUnlocked) {
+        console.log(`Awarding achievement: ${achievement.title}`);
         
         // Award the achievement
         const { error } = await supabase
@@ -255,13 +282,14 @@ export async function checkAndAwardAchievements(userId: string): Promise<string[
 
         if (!error) {
           newAchievements.push(achievement.id);
-          console.log(`Achievement unlocked: ${achievement.title}`);
+          console.log(`Successfully awarded: ${achievement.title}`);
         } else {
-          console.error('Error awarding achievement:', error);
+          console.error('Error awarding achievement:', achievement.id, error);
         }
       }
     }
 
+    console.log('New achievements awarded:', newAchievements);
     return newAchievements;
   } catch (error) {
     console.error('Error checking achievements:', error);
@@ -278,11 +306,16 @@ export async function getAchievementProgress(userId: string) {
 
   const unlockedIds = unlockedAchievements?.map(a => a.achievement_type) || [];
 
-  return achievementDefinitions.map(achievement => ({
-    ...achievement,
-    isUnlocked: unlockedIds.includes(achievement.id),
-    progress: achievement.checkCondition(stats) ? 1 : getProgressTowardsAchievement(achievement, stats)
-  }));
+  return achievementDefinitions.map(achievement => {
+    const isUnlocked = unlockedIds.includes(achievement.id);
+    const progress = isUnlocked ? 1 : getProgressTowardsAchievement(achievement, stats);
+    
+    return {
+      ...achievement,
+      isUnlocked,
+      progress
+    };
+  });
 }
 
 function getProgressTowardsAchievement(achievement: AchievementDefinition, stats: UserStats): number {
