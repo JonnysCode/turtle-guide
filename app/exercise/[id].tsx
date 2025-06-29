@@ -133,6 +133,7 @@ export default function ExerciseDetail() {
   const [isPerforming, setIsPerforming] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   useEffect(() => {
     const foundExercise = exercises.find(ex => ex.id === id);
@@ -180,6 +181,32 @@ export default function ExerciseDetail() {
     setIsPerforming(true);
   };
 
+  const showCompletionMessage = () => {
+    if (Platform.OS === 'web') {
+      // On web, show our custom modal instead of Alert
+      setShowCompletionModal(true);
+    } else {
+      // On native platforms, use Alert
+      Alert.alert(
+        'Excellent Work! 🎉',
+        'You completed the exercise! I\'m so proud of your dedication.',
+        [
+          {
+            text: 'Continue',
+            onPress: () => {
+              router.back();
+            }
+          }
+        ]
+      );
+    }
+  };
+
+  const handleCompletionModalClose = () => {
+    setShowCompletionModal(false);
+    router.back();
+  };
+
   const completeExercise = async () => {
     if (!user || !exercise) return;
 
@@ -199,7 +226,11 @@ export default function ExerciseDetail() {
 
       if (sessionError) {
         console.error('Error recording exercise session:', sessionError);
-        Alert.alert('Error', 'Failed to record exercise completion');
+        if (Platform.OS === 'web') {
+          setShowCompletionModal(true);
+        } else {
+          Alert.alert('Error', 'Failed to record exercise completion');
+        }
         return;
       }
 
@@ -229,24 +260,16 @@ export default function ExerciseDetail() {
       // Mark as completed locally
       setIsCompleted(true);
 
-      // Show success message and navigate back
-      Alert.alert(
-        'Excellent Work! 🎉',
-        'You completed the exercise! I\'m so proud of your dedication.',
-        [
-          {
-            text: 'Continue',
-            onPress: () => {
-              // Navigate back to exercises page
-              router.back();
-            }
-          }
-        ]
-      );
+      // Show success message (platform-specific)
+      showCompletionMessage();
 
     } catch (error) {
       console.error('Error in completeExercise:', error);
-      Alert.alert('Error', 'Failed to record exercise completion. Please try again.');
+      if (Platform.OS === 'web') {
+        setShowCompletionModal(true);
+      } else {
+        Alert.alert('Error', 'Failed to record exercise completion. Please try again.');
+      }
     }
   };
 
@@ -277,6 +300,41 @@ export default function ExerciseDetail() {
 
   return (
     <SafeAreaView className="flex-1 bg-turtle-cream-50" edges={['top', 'left', 'right', 'bottom']}>
+      {/* Completion Modal for Web */}
+      {showCompletionModal && Platform.OS === 'web' && (
+        <View className="absolute inset-0 bg-black/50 z-50 items-center justify-center">
+          <View className="bg-chalk rounded-3xl p-8 mx-6 max-w-md w-full shadow-2xl">
+            <View className="items-center mb-6">
+              <TurtleCompanion
+                size={120}
+                mood="great"
+                message="Excellent work! You completed the exercise!"
+                showMessage={false}
+                animate={true}
+              />
+            </View>
+            
+            <Text className="text-2xl font-inter-bold text-earie-black text-center mb-4">
+              Excellent Work! 🎉
+            </Text>
+            
+            <Text className="text-earie-black font-inter text-center text-lg mb-8 leading-relaxed">
+              You completed the exercise! I'm so proud of your dedication to your recovery journey.
+            </Text>
+            
+            <Button
+              onPress={handleCompletionModalClose}
+              variant="primary"
+              size="lg"
+              className="w-full"
+              style={{ backgroundColor: categoryColor }}
+            >
+              Continue
+            </Button>
+          </View>
+        </View>
+      )}
+
       {/* Header with back button */}
       <View className="px-6 py-4 border-b border-turtle-teal-300">
         <View className="flex-row items-center">
