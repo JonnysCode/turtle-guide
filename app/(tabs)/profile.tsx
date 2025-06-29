@@ -231,7 +231,7 @@ export default function Profile() {
               App Settings
             </Text>
 
-            <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-100">
+            <TouchableOpacity className="flex-row items-center py-4 border-b border-turtle-cream-300/70">
               <Settings size={20} color="#418D84" />
               <View className="flex-1 ml-4">
                 <Text className="text-earie-black font-inter-semibold">Preferences</Text>
@@ -241,7 +241,7 @@ export default function Profile() {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-100">
+            <TouchableOpacity className="flex-row items-center py-4 border-b border-turtle-cream-300/70">
               <User size={20} color="#418D84" />
               <View className="flex-1 ml-4">
                 <Text className="text-earie-black font-inter-semibold">Account Settings</Text>
