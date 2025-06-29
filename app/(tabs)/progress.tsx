@@ -382,18 +382,19 @@ export default function Progress() {
                     const badgeImage = badgeImages[achievement.id as keyof typeof badgeImages];
                     
                     return (
-                      <View key={achievement.id} className="bg-white rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center border-2 border-royal-palm shadow-lg">
-                        {/* Earned Badge Glow Effect */}
-                        <View className="relative">
-                          <View className="absolute inset-0 bg-royal-palm/20 rounded-full blur-lg" />
-                          <View className="w-20 h-20 mb-3 items-center justify-center relative">
+                      <View key={achievement.id} className="bg-white rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center border-2 border-royal-palm shadow-xl">
+                        {/* Earned Badge with Enhanced Visibility */}
+                        <View className="relative mb-3">
+                          {/* Glow effect */}
+                          <View className="absolute -inset-2 bg-royal-palm/20 rounded-full blur-sm" />
+                          <View className="w-20 h-20 items-center justify-center relative">
                             <Image 
                               source={badgeImage}
                               style={{
-                                width: 80,
-                                height: 80,
-                                maxWidth: 80,
-                                maxHeight: 80
+                                width: 64,
+                                height: 64,
+                                maxWidth: 64,
+                                maxHeight: 64
                               }}
                               resizeMode="contain"
                             />
@@ -403,7 +404,7 @@ export default function Progress() {
                         <Text className="font-inter-bold text-earie-black text-center mb-1 text-base">
                           {achievement.title}
                         </Text>
-                        <Text className="text-royal-palm font-inter text-xs text-center mb-3 leading-tight">
+                        <Text className="text-earie-black/80 font-inter text-xs text-center mb-3 leading-tight">
                           {achievement.description}
                         </Text>
                         
@@ -416,9 +417,11 @@ export default function Progress() {
                               +{achievement.points} pts
                             </Text>
                           </View>
-                          <Text className="text-emerald-600 font-inter-bold text-xs">
-                            ✓ EARNED
-                          </Text>
+                          <View className="bg-emerald-100 px-2 py-1 rounded-full">
+                            <Text className="text-emerald-700 font-inter-bold text-xs">
+                              ✓ EARNED
+                            </Text>
+                          </View>
                         </View>
                         
                         <Text className="text-earie-black/60 font-inter text-xs">
@@ -443,42 +446,43 @@ export default function Progress() {
                     const progressPercent = Math.round(achievement.progress * 100);
                     
                     return (
-                      <View key={achievement.id} className="bg-gray-50 rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center border border-gray-200">
+                      <View key={achievement.id} className="bg-gray-100 rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center border border-gray-300">
                         <View className="w-20 h-20 mb-3 items-center justify-center relative">
-                          {/* Grayscale overlay for locked badges */}
+                          {/* Badge image with light opacity overlay */}
                           <Image 
                             source={badgeImage}
                             style={{
-                              width: 80,
-                              height: 80,
-                              maxWidth: 80,
-                              maxHeight: 80,
-                              opacity: 0.4
+                              width: 64,
+                              height: 64,
+                              maxWidth: 64,
+                              maxHeight: 64,
+                              opacity: 0.3
                             }}
                             resizeMode="contain"
                           />
-                          <View className="absolute inset-0 bg-gray-400/30 rounded-full" />
                           <View className="absolute inset-0 items-center justify-center">
-                            <Text className="text-gray-600 font-inter-bold text-xs">
-                              LOCKED
-                            </Text>
+                            <View className="bg-gray-600/80 px-2 py-1 rounded">
+                              <Text className="text-white font-inter-bold text-xs">
+                                LOCKED
+                              </Text>
+                            </View>
                           </View>
                         </View>
                         
-                        <Text className="font-inter-bold text-gray-700 text-center mb-1 text-base">
+                        <Text className="font-inter-bold text-gray-800 text-center mb-1 text-base">
                           {achievement.title}
                         </Text>
-                        <Text className="text-gray-600 font-inter text-xs text-center mb-3 leading-tight">
+                        <Text className="text-gray-700 font-inter text-xs text-center mb-3 leading-tight">
                           {achievement.description}
                         </Text>
-                        <Text className="text-gray-500 font-inter-semibold text-xs text-center mb-3">
+                        <Text className="text-gray-600 font-inter-semibold text-xs text-center mb-3">
                           {achievement.requirement}
                         </Text>
                         
                         {/* Progress bar for locked achievements */}
                         {progressPercent > 0 && (
                           <View className="w-full mb-3">
-                            <View className="w-full bg-gray-200 rounded-full h-2 mb-1">
+                            <View className="w-full bg-gray-300 rounded-full h-2 mb-1">
                               <View 
                                 className="h-2 rounded-full"
                                 style={{ 
@@ -487,7 +491,7 @@ export default function Progress() {
                                 }}
                               />
                             </View>
-                            <Text className="text-gray-600 font-inter text-xs text-center">
+                            <Text className="text-gray-700 font-inter text-xs text-center">
                               {progressPercent}% complete
                             </Text>
                           </View>
