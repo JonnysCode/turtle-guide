@@ -356,7 +356,7 @@ export default function Onboarding() {
         {renderStepContent()}
       </ScrollView>
 
-      <View className="px-6 pb-6">
+      <View className="px-6 pb-6 mt-2">
         <TouchableOpacity
           onPress={step === 5 ? handleComplete : () => setStep(step + 1)}
           disabled={loading || (step === 1 && !patientName.trim()) || (step === 2 && !strokeType) || (step === 4 && selectedGoals.length === 0)}
