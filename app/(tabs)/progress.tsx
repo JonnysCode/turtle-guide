@@ -460,16 +460,23 @@ export default function Progress() {
                     const unlockedDate = unlockedData ? new Date(unlockedData.unlocked_at).toLocaleDateString() : '';
                     
                     return (
-                      <View key={achievement.id} className="bg-flaxseed rounded-xl p-4 flex-1 min-w-[45%] items-center">
-                        <Image 
-                          source={achievement.badgeImage}
-                          className="w-16 h-16 mb-3"
-                          resizeMode="contain"
-                        />
-                        <Text className="font-inter-bold text-earie-black text-center mb-1">
+                      <View key={achievement.id} className="bg-flaxseed rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center">
+                        <View className="w-16 h-16 mb-3 items-center justify-center">
+                          <Image 
+                            source={achievement.badgeImage}
+                            style={{
+                              width: 64,
+                              height: 64,
+                              maxWidth: 64,
+                              maxHeight: 64
+                            }}
+                            resizeMode="contain"
+                          />
+                        </View>
+                        <Text className="font-inter-bold text-earie-black text-center mb-1 text-sm">
                           {achievement.title}
                         </Text>
-                        <Text className="text-royal-palm font-inter text-xs text-center mb-2">
+                        <Text className="text-royal-palm font-inter text-xs text-center mb-2 leading-tight">
                           {achievement.description}
                         </Text>
                         <View 
@@ -501,23 +508,31 @@ export default function Progress() {
                 </Text>
                 <View className="flex-row flex-wrap gap-3">
                   {getLockedAchievements().slice(0, 4).map((achievement) => (
-                    <View key={achievement.id} className="bg-blue-glass/50 rounded-xl p-4 flex-1 min-w-[45%] items-center opacity-75">
-                      <Image 
-                        source={achievement.badgeImage}
-                        className="w-16 h-16 mb-3 opacity-50"
-                        resizeMode="contain"
-                      />
-                      <Text className="font-inter-bold text-earie-black text-center mb-1">
+                    <View key={achievement.id} className="bg-blue-glass/50 rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center opacity-75">
+                      <View className="w-16 h-16 mb-3 items-center justify-center">
+                        <Image 
+                          source={achievement.badgeImage}
+                          style={{
+                            width: 64,
+                            height: 64,
+                            maxWidth: 64,
+                            maxHeight: 64,
+                            opacity: 0.5
+                          }}
+                          resizeMode="contain"
+                        />
+                      </View>
+                      <Text className="font-inter-bold text-earie-black text-center mb-1 text-sm">
                         {achievement.title}
                       </Text>
-                      <Text className="text-royal-palm font-inter text-xs text-center mb-2">
+                      <Text className="text-royal-palm font-inter text-xs text-center mb-2 leading-tight">
                         {achievement.description}
                       </Text>
-                      <Text className="text-earie-black/60 font-inter text-xs text-center">
+                      <Text className="text-earie-black/60 font-inter text-xs text-center mb-2">
                         {achievement.requirement}
                       </Text>
                       <View 
-                        className="px-2 py-1 rounded-full mt-2"
+                        className="px-2 py-1 rounded-full"
                         style={{ backgroundColor: `${categoryColors[achievement.category]}20` }}
                       >
                         <Text 
