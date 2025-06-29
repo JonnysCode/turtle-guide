@@ -8,6 +8,7 @@ import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import { supabase } from '@/lib/supabase';
+import { checkAndAwardAchievements } from '@/lib/achievementSystem';
 
 interface Lesson {
   id: string;
@@ -327,31 +328,44 @@ export default function LessonDetail() {
   const completeLesson = async () => {
     if (!user || !lesson) return;
 
-    const { error } = await supabase
-      .from('education_progress')
-      .upsert({
-        user_id: user.id,
-        lesson_id: lesson.id,
-        completed: true,
-        completed_at: new Date().toISOString()
-      });
+    try {
+      const { error } = await supabase
+        .from('education_progress')
+        .upsert({
+          user_id: user.id,
+          lesson_id: lesson.id,
+          completed: true,
+          completed_at: new Date().toISOString()
+        });
 
-    if (error) {
-      Alert.alert('Error', 'Failed to mark lesson as complete');
-      return;
+      if (error) {
+        Alert.alert('Error', 'Failed to mark lesson as complete');
+        return;
+      }
+
+      // Check for new achievements
+      const newAchievements = await checkAndAwardAchievements(user.id);
+
+      setIsCompleted(true);
+
+      const message = newAchievements.length > 0
+        ? `Great job! You completed the lesson and earned ${newAchievements.length} new badge${newAchievements.length > 1 ? 's' : ''}! 🏆`
+        : 'Great job! You\'ve completed another step in your learning journey.';
+
+      Alert.alert(
+        'Lesson Complete! 🎉',
+        message,
+        [
+          {
+            text: 'Continue Learning',
+            onPress: () => router.back()
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('Error completing lesson:', error);
+      Alert.alert('Error', 'Failed to mark lesson as complete. Please try again.');
     }
-
-    setIsCompleted(true);
-    Alert.alert(
-      'Lesson Complete! 🎉',
-      'Great job! You\'ve completed another step in your learning journey.',
-      [
-        {
-          text: 'Continue Learning',
-          onPress: () => router.back()
-        }
-      ]
-    );
   };
 
   if (!lesson) {

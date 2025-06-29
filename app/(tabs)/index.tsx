@@ -8,6 +8,7 @@ import { useUser } from '@/contexts/UserContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import TurtleIntroduction from '@/components/TurtleIntroduction';
 import { supabase } from '@/lib/supabase';
+import { checkAndAwardAchievements } from '@/lib/achievementSystem';
 
 interface DailyProgress {
   date: string;
@@ -93,7 +94,7 @@ export default function Home() {
     try {
       const { data } = await supabase
         .from('daily_progress')
-        .select('date')
+        .select('date, exercises_completed')
         .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(30);
@@ -111,7 +112,8 @@ export default function Home() {
         const expectedDate = new Date(today);
         expectedDate.setDate(today.getDate() - i);
 
-        if (progressDate.toDateString() === expectedDate.toDateString()) {
+        if (progressDate.toDateString() === expectedDate.toDateString() && 
+            data[i].exercises_completed > 0) {
           currentStreak++;
         } else {
           break;
@@ -146,6 +148,8 @@ export default function Home() {
         Alert.alert('Error', 'Failed to save mood. Please try again.');
         console.error('Error updating mood:', error);
       } else {
+        // Check for achievements after mood update
+        await checkAndAwardAchievements(user.id);
         fetchTodayProgress();
       }
     } catch (error) {

@@ -8,6 +8,7 @@ import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import { supabase } from '@/lib/supabase';
+import { checkAndAwardAchievements } from '@/lib/achievementSystem';
 
 interface Exercise {
   id: string;
@@ -134,6 +135,7 @@ export default function ExerciseDetail() {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [newAchievements, setNewAchievements] = useState<string[]>([]);
 
   useEffect(() => {
     const foundExercise = exercises.find(ex => ex.id === id);
@@ -181,15 +183,21 @@ export default function ExerciseDetail() {
     setIsPerforming(true);
   };
 
-  const showCompletionMessage = () => {
+  const showCompletionMessage = (achievements: string[] = []) => {
+    const hasNewAchievements = achievements.length > 0;
+    const message = hasNewAchievements 
+      ? `You completed the exercise and earned ${achievements.length} new badge${achievements.length > 1 ? 's' : ''}! 🏆`
+      : 'You completed the exercise! I\'m so proud of your dedication.';
+
     if (Platform.OS === 'web') {
       // On web, show our custom modal instead of Alert
+      setNewAchievements(achievements);
       setShowCompletionModal(true);
     } else {
       // On native platforms, use Alert
       Alert.alert(
         'Excellent Work! 🎉',
-        'You completed the exercise! I\'m so proud of your dedication.',
+        message,
         [
           {
             text: 'Continue',
@@ -204,6 +212,7 @@ export default function ExerciseDetail() {
 
   const handleCompletionModalClose = () => {
     setShowCompletionModal(false);
+    setNewAchievements([]);
     router.back();
   };
 
@@ -257,11 +266,14 @@ export default function ExerciseDetail() {
         console.error('Error updating daily progress:', progressError);
       }
 
+      // Check for new achievements
+      const newAchievements = await checkAndAwardAchievements(user.id);
+
       // Mark as completed locally
       setIsCompleted(true);
 
-      // Show success message (platform-specific)
-      showCompletionMessage();
+      // Show success message with achievements
+      showCompletionMessage(newAchievements);
 
     } catch (error) {
       console.error('Error in completeExercise:', error);
@@ -318,9 +330,21 @@ export default function ExerciseDetail() {
               Excellent Work! 🎉
             </Text>
             
-            <Text className="text-earie-black font-inter text-center text-lg mb-8 leading-relaxed">
+            <Text className="text-earie-black font-inter text-center text-lg mb-6 leading-relaxed">
               You completed the exercise! I'm so proud of your dedication to your recovery journey.
             </Text>
+
+            {newAchievements.length > 0 && (
+              <View className="bg-flaxseed rounded-xl p-4 mb-6">
+                <Text className="text-royal-palm font-inter-bold text-center mb-2">
+                  🏆 New Badge{newAchievements.length > 1 ? 's' : ''} Earned!
+                </Text>
+                <Text className="text-earie-black font-inter text-center">
+                  You earned {newAchievements.length} new achievement{newAchievements.length > 1 ? 's' : ''}! 
+                  Check your progress page to see your badges.
+                </Text>
+              </View>
+            )}
             
             <Button
               onPress={handleCompletionModalClose}

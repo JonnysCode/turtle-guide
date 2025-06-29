@@ -7,6 +7,7 @@ import { useUser } from '@/contexts/UserContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
 import { supabase } from '@/lib/supabase';
+import { achievementDefinitions, getUserStats, getAchievementProgress } from '@/lib/achievementSystem';
 
 interface ProgressData {
   date: string;
@@ -20,72 +21,18 @@ interface Achievement {
   unlocked_at: string;
 }
 
-interface AchievementDefinition {
-  id: string;
-  title: string;
-  description: string;
-  badgeImage: any;
-  category: 'exercise' | 'consistency' | 'learning' | 'milestone' | 'mood' | 'special';
-  requirement: string;
-  points: number;
-}
-
-const achievementDefinitions: AchievementDefinition[] = [
-  {
-    id: 'first_exercise',
-    title: 'First Steps',
-    description: 'Completed your very first exercise',
-    badgeImage: require('@/assets/images/badges/badge-1.png'),
-    category: 'exercise',
-    requirement: 'Complete 1 exercise',
-    points: 10
-  },
-  {
-    id: 'exercise_streak_3',
-    title: 'Building Momentum',
-    description: 'Exercised for 3 days in a row',
-    badgeImage: require('@/assets/images/badges/badge-2.png'),
-    category: 'consistency',
-    requirement: '3-day exercise streak',
-    points: 25
-  },
-  {
-    id: 'exercise_streak_7',
-    title: 'Week Warrior',
-    description: 'Maintained a 7-day exercise streak',
-    badgeImage: require('@/assets/images/badges/badge-3.png'),
-    category: 'consistency',
-    requirement: '7-day exercise streak',
-    points: 50
-  },
-  {
-    id: 'exercise_master_25',
-    title: 'Exercise Champion',
-    description: 'Completed 25 total exercises',
-    badgeImage: require('@/assets/images/badges/badge-4.png'),
-    category: 'milestone',
-    requirement: 'Complete 25 exercises',
-    points: 75
-  },
-  {
-    id: 'learning_enthusiast',
-    title: 'Knowledge Seeker',
-    description: 'Completed 3 learning modules',
-    badgeImage: require('@/assets/images/badges/badge-5.png'),
-    category: 'learning',
-    requirement: 'Complete 3 lessons',
-    points: 40
-  },
-  {
-    id: 'mood_tracker_7',
-    title: 'Self-Aware Soul',
-    description: 'Tracked your mood for 7 consecutive days',
-    badgeImage: require('@/assets/images/badges/badge-6.png'),
-    category: 'mood',
-    requirement: 'Track mood for 7 days',
-    points: 30
-  }
-];
+const badgeImages = {
+  'first_exercise': require('@/assets/images/badges/badge-1.png'),
+  'exercise_streak_3': require('@/assets/images/badges/badge-2.png'),
+  'exercise_streak_7': require('@/assets/images/badges/badge-3.png'),
+  'exercise_master_10': require('@/assets/images/badges/badge-1.png'),
+  'exercise_master_25': require('@/assets/images/badges/badge-4.png'),
+  'exercise_master_50': require('@/assets/images/badges/badge-4.png'),
+  'learning_enthusiast': require('@/assets/images/badges/badge-5.png'),
+  'learning_master': require('@/assets/images/badges/badge-5.png'),
+  'mood_tracker_7': require('@/assets/images/badges/badge-6.png'),
+  'weekly_warrior': require('@/assets/images/badges/badge-3.png')
+};
 
 const moodIcons = [
   { rating: 1, icon: '😢', color: '#EF4444', label: 'Tough' },
@@ -109,19 +56,54 @@ export default function Progress() {
   const { profile } = useUser();
   const [progressData, setProgressData] = useState<ProgressData[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [totalExercises, setTotalExercises] = useState(0);
-  const [totalLessons, setTotalLessons] = useState(0);
+  const [achievementProgress, setAchievementProgress] = useState<any[]>([]);
+  const [userStats, setUserStats] = useState<any>(null);
   const [averageMood, setAverageMood] = useState(0);
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'all'>('week');
   const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
     if (user) {
-      fetchProgressData();
-      fetchAchievements();
-      fetchTotalStats();
+      fetchAllData();
     }
   }, [user, selectedPeriod]);
+
+  const fetchAllData = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch user stats
+      const stats = await getUserStats(user.id);
+      setUserStats(stats);
+
+      // Fetch achievement progress
+      const progress = await getAchievementProgress(user.id);
+      setAchievementProgress(progress);
+
+      // Fetch achievements
+      const { data: achievementData } = await supabase
+        .from('achievements')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('unlocked_at', { ascending: false });
+
+      if (achievementData) {
+        setAchievements(achievementData);
+        
+        // Calculate total points
+        const points = achievementData.reduce((total, achievement) => {
+          const def = achievementDefinitions.find(a => a.id === achievement.achievement_type);
+          return total + (def?.points || 0);
+        }, 0);
+        setTotalPoints(points);
+      }
+
+      // Fetch progress data for charts
+      await fetchProgressData();
+    } catch (error) {
+      console.error('Error fetching progress data:', error);
+    }
+  };
 
   const fetchProgressData = async () => {
     if (!user) return;
@@ -152,73 +134,6 @@ export default function Progress() {
         : 0;
       setAverageMood(Math.round(avgMood * 10) / 10);
     }
-  };
-
-  const fetchAchievements = async () => {
-    if (!user) return;
-
-    const { data } = await supabase
-      .from('achievements')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('unlocked_at', { ascending: false });
-
-    if (data) {
-      setAchievements(data);
-      
-      // Calculate total points
-      const points = data.reduce((total, achievement) => {
-        const def = achievementDefinitions.find(a => a.id === achievement.achievement_type);
-        return total + (def?.points || 0);
-      }, 0);
-      setTotalPoints(points);
-    }
-  };
-
-  const fetchTotalStats = async () => {
-    if (!user) return;
-
-    // Get total exercises
-    const { count: exerciseCount } = await supabase
-      .from('exercise_sessions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('completed', true);
-
-    // Get total lessons
-    const { count: lessonCount } = await supabase
-      .from('education_progress')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('completed', true);
-
-    setTotalExercises(exerciseCount || 0);
-    setTotalLessons(lessonCount || 0);
-  };
-
-  const getCurrentStreak = () => {
-    if (progressData.length === 0) return 0;
-
-    let streak = 0;
-    const today = new Date();
-    const sortedData = [...progressData].sort((a, b) =>
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-
-    for (let i = 0; i < sortedData.length; i++) {
-      const progressDate = new Date(sortedData[i].date);
-      const expectedDate = new Date(today);
-      expectedDate.setDate(today.getDate() - i);
-
-      if (progressDate.toDateString() === expectedDate.toDateString() && 
-          sortedData[i].exercises_completed > 0) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-
-    return streak;
   };
 
   const getExerciseChart = () => {
@@ -256,15 +171,11 @@ export default function Progress() {
   };
 
   const getUnlockedAchievements = () => {
-    return achievementDefinitions.filter(def => 
-      achievements.some(a => a.achievement_type === def.id)
-    );
+    return achievementProgress.filter(a => a.isUnlocked);
   };
 
   const getLockedAchievements = () => {
-    return achievementDefinitions.filter(def => 
-      !achievements.some(a => a.achievement_type === def.id)
-    );
+    return achievementProgress.filter(a => !a.isUnlocked);
   };
 
   const getProgressLevel = () => {
@@ -276,6 +187,16 @@ export default function Progress() {
   };
 
   const levelInfo = getProgressLevel();
+
+  if (!userStats) {
+    return (
+      <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-earie-black font-inter text-lg">Loading progress...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
@@ -375,7 +296,7 @@ export default function Progress() {
                   <Target size={28} color="#418D84" />
                 </View>
                 <Text className="text-2xl font-inter-bold text-earie-black">
-                  {totalExercises}
+                  {userStats.totalExercises}
                 </Text>
                 <Text className="text-royal-palm font-inter text-sm text-center">
                   Total{'\n'}Exercises
@@ -387,7 +308,7 @@ export default function Progress() {
                   <TrendingUp size={28} color="#9381FF" />
                 </View>
                 <Text className="text-2xl font-inter-bold text-earie-black">
-                  {getCurrentStreak()}
+                  {userStats.currentStreak}
                 </Text>
                 <Text className="text-royal-palm font-inter text-sm text-center">
                   Current{'\n'}Streak
@@ -458,12 +379,13 @@ export default function Progress() {
                   {getUnlockedAchievements().map((achievement) => {
                     const unlockedData = achievements.find(a => a.achievement_type === achievement.id);
                     const unlockedDate = unlockedData ? new Date(unlockedData.unlocked_at).toLocaleDateString() : '';
+                    const badgeImage = badgeImages[achievement.id as keyof typeof badgeImages];
                     
                     return (
                       <View key={achievement.id} className="bg-flaxseed rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center">
                         <View className="w-16 h-16 mb-3 items-center justify-center">
                           <Image 
-                            source={achievement.badgeImage}
+                            source={badgeImage}
                             style={{
                               width: 64,
                               height: 64,
@@ -507,43 +429,62 @@ export default function Progress() {
                   🎯 Available Badges
                 </Text>
                 <View className="flex-row flex-wrap gap-3">
-                  {getLockedAchievements().slice(0, 4).map((achievement) => (
-                    <View key={achievement.id} className="bg-blue-glass/50 rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center opacity-75">
-                      <View className="w-16 h-16 mb-3 items-center justify-center">
-                        <Image 
-                          source={achievement.badgeImage}
-                          style={{
-                            width: 64,
-                            height: 64,
-                            maxWidth: 64,
-                            maxHeight: 64,
-                            opacity: 0.5
-                          }}
-                          resizeMode="contain"
-                        />
-                      </View>
-                      <Text className="font-inter-bold text-earie-black text-center mb-1 text-sm">
-                        {achievement.title}
-                      </Text>
-                      <Text className="text-royal-palm font-inter text-xs text-center mb-2 leading-tight">
-                        {achievement.description}
-                      </Text>
-                      <Text className="text-earie-black/60 font-inter text-xs text-center mb-2">
-                        {achievement.requirement}
-                      </Text>
-                      <View 
-                        className="px-2 py-1 rounded-full"
-                        style={{ backgroundColor: `${categoryColors[achievement.category]}20` }}
-                      >
-                        <Text 
-                          className="font-inter text-xs"
-                          style={{ color: categoryColors[achievement.category] }}
-                        >
-                          +{achievement.points} pts
+                  {getLockedAchievements().slice(0, 4).map((achievement) => {
+                    const badgeImage = badgeImages[achievement.id as keyof typeof badgeImages];
+                    const progressPercent = Math.round(achievement.progress * 100);
+                    
+                    return (
+                      <View key={achievement.id} className="bg-blue-glass/50 rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center opacity-75">
+                        <View className="w-16 h-16 mb-3 items-center justify-center">
+                          <Image 
+                            source={badgeImage}
+                            style={{
+                              width: 64,
+                              height: 64,
+                              maxWidth: 64,
+                              maxHeight: 64,
+                              opacity: 0.5
+                            }}
+                            resizeMode="contain"
+                          />
+                        </View>
+                        <Text className="font-inter-bold text-earie-black text-center mb-1 text-sm">
+                          {achievement.title}
                         </Text>
+                        <Text className="text-royal-palm font-inter text-xs text-center mb-2 leading-tight">
+                          {achievement.description}
+                        </Text>
+                        <Text className="text-earie-black/60 font-inter text-xs text-center mb-2">
+                          {achievement.requirement}
+                        </Text>
+                        
+                        {/* Progress bar for locked achievements */}
+                        {progressPercent > 0 && (
+                          <View className="w-full bg-blue-glass rounded-full h-2 mb-2">
+                            <View 
+                              className="h-2 rounded-full"
+                              style={{ 
+                                width: `${progressPercent}%`,
+                                backgroundColor: categoryColors[achievement.category] 
+                              }}
+                            />
+                          </View>
+                        )}
+                        
+                        <View 
+                          className="px-2 py-1 rounded-full"
+                          style={{ backgroundColor: `${categoryColors[achievement.category]}20` }}
+                        >
+                          <Text 
+                            className="font-inter text-xs"
+                            style={{ color: categoryColors[achievement.category] }}
+                          >
+                            {progressPercent > 0 ? `${progressPercent}% • ` : ''}+{achievement.points} pts
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                  ))}
+                    );
+                  })}
                 </View>
               </View>
             )}
@@ -558,8 +499,8 @@ export default function Progress() {
                   Progress Reflection from {profile?.turtle_name || 'Shelly'}
                 </Text>
                 <Text className="text-turtle-indigo-700 font-inter text-base leading-relaxed italic">
-                  {totalExercises > 0
-                    ? `"Look at all you've accomplished! ${totalExercises} exercises completed and ${achievements.length} badges earned shows your incredible dedication. Every small step forward is a victory worth celebrating. I'm so proud of your commitment to recovery!"`
+                  {userStats.totalExercises > 0
+                    ? `"Look at all you've accomplished! ${userStats.totalExercises} exercises completed and ${achievements.length} badges earned shows your incredible dedication. Every small step forward is a victory worth celebrating. I'm so proud of your commitment to recovery!"`
                     : '"Every journey begins with a single step. You\'re here, you\'re learning, and that\'s already progress! I\'m excited to celebrate many achievements with you in the days ahead."'
                   }
                 </Text>
