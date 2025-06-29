@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Calendar, Heart, LocationEdit as Edit3, LogOut, Phone, Settings, User } from 'lucide-react-native';
+import { Calendar, Heart, LocationEdit as Edit3, LogOut, Phone, Settings, User, Activity, Pill } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'expo-router';
@@ -161,11 +161,49 @@ export default function Profile() {
             </View>
           </View>
 
+          {/* Health & Wellness Tools */}
+          <View
+            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+            <Text className="text-lg font-inter-bold text-earie-black mb-4">
+              Health & Wellness Tools
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => router.push('/medication-reminders')}
+              className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
+            >
+              <View className="w-10 h-10 bg-tropical-indigo/10 rounded-lg items-center justify-center mr-4">
+                <Pill size={20} color="#9381FF" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-earie-black font-inter-semibold">Medication Reminders</Text>
+                <Text className="text-royal-palm font-inter text-sm">
+                  Set up daily medication alerts and track adherence
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => router.push('/health-tracking')}
+              className="flex-row items-center py-4"
+            >
+              <View className="w-10 h-10 bg-blue-glass rounded-lg items-center justify-center mr-4">
+                <Activity size={20} color="#418D84" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-earie-black font-inter-semibold">Health Tracking</Text>
+                <Text className="text-royal-palm font-inter text-sm">
+                  Log vital signs, symptoms, and health metrics
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
           {/* Quick Actions */}
           <View
             className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
             <Text className="text-lg font-inter-bold text-earie-black mb-4">
-              Quick Actions
+              Emergency & Support
             </Text>
 
             <TouchableOpacity
@@ -198,30 +236,6 @@ export default function Profile() {
                 </Text>
               </View>
             )}
-
-            <TouchableOpacity className="flex-row items-center py-4 border-b border-turtle-cream-300/70">
-              <View className="w-10 h-10 bg-tropical-indigo/10 rounded-lg items-center justify-center mr-4">
-                <Calendar size={20} color="#9381FF" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-earie-black font-inter-semibold">Medication Reminders</Text>
-                <Text className="text-royal-palm font-inter text-sm">
-                  Set up daily medication alerts
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="flex-row items-center py-4">
-              <View className="w-10 h-10 bg-blue-glass rounded-lg items-center justify-center mr-4">
-                <Heart size={20} color="#418D84" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-earie-black font-inter-semibold">Health Tracking</Text>
-                <Text className="text-royal-palm font-inter text-sm">
-                  Log symptoms and vital signs
-                </Text>
-              </View>
-            </TouchableOpacity>
           </View>
 
           {/* App Settings */}
