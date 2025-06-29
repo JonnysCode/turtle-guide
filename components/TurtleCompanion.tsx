@@ -239,7 +239,7 @@ export default function TurtleCompanion({
             opacity: messageOpacity,
             transform: [{ scale: messageScale }]
           }}
-          className="mb-4 max-w-xs"
+          className="mb-4 max-w-xs z-7"
         >
           <View className="bg-chalk border-2 border-royal-palm rounded-2xl px-4 py-3 shadow-lg">
             <Text className="text-earie-black font-inter text-base leading-relaxed text-center">
