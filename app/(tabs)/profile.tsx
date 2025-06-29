@@ -27,7 +27,6 @@ export default function Profile() {
   const { user, signOut } = useAuth();
   const { profile } = useUser();
   const router = useRouter();
-  const [showEmergencyContacts, setShowEmergencyContacts] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = () => {
@@ -199,7 +198,7 @@ export default function Profile() {
             </TouchableOpacity>
           </View>
 
-          {/* Quick Actions */}
+          {/* Emergency & Support */}
           <View
             className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
             <Text className="text-lg font-inter-bold text-earie-black mb-4">
@@ -207,8 +206,8 @@ export default function Profile() {
             </Text>
 
             <TouchableOpacity
-              onPress={() => setShowEmergencyContacts(!showEmergencyContacts)}
-              className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
+              onPress={() => router.push('/emergency-contacts')}
+              className="flex-row items-center py-4"
             >
               <View className="w-10 h-10 bg-red-100 rounded-lg items-center justify-center mr-4">
                 <Phone size={20} color="#EF4444" />
@@ -216,26 +215,10 @@ export default function Profile() {
               <View className="flex-1">
                 <Text className="text-earie-black font-inter-semibold">Emergency Contacts</Text>
                 <Text className="text-royal-palm font-inter text-sm">
-                  Quick access to important numbers
+                  Manage family, friends, and medical team contacts
                 </Text>
               </View>
             </TouchableOpacity>
-
-            {showEmergencyContacts && (
-              <View className="bg-red-50 p-4 rounded-lg mt-2 border border-red-200">
-                <Text className="text-red-800 font-inter-semibold mb-2">
-                  🚨 Emergency Services
-                </Text>
-                <TouchableOpacity className="bg-red-600 py-3 rounded-lg mb-3">
-                  <Text className="text-white font-inter-bold text-center text-lg">
-                    Call 911
-                  </Text>
-                </TouchableOpacity>
-                <Text className="text-red-700 font-inter text-sm text-center">
-                  For immediate medical emergencies
-                </Text>
-              </View>
-            )}
           </View>
 
           {/* App Settings */}
