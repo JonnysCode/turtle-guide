@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BookOpen, Brain, CircleCheck as CheckCircle, ChevronRight, Heart, Moon, Play } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { BookOpen, Brain, CircleCheck as CheckCircle, ChevronRight, Clock, Heart, Moon, Play } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import { supabase } from '@/lib/supabase';
@@ -13,18 +14,6 @@ interface Lesson {
   difficulty: 'beginner' | 'intermediate';
   duration: number;
   description: string;
-  content: LessonContent;
-}
-
-interface LessonContent {
-  introduction: string;
-  sections: {
-    title: string;
-    content: string;
-    tips?: string[];
-  }[];
-  keyTakeaways: string[];
-  turtleWisdom: string;
 }
 
 const lessons: Lesson[] = [
@@ -34,37 +23,7 @@ const lessons: Lesson[] = [
     category: 'basics',
     difficulty: 'beginner',
     duration: 8,
-    description: 'Learn the basics of stroke and the recovery process',
-    content: {
-      introduction: 'Understanding what happened during a stroke and how recovery works is an important first step in your journey.',
-      sections: [
-        {
-          title: 'What is a Stroke?',
-          content: 'A stroke happens when blood flow to part of the brain is interrupted. This can be due to a blockage (ischemic stroke) or bleeding (hemorrhagic stroke). When brain cells don\'t get enough oxygen, they can be damaged or die.',
-          tips: [
-            'Every stroke is different and affects people differently',
-            'The brain has amazing ability to heal and adapt (neuroplasticity)',
-            'Recovery is possible at any age'
-          ]
-        },
-        {
-          title: 'The Recovery Process',
-          content: 'Recovery from stroke is not linear - it happens in waves with good days and challenging days. Your brain is working hard to create new pathways and restore function.',
-          tips: [
-            'Most recovery happens in the first 6 months, but improvement can continue for years',
-            'Repetition and practice help create new brain pathways',
-            'Rest is just as important as exercise'
-          ]
-        }
-      ],
-      keyTakeaways: [
-        'Every stroke survivor\'s journey is unique',
-        'The brain can heal and adapt throughout life',
-        'Recovery takes time, patience, and consistent effort',
-        'You are not alone in this journey'
-      ],
-      turtleWisdom: 'Just like how I carry my home on my back, you carry strength within you. Recovery isn\'t about returning to who you were - it\'s about discovering who you\'re becoming.'
-    }
+    description: 'Learn the basics of stroke and the recovery process'
   },
   {
     id: 'nutrition-healing',
@@ -72,37 +31,7 @@ const lessons: Lesson[] = [
     category: 'lifestyle',
     difficulty: 'beginner',
     duration: 6,
-    description: 'Foods that support brain health and recovery',
-    content: {
-      introduction: 'Good nutrition is like fuel for your recovery. The right foods can help your brain heal and give you energy for daily activities.',
-      sections: [
-        {
-          title: 'Brain-Healthy Foods',
-          content: 'Certain foods are especially good for brain health and recovery. Think of colorful fruits and vegetables, fish rich in omega-3s, and whole grains.',
-          tips: [
-            'Blueberries and dark leafy greens are brain superfoods',
-            'Salmon, walnuts, and flaxseeds provide healthy fats',
-            'Whole grains give steady energy to your brain'
-          ]
-        },
-        {
-          title: 'Staying Hydrated',
-          content: 'Your brain is about 75% water, so staying hydrated is crucial for thinking clearly and feeling your best.',
-          tips: [
-            'Aim for 8 glasses of water daily',
-            'Herbal teas and broths count too',
-            'If swallowing is difficult, try thickened liquids as recommended by your speech therapist'
-          ]
-        }
-      ],
-      keyTakeaways: [
-        'Colorful, whole foods support brain healing',
-        'Hydration is essential for brain function',
-        'Small, frequent meals can help maintain energy',
-        'Work with a dietitian if you have special needs'
-      ],
-      turtleWisdom: 'I move slowly and eat mindfully - there\'s wisdom in taking time with nourishment. Every healthy bite is a gift to your healing brain.'
-    }
+    description: 'Foods that support brain health and recovery'
   },
   {
     id: 'emotional-wellbeing',
@@ -110,38 +39,7 @@ const lessons: Lesson[] = [
     category: 'mental-health',
     difficulty: 'intermediate',
     duration: 10,
-    description: 'Understanding and coping with emotional changes',
-    content: {
-      introduction: 'It\'s completely normal to experience a range of emotions after a stroke. Feeling sad, frustrated, anxious, or angry doesn\'t mean you\'re not strong - it means you\'re human.',
-      sections: [
-        {
-          title: 'Common Emotional Changes',
-          content: 'Many stroke survivors experience changes in emotions. This can be due to brain changes, the stress of recovery, or grief for abilities that have changed.',
-          tips: [
-            'Crying or feeling sad is a normal part of processing what happened',
-            'Frustration with new limitations is understandable',
-            'Some emotional changes are due to brain injury itself (pseudobulbar affect)'
-          ]
-        },
-        {
-          title: 'Coping Strategies',
-          content: 'There are many ways to support your emotional health during recovery. Finding what works for you is important.',
-          tips: [
-            'Talk to trusted friends, family, or a counselor',
-            'Practice gentle breathing exercises',
-            'Celebrate small victories every day',
-            'Join a stroke support group to connect with others who understand'
-          ]
-        }
-      ],
-      keyTakeaways: [
-        'Emotional changes after stroke are normal and common',
-        'It\'s okay to grieve and feel frustrated',
-        'Professional support can be very helpful',
-        'You are not alone in these feelings'
-      ],
-      turtleWisdom: 'Even turtles sometimes need to retreat into their shells. Taking time to process emotions isn\'t weakness - it\'s wisdom. I\'m here with you through all the feelings.'
-    }
+    description: 'Understanding and coping with emotional changes'
   },
   {
     id: 'sleep-recovery',
@@ -149,38 +47,23 @@ const lessons: Lesson[] = [
     category: 'lifestyle',
     difficulty: 'beginner',
     duration: 7,
-    description: 'The importance of good sleep for healing',
-    content: {
-      introduction: 'Sleep is when your brain does its most important healing work. Getting good quality sleep can significantly impact your recovery progress.',
-      sections: [
-        {
-          title: 'Why Sleep Matters',
-          content: 'During sleep, your brain clears out toxins, consolidates memories, and repairs itself. For stroke recovery, sleep is especially important for neuroplasticity - your brain\'s ability to form new connections.',
-          tips: [
-            'Deep sleep is when most brain repair happens',
-            'REM sleep helps process emotions and memories',
-            'Even short naps can be beneficial for recovery'
-          ]
-        },
-        {
-          title: 'Creating Good Sleep Habits',
-          content: 'Good sleep doesn\'t always come naturally after a stroke, but there are ways to improve it.',
-          tips: [
-            'Keep a consistent bedtime and wake time',
-            'Create a calm, dark sleeping environment',
-            'Avoid screens for 1 hour before bed',
-            'Try gentle stretching or meditation before sleep'
-          ]
-        }
-      ],
-      keyTakeaways: [
-        'Sleep is crucial for brain healing and recovery',
-        'Consistent sleep schedule helps regulate your body',
-        'Good sleep hygiene makes a big difference',
-        'Talk to your doctor if sleep problems persist'
-      ],
-      turtleWisdom: 'We turtles are experts at rest! Remember, healing happens during quiet moments too. Your brain is working hard even when you\'re sleeping peacefully.'
-    }
+    description: 'The importance of good sleep for healing'
+  },
+  {
+    id: 'building-confidence',
+    title: 'Building Confidence After Stroke',
+    category: 'mental-health',
+    difficulty: 'intermediate',
+    duration: 12,
+    description: 'Rebuilding self-confidence and independence'
+  },
+  {
+    id: 'communication-strategies',
+    title: 'Communication Strategies',
+    category: 'basics',
+    difficulty: 'intermediate',
+    duration: 9,
+    description: 'Effective ways to communicate after stroke'
   }
 ];
 
@@ -199,10 +82,9 @@ const categoryColors = {
 };
 
 export default function Learn() {
+  const router = useRouter();
   const { user } = useAuth();
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
-  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-  const [currentSection, setCurrentSection] = useState(0);
 
   useEffect(() => {
     fetchCompletedLessons();
@@ -222,175 +104,9 @@ export default function Learn() {
     }
   };
 
-  const completeLesson = async (lessonId: string) => {
-    if (!user) return;
-
-    const { error } = await supabase
-      .from('education_progress')
-      .upsert({
-        user_id: user.id,
-        lesson_id: lessonId,
-        completed: true,
-        completed_at: new Date().toISOString()
-      });
-
-    if (!error) {
-      setCompletedLessons(prev => [...prev, lessonId]);
-      setSelectedLesson(null);
-      setCurrentSection(0);
-    }
+  const navigateToLesson = (lessonId: string) => {
+    router.push(`/lesson/${lessonId}`);
   };
-
-  if (selectedLesson) {
-    const currentSectionData = selectedLesson.content.sections[currentSection];
-    const isLastSection = currentSection === selectedLesson.content.sections.length - 1;
-
-    return (
-      <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-        <View className="flex-1">
-          {/* Header */}
-          <View className="px-6 py-4 bg-chalk shadow-sm">
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedLesson(null);
-                setCurrentSection(0);
-              }}
-              className="mb-2"
-            >
-              <Text className="text-royal-palm font-inter">← Back to Lessons</Text>
-            </TouchableOpacity>
-            <Text className="text-xl font-inter-bold text-earie-black">
-              {selectedLesson.title}
-            </Text>
-            <View className="flex-row items-center mt-2">
-              <View className="flex-1 bg-blue-glass h-2 rounded-full">
-                <View
-                  className="bg-royal-palm h-2 rounded-full"
-                  style={{ width: `${((currentSection + 1) / (selectedLesson.content.sections.length + 1)) * 100}%` }}
-                />
-              </View>
-              <Text className="text-earie-black/70 font-inter text-sm ml-3">
-                {currentSection + 1} of {selectedLesson.content.sections.length + 1}
-              </Text>
-            </View>
-          </View>
-
-          <ScrollView 
-            className="flex-1 px-6 py-6" 
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
-          >
-            {currentSection === 0 ? (
-              // Introduction
-              <View>
-                <View className="items-center mb-6">
-                  <TurtleCompanion
-                    size={120}
-                    mood="idea"
-                    message={selectedLesson.content.introduction}
-                    showMessage={true}
-                    animate={true}
-                  />
-                </View>
-              </View>
-            ) : currentSection <= selectedLesson.content.sections.length ? (
-              // Section content
-              <View>
-                <Text className="text-2xl font-inter-bold text-earie-black mb-4">
-                  {currentSectionData.title}
-                </Text>
-                <Text className="text-earie-black font-inter text-lg leading-7 mb-6">
-                  {currentSectionData.content}
-                </Text>
-
-                {currentSectionData.tips && (
-                  <View className="bg-flaxseed rounded-2xl p-6 shadow-sm border border-royal-palm">
-                    <Text className="text-royal-palm font-inter-semibold mb-3">
-                      💡 Key Tips
-                    </Text>
-                    {currentSectionData.tips.map((tip, index) => (
-                      <View key={index} className="flex-row mb-2">
-                        <Text className="text-royal-palm mr-2">•</Text>
-                        <Text className="text-earie-black font-inter flex-1">{tip}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </View>
-            ) : (
-              // Summary page
-              <View>
-                <View className="items-center mb-6">
-                  <TurtleCompanion
-                    size={140}
-                    mood="great"
-                    message="Fantastic! You completed another lesson. Your dedication to learning is inspiring!"
-                    showMessage={true}
-                    animate={true}
-                  />
-                  <Text className="text-2xl font-inter-bold text-earie-black mt-4">
-                    Lesson Complete! 🎉
-                  </Text>
-                </View>
-
-                <View className="bg-chalk rounded-2xl p-6 mb-6 shadow-sm border border-royal-palm">
-                  <Text className="text-royal-palm font-inter-bold mb-4">
-                    🌟 Key Takeaways
-                  </Text>
-                  {selectedLesson.content.keyTakeaways.map((takeaway, index) => (
-                    <View key={index} className="flex-row mb-3">
-                      <CheckCircle size={20} color="#418D84" className="mr-3 mt-1" />
-                      <Text className="text-earie-black font-inter flex-1">{takeaway}</Text>
-                    </View>
-                  ))}
-                </View>
-
-                <View className="bg-blue-glass rounded-2xl p-6 border border-royal-palm">
-                  <Text className="text-royal-palm font-inter-semibold mb-3">
-                    🐢 Turtle Wisdom
-                  </Text>
-                  <Text className="text-earie-black font-inter italic">
-                    "{selectedLesson.content.turtleWisdom}"
-                  </Text>
-                </View>
-              </View>
-            )}
-          </ScrollView>
-
-          {/* Navigation */}
-          <View className="px-6 pb-6 bg-chalk">
-            <View className="flex-row gap-4 mb-8">
-              {currentSection > 0 && (
-                <TouchableOpacity
-                  onPress={() => setCurrentSection(prev => prev - 1)}
-                  className="flex-1 bg-blue-glass py-4 rounded-2xl"
-                >
-                  <Text className="text-earie-black font-inter-semibold text-center">
-                    Previous
-                  </Text>
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity
-                onPress={() => {
-                  if (currentSection === selectedLesson.content.sections.length) {
-                    completeLesson(selectedLesson.id);
-                  } else {
-                    setCurrentSection(prev => prev + 1);
-                  }
-                }}
-                className="flex-1 bg-royal-palm py-4 rounded-2xl"
-              >
-                <Text className="text-chalk font-inter-semibold text-center">
-                  {currentSection === selectedLesson.content.sections.length ? 'Complete Lesson' : 'Continue'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
@@ -444,7 +160,7 @@ export default function Learn() {
               return (
                 <TouchableOpacity
                   key={lesson.id}
-                  onPress={() => setSelectedLesson(lesson)}
+                  onPress={() => navigateToLesson(lesson.id)}
                   className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 shadow-lg shadow-turtle-teal-300/50"
                 >
                   <View className="flex-row items-start justify-between mb-3">
@@ -469,7 +185,7 @@ export default function Learn() {
                       <View className="flex-row items-center">
                         <View className="bg-blue-glass px-2 py-1 rounded mr-3">
                           <Text className="text-royal-palm font-inter text-xs">
-                            {lesson.duration} min read
+                            <Clock size={12} color="#418D84" /> {lesson.duration} min read
                           </Text>
                         </View>
                         <View
@@ -481,6 +197,11 @@ export default function Learn() {
                             style={{ color: categoryColor }}
                           >
                             {lesson.category.replace('-', ' ')}
+                          </Text>
+                        </View>
+                        <View className="bg-blue-glass px-2 py-1 rounded ml-2">
+                          <Text className="text-royal-palm font-inter text-xs capitalize">
+                            {lesson.difficulty}
                           </Text>
                         </View>
                       </View>
