@@ -241,7 +241,7 @@ export default function TurtleCompanion({
           }}
           className="mb-4 max-w-xs z-7"
         >
-          <View className="bg-chalk border-2 border-royal-palm rounded-2xl px-4 py-3 shadow-lg">
+          <View className="z-7 bg-chalk border-2 border-royal-palm rounded-2xl px-4 py-3 shadow-lg">
             <Text className="text-earie-black font-inter text-base leading-relaxed text-center">
               {currentMessage}
             </Text>
