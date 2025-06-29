@@ -34,8 +34,8 @@ export default function TabLayout() {
   console.log('TabLayout rendering tabs for authenticated user');
 
   // Calculate proper tab bar height with safe area
-  const tabBarHeight = Platform.OS === 'android' 
-    ? Math.max(80, 60 + insets.bottom) 
+  const tabBarHeight = Platform.OS === 'android'
+    ? Math.max(80, 60 + insets.bottom)
     : 88;
 
   return (
@@ -56,12 +56,7 @@ export default function TabLayout() {
           position: 'absolute',
           bottom: 0,
           left: 0,
-          right: 0,
-          elevation: 8, // Android shadow
-          shadowColor: '#000', // iOS shadow
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
+          right: 0
         },
         tabBarActiveTintColor: '#418D84',
         tabBarInactiveTintColor: '#64748B',
@@ -69,10 +64,10 @@ export default function TabLayout() {
           fontSize: 12,
           fontFamily: 'Inter-SemiBold',
           marginTop: 4,
-          marginBottom: Platform.OS === 'android' ? 4 : 0,
+          marginBottom: Platform.OS === 'android' ? 4 : 0
         },
         tabBarItemStyle: {
-          paddingVertical: 4,
+          paddingVertical: 4
         }
       }}
     >
