@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, ScrollView, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, Heart, LocationEdit as Edit3, Phone, Settings, User, Activity, Pill, ChevronRight } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,15 +34,15 @@ export default function Profile() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <ScrollView 
-        className="flex-1 px-6" 
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
+        contentContainerStyle={styles.scrollContent}
       >
-        <View className="py-6">
+        <View style={styles.content}>
           {/* Profile Header */}
-          <View className="items-center mb-8">
+          <View style={styles.profileHeader}>
             <TurtleCompanion
               size={140}
               mood="writing"
@@ -50,65 +50,64 @@ export default function Profile() {
               animate={false}
               className="mb-4"
             />
-            <Text className="text-2xl font-inter-bold text-earie-black mt-4">
+            <Text style={styles.profileName}>
               {profile?.patient_name || user?.email?.split('@')[0] || 'Friend'}
             </Text>
-            <Text className="text-royal-palm font-inter mt-1">
+            <Text style={styles.profileSubtitle}>
               Recovery companion: {profile?.turtle_name || 'Shelly'}
             </Text>
-            <Text className="text-royal-palm font-inter text-sm mt-2">
+            <Text style={styles.profileMemberSince}>
               Member since {formatDate(profile?.created_at || null)}
             </Text>
           </View>
 
           {/* Recovery Profile */}
-          <View
-            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
-            <View className="flex-row items-center justify-between mb-4">
-              <Text className="text-lg font-inter-bold text-earie-black">
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>
                 Recovery Profile
               </Text>
-              <TouchableOpacity className="p-2">
+              <TouchableOpacity style={styles.editButton}>
                 <Edit3 size={20} color="#418D84" />
               </TouchableOpacity>
             </View>
 
-            <View className="gap-4">
-              <View className="flex-row justify-between">
-                <Text className="text-royal-palm font-inter">Patient Name</Text>
-                <Text className="text-earie-black font-inter-semibold">
+            <View style={styles.profileDetails}>
+              <View style={styles.profileRow}>
+                <Text style={styles.profileLabel}>Patient Name</Text>
+                <Text style={styles.profileValue}>
                   {profile?.patient_name || 'Not specified'}
                 </Text>
               </View>
 
-              <View className="flex-row justify-between">
-                <Text className="text-royal-palm font-inter">Stroke Type</Text>
-                <Text className="text-earie-black font-inter-semibold">
+              <View style={styles.profileRow}>
+                <Text style={styles.profileLabel}>Stroke Type</Text>
+                <Text style={styles.profileValue}>
                   {profile?.stroke_type ? strokeTypes[profile.stroke_type as keyof typeof strokeTypes] : 'Not specified'}
                 </Text>
               </View>
 
-              <View className="flex-row justify-between">
-                <Text className="text-royal-palm font-inter">Stroke Date</Text>
-                <Text className="text-earie-black font-inter-semibold">
+              <View style={styles.profileRow}>
+                <Text style={styles.profileLabel}>Stroke Date</Text>
+                <Text style={styles.profileValue}>
                   {formatDate(profile?.stroke_date)}
                 </Text>
               </View>
 
-              <View className="flex-row justify-between">
-                <Text className="text-royal-palm font-inter">Mobility Level</Text>
-                <Text className="text-earie-black font-inter-semibold">
+              <View style={styles.profileRow}>
+                <Text style={styles.profileLabel}>Mobility Level</Text>
+                <Text style={styles.profileValue}>
                   {profile?.mobility_level || 'Not set'}/10
                 </Text>
               </View>
 
               {profile?.recovery_goals && profile.recovery_goals.length > 0 && (
-                <View>
-                  <Text className="text-royal-palm font-inter mb-2">Recovery Goals</Text>
-                  <View className="flex-row flex-wrap">
+                <View style={styles.goalsContainer}>
+                  <Text style={styles.profileLabel}>Recovery Goals</Text>
+                  <View style={styles.goalsList}>
                     {profile.recovery_goals.map((goal) => (
-                      <View key={goal} className="bg-blue-glass px-3 py-1 rounded-full mr-2 mb-2">
-                        <Text className="text-royal-palm font-inter text-sm">
+                      <View key={goal} style={styles.goalTag}>
+                        <Text style={styles.goalText}>
                           {recoveryGoalLabels[goal as keyof typeof recoveryGoalLabels] || goal}
                         </Text>
                       </View>
@@ -120,22 +119,21 @@ export default function Profile() {
           </View>
 
           {/* Health & Wellness Tools */}
-          <View
-            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
-            <Text className="text-lg font-inter-bold text-earie-black mb-4">
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
               Health & Wellness Tools
             </Text>
 
             <TouchableOpacity
               onPress={() => router.push('/medication-reminders')}
-              className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
+              style={styles.toolRow}
             >
-              <View className="w-10 h-10 bg-tropical-indigo/10 rounded-lg items-center justify-center mr-4">
+              <View style={styles.toolIcon}>
                 <Pill size={20} color="#9381FF" />
               </View>
-              <View className="flex-1">
-                <Text className="text-earie-black font-inter-semibold">Medication Reminders</Text>
-                <Text className="text-royal-palm font-inter text-sm">
+              <View style={styles.toolContent}>
+                <Text style={styles.toolTitle}>Medication Reminders</Text>
+                <Text style={styles.toolDescription}>
                   Set up daily medication alerts and track adherence
                 </Text>
               </View>
@@ -144,14 +142,14 @@ export default function Profile() {
 
             <TouchableOpacity
               onPress={() => router.push('/health-tracking')}
-              className="flex-row items-center py-4"
+              style={styles.toolRow}
             >
-              <View className="w-10 h-10 bg-blue-glass rounded-lg items-center justify-center mr-4">
+              <View style={styles.toolIconBlue}>
                 <Activity size={20} color="#418D84" />
               </View>
-              <View className="flex-1">
-                <Text className="text-earie-black font-inter-semibold">Health Tracking</Text>
-                <Text className="text-royal-palm font-inter text-sm">
+              <View style={styles.toolContent}>
+                <Text style={styles.toolTitle}>Health Tracking</Text>
+                <Text style={styles.toolDescription}>
                   Log vital signs, symptoms, and health metrics
                 </Text>
               </View>
@@ -160,22 +158,21 @@ export default function Profile() {
           </View>
 
           {/* Emergency & Support */}
-          <View
-            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
-            <Text className="text-lg font-inter-bold text-earie-black mb-4">
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
               Emergency & Support
             </Text>
 
             <TouchableOpacity
               onPress={() => router.push('/emergency-contacts')}
-              className="flex-row items-center py-4"
+              style={styles.toolRow}
             >
-              <View className="w-10 h-10 bg-red-100 rounded-lg items-center justify-center mr-4">
+              <View style={styles.toolIconRed}>
                 <Phone size={20} color="#EF4444" />
               </View>
-              <View className="flex-1">
-                <Text className="text-earie-black font-inter-semibold">Emergency Contacts</Text>
-                <Text className="text-royal-palm font-inter text-sm">
+              <View style={styles.toolContent}>
+                <Text style={styles.toolTitle}>Emergency Contacts</Text>
+                <Text style={styles.toolDescription}>
                   Manage family, friends, and medical team contacts
                 </Text>
               </View>
@@ -184,31 +181,33 @@ export default function Profile() {
           </View>
 
           {/* App Settings */}
-          <View
-            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
-            <Text className="text-lg font-inter-bold text-earie-black mb-4">
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
               App Settings
             </Text>
 
             <TouchableOpacity 
-              onPress={() => router.push('/settings')}
-              className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
+              onPress={() => router.push('/preferences')}
+              style={styles.toolRow}
             >
               <Settings size={20} color="#418D84" />
-              <View className="flex-1 ml-4">
-                <Text className="text-earie-black font-inter-semibold">Preferences</Text>
-                <Text className="text-royal-palm font-inter text-sm">
+              <View style={styles.toolContent}>
+                <Text style={styles.toolTitle}>Preferences</Text>
+                <Text style={styles.toolDescription}>
                   Customize your app experience
                 </Text>
               </View>
               <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center py-4">
+            <TouchableOpacity 
+              onPress={() => router.push('/account-settings')}
+              style={styles.toolRow}
+            >
               <User size={20} color="#418D84" />
-              <View className="flex-1 ml-4">
-                <Text className="text-earie-black font-inter-semibold">Account Settings</Text>
-                <Text className="text-royal-palm font-inter text-sm">
+              <View style={styles.toolContent}>
+                <Text style={styles.toolTitle}>Account Settings</Text>
+                <Text style={styles.toolDescription}>
                   Manage your account details
                 </Text>
               </View>
@@ -217,23 +216,206 @@ export default function Profile() {
           </View>
 
           {/* Turtle Message */}
-          <View
-            className="bg-turtle-indigo-50 border border-turtle-indigo-200 rounded-3xl px-6 py-4 mt-4">
-            <View className="flex-row items-start mb-2">
-              <View className="flex-1">
-                <Text className="text-turtle-indigo-700 font-inter-bold text-lg ml-1">
-                  🐢 From {profile?.turtle_name || 'Shelly'}
+          <View style={styles.turtleMessage}>
+            <View style={styles.turtleMessageContent}>
+              <Text style={styles.turtleEmoji}>🐢</Text>
+              <View style={styles.turtleMessageText}>
+                <Text style={styles.turtleMessageTitle}>
+                  From {profile?.turtle_name || 'Shelly'}
+                </Text>
+                <Text style={styles.turtleMessageBody}>
+                  "I'm so grateful to be part of your recovery journey, {profile?.patient_name || 'my friend'}! Remember,
+                  every day you show up and try is a day worth celebrating. Keep being amazing!"
                 </Text>
               </View>
             </View>
-            <Text
-              className="text-turtle-indigo-700 font-inter text-base leading-relaxed italic">
-              "I'm so grateful to be part of your recovery journey, {profile?.patient_name || 'my friend'}! Remember,
-              every day you show up and try is a day worth celebrating. Keep being amazing!"
-            </Text>
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F6F4F1',
+  },
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+  scrollContent: {
+    paddingBottom: 120,
+  },
+  content: {
+    paddingVertical: 24,
+  },
+  profileHeader: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  profileName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1A1F16',
+    marginTop: 16,
+    fontFamily: 'Inter-Bold',
+  },
+  profileSubtitle: {
+    color: '#418D84',
+    marginTop: 4,
+    fontFamily: 'Inter-Regular',
+  },
+  profileMemberSince: {
+    color: '#418D84',
+    fontSize: 14,
+    marginTop: 8,
+    fontFamily: 'Inter-Regular',
+  },
+  section: {
+    backgroundColor: '#FEF7ED',
+    borderWidth: 1,
+    borderColor: '#14B8A6',
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 24,
+    shadowColor: '#14B8A6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1A1F16',
+    fontFamily: 'Inter-Bold',
+  },
+  editButton: {
+    padding: 8,
+  },
+  profileDetails: {
+    gap: 16,
+  },
+  profileRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  profileLabel: {
+    color: '#418D84',
+    fontFamily: 'Inter-Regular',
+  },
+  profileValue: {
+    color: '#1A1F16',
+    fontWeight: '600',
+    fontFamily: 'Inter-SemiBold',
+  },
+  goalsContainer: {
+    marginTop: 8,
+  },
+  goalsList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
+  },
+  goalTag: {
+    backgroundColor: '#B8DCDC',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  goalText: {
+    color: '#418D84',
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+  },
+  toolRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(20, 184, 166, 0.1)',
+  },
+  toolIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(147, 129, 255, 0.1)',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  toolIconBlue: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#B8DCDC',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  toolIconRed: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#FEF2F2',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  toolContent: {
+    flex: 1,
+  },
+  toolTitle: {
+    color: '#1A1F16',
+    fontWeight: '600',
+    fontFamily: 'Inter-SemiBold',
+  },
+  toolDescription: {
+    color: '#418D84',
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+  },
+  turtleMessage: {
+    backgroundColor: '#F0F9FF',
+    borderWidth: 1,
+    borderColor: '#93C5FD',
+    borderRadius: 24,
+    padding: 16,
+    marginTop: 16,
+  },
+  turtleMessageContent: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  turtleEmoji: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  turtleMessageText: {
+    flex: 1,
+  },
+  turtleMessageTitle: {
+    color: '#1E40AF',
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginBottom: 8,
+    fontFamily: 'Inter-Bold',
+  },
+  turtleMessageBody: {
+    color: '#1E40AF',
+    fontSize: 16,
+    lineHeight: 24,
+    fontStyle: 'italic',
+    fontFamily: 'Inter-Regular',
+  },
+});
