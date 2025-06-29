@@ -3,7 +3,6 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BookOpen, Brain, CheckCircle, ChevronRight, Heart, Moon, Play } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import TurtleAvatar from '@/components/TurtleAvatar';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import { supabase } from '@/lib/supabase';
 
@@ -281,9 +280,9 @@ export default function Learn() {
               // Introduction
               <View>
                 <View className="items-center mb-6">
-                  <TurtleCompanion 
-                    size={120} 
-                    mood="idea" 
+                  <TurtleCompanion
+                    size={120}
+                    mood="idea"
                     message={selectedLesson.content.introduction}
                     showMessage={true}
                     animate={true}
@@ -318,9 +317,9 @@ export default function Learn() {
               // Summary page
               <View>
                 <View className="items-center mb-6">
-                  <TurtleCompanion 
-                    size={140} 
-                    mood="great" 
+                  <TurtleCompanion
+                    size={140}
+                    mood="great"
                     message="Fantastic! You completed another lesson. Your dedication to learning is inspiring!"
                     showMessage={true}
                     animate={true}
@@ -394,9 +393,9 @@ export default function Learn() {
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-6">
           <View className="items-center mb-6">
-            <TurtleCompanion 
-              size={100} 
-              mood="idea" 
+            <TurtleCompanion
+              size={100}
+              mood="idea"
               message="Learning something new today? I love discovering things together with you!"
               showMessage={false}
               animate={true}
@@ -418,7 +417,8 @@ export default function Learn() {
                 </Text>
               </View>
               <Text className="text-emerald-600 font-inter">
-                You've completed {completedLessons.length} lesson{completedLessons.length > 1 ? 's' : ''}! Keep up the great work!
+                You've completed {completedLessons.length} lesson{completedLessons.length > 1 ? 's' : ''}! Keep up the
+                great work!
               </Text>
             </View>
           )}
@@ -513,7 +513,8 @@ export default function Learn() {
             </View>
             <Text
               className="text-turtle-indigo-700 font-inter text-base leading-relaxed italic">
-              "Take your time with each lesson - there's no rush! Understanding comes gradually, just like everything in recovery. I'll be here whenever you're ready to learn something new."
+              "Take your time with each lesson - there's no rush! Understanding comes gradually, just like everything in
+              recovery. I'll be here whenever you're ready to learn something new."
             </Text>
           </View>
         </View>

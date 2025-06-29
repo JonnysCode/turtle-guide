@@ -82,7 +82,7 @@ export default function Profile() {
           {/* Profile Header */}
           <View className="items-center mb-8">
             <TurtleCompanion
-              size={120}
+              size={140}
               mood="writing"
               showMessage={false}
               animate={false}

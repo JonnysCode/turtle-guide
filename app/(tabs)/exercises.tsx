@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CircleCheck as CheckCircle, Clock, Play, Star } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
-import TurtleAvatar from '@/components/TurtleAvatar';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
@@ -258,8 +257,8 @@ export default function Exercises() {
           <View className="items-center mb-10">
             <TurtleCompanion
               size={140}
-              mood={isPerforming ? "excited" : "meditation"}
-              message={isPerforming ? "You're doing amazing! Keep going strong!" : "Take your time and breathe. I believe in you!"}
+              mood={isPerforming ? 'excited' : 'meditation'}
+              message={isPerforming ? 'You\'re doing amazing! Keep going strong!' : 'Take your time and breathe. I believe in you!'}
               showMessage={isPerforming}
               animate={true}
             />
@@ -360,9 +359,9 @@ export default function Exercises() {
       <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
         <View className="py-6">
           <View className="items-center mb-6">
-            <TurtleCompanion 
-              size={100} 
-              mood="excited" 
+            <TurtleCompanion
+              size={100}
+              mood="excited"
               message="Ready to move and grow stronger? Let's do this together!"
               showMessage={false}
               animate={true}

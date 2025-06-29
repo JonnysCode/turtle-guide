@@ -204,7 +204,7 @@ export default function Home() {
             size={160}
             mood={getTurtleMood()}
             message={getTurtleMessage()}
-            onTap={() => setShowTurtleChat(true)}
+            onTap={() => router.push('/turtle-chat')}
             showMessage={true}
             animate={true}
             className="mb-4"
