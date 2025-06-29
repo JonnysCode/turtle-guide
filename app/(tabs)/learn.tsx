@@ -206,24 +206,6 @@ export default function Learn() {
                           </Text>
                         </View>
                       </View>
-                      <View className="flex-row items-center mt-2">
-                        <View
-                          className="px-2 py-1 rounded"
-                          style={{ backgroundColor: `${categoryColor}25` }}
-                        >
-                          <Text
-                            className="font-inter text-xs capitalize"
-                            style={{ color: categoryColor }}
-                          >
-                            {lesson.category.replace('-', ' ')}
-                          </Text>
-                        </View>
-                        <View className="bg-blue-glass px-2 py-1 rounded ml-2">
-                          <Text className="text-royal-palm font-inter text-xs capitalize">
-                            {lesson.difficulty}
-                          </Text>
-                        </View>
-                      </View>
                     </View>
                     <View className="items-center ml-4">
                       {isCompleted ? (
