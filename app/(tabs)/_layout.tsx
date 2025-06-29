@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Tabs, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Award, BookOpen, Home, Target, User } from 'lucide-react-native';
+import { Award, BookOpen, Chrome as Home, Target, User } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function TabLayout() {

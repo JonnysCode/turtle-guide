@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BookOpen, Brain, CheckCircle, ChevronRight, Heart, Moon, Play } from 'lucide-react-native';
+import { BookOpen, Brain, CircleCheck as CheckCircle, ChevronRight, Heart, Moon, Play } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import { supabase } from '@/lib/supabase';
