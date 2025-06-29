@@ -118,7 +118,7 @@ export default function Onboarding() {
                 </View>
               </View>
 
-              <View className="bg-turtle-cream-100 p-4 rounded-xl border border-turtle-teal-300">
+              <View className="bg-turtle-cream-100 p-4 rounded-xl border border-turtle-teal-300 mb-8">
                 <Text className="text-royal-palm font-inter-semibold mb-2">
                   🐢 Privacy Note
                 </Text>
