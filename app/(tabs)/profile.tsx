@@ -191,7 +191,7 @@ export default function Profile() {
             </Text>
 
             <TouchableOpacity 
-              onPress={() => router.push('/settings')}
+              onPress={() => router.push('/preferences')}
               className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
             >
               <Settings size={20} color="#418D84" />
@@ -204,7 +204,10 @@ export default function Profile() {
               <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center py-4">
+            <TouchableOpacity 
+              onPress={() => router.push('/account-settings')}
+              className="flex-row items-center py-4"
+            >
               <User size={20} color="#418D84" />
               <View className="flex-1 ml-4">
                 <Text className="text-earie-black font-inter-semibold">Account Settings</Text>
