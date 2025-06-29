@@ -136,30 +136,64 @@ export default function Progress() {
     }
   };
 
-  const getExerciseChart = () => {
-    const screenWidth = Dimensions.get('window').width;
-    const chartWidth = screenWidth - 48;
-    const maxExercises = Math.max(...progressData.map(d => d.exercises_completed), 1);
+  const getFullWeekData = () => {
+    const today = new Date();
+    const weekData = [];
+    
+    // Generate the last 7 days (including today)
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dateString = date.toISOString().split('T')[0];
+      
+      // Find existing data for this date
+      const existingData = progressData.find(d => d.date === dateString);
+      
+      weekData.push({
+        date: dateString,
+        exercises_completed: existingData?.exercises_completed || 0,
+        mood_rating: existingData?.mood_rating || null,
+        dayName: date.toLocaleDateString('en', { weekday: 'short' }),
+        dayNumber: date.getDate()
+      });
+    }
+    
+    return weekData;
+  };
 
-    return progressData.slice(-7).map((data, index) => {
-      const height = (data.exercises_completed / maxExercises) * 80;
-      const date = new Date(data.date);
-      const dayLabel = date.toLocaleDateString('en', { weekday: 'short' });
+  const getExerciseChart = () => {
+    const weekData = getFullWeekData();
+    const maxExercises = Math.max(...weekData.map(d => d.exercises_completed), 1);
+
+    return weekData.map((data, index) => {
+      const height = maxExercises > 0 ? (data.exercises_completed / maxExercises) * 80 : 4;
+      const isToday = data.date === new Date().toISOString().split('T')[0];
 
       return (
         <View key={index} className="items-center flex-1">
           <View className="h-20 justify-end mb-2">
             <View
-              className="bg-royal-palm rounded-t-lg w-6 min-h-[4px]"
+              className={`rounded-t-lg w-6 min-h-[4px] ${
+                data.exercises_completed > 0 
+                  ? 'bg-royal-palm' 
+                  : 'bg-gray-300'
+              } ${isToday ? 'border-2 border-tropical-indigo' : ''}`}
               style={{ height: Math.max(height, 4) }}
             />
           </View>
-          <Text className="text-royal-palm font-inter text-xs">
-            {dayLabel}
+          <Text className={`font-inter text-xs ${
+            isToday ? 'text-tropical-indigo font-inter-bold' : 'text-royal-palm'
+          }`}>
+            {data.dayName}
           </Text>
-          <Text className="text-earie-black font-inter-bold text-xs">
+          <Text className={`font-inter-bold text-xs ${
+            data.exercises_completed > 0 ? 'text-earie-black' : 'text-gray-400'
+          }`}>
             {data.exercises_completed}
           </Text>
+          {isToday && (
+            <View className="w-1 h-1 bg-tropical-indigo rounded-full mt-1" />
+          )}
         </View>
       );
     });
@@ -341,20 +375,26 @@ export default function Progress() {
             </View>
           </Card>
 
-          {/* Exercise Chart */}
-          {progressData.length > 0 && (
-            <Card variant="elevated" className="mb-6">
-              <Text className="text-lg font-inter-bold text-earie-black mb-4">
-                Daily Exercise Activity
+          {/* Exercise Chart - Always show full week */}
+          <Card variant="elevated" className="mb-6">
+            <Text className="text-lg font-inter-bold text-earie-black mb-4">
+              Weekly Exercise Activity
+            </Text>
+            <View className="flex-row items-end justify-between mb-4">
+              {getExerciseChart()}
+            </View>
+            <View className="flex-row justify-between items-center">
+              <Text className="text-royal-palm font-inter text-sm">
+                Last 7 days • Today highlighted
               </Text>
-              <View className="flex-row items-end justify-between mb-4">
-                {getExerciseChart()}
+              <View className="flex-row items-center">
+                <View className="w-3 h-3 bg-royal-palm rounded mr-2" />
+                <Text className="text-royal-palm font-inter text-xs mr-3">Active</Text>
+                <View className="w-3 h-3 bg-gray-300 rounded mr-2" />
+                <Text className="text-gray-500 font-inter text-xs">Rest</Text>
               </View>
-              <Text className="text-royal-palm font-inter text-center text-sm">
-                Exercises completed per day (last 7 days)
-              </Text>
-            </Card>
-          )}
+            </View>
+          </Card>
 
           {/* Achievements Section */}
           <Card variant="elevated" className="mb-6">
