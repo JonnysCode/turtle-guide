@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
@@ -45,8 +45,18 @@ export default function Register() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-chalk">
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+    <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right', 'bottom']}>
+      <KeyboardAvoidingView 
+        className="flex-1" 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <ScrollView 
+          className="flex-1 px-6" 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
         <TouchableOpacity
           onPress={() => router.back()}
           className="mt-4 mb-8 w-12 h-12 bg-turtle-cream-100 border border-turtle-teal-300 rounded-full items-center justify-center shadow-lg shadow-turtle-teal-300/50"
@@ -118,7 +128,8 @@ export default function Register() {
             Already have an account? <Text className="font-inter-semibold">Sign In</Text>
           </Text>
         </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

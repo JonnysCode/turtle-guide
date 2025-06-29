@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, ArrowRight, User } from 'lucide-react-native';
@@ -331,16 +331,26 @@ export default function Onboarding() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk">
-      {step > 1 && (
-        <TouchableOpacity
-          onPress={() => setStep(step - 1)}
-          className="mt-4 ml-6 w-12 h-12 bg-turtle-cream-100 border border-turtle-teal-300 rounded-full items-center justify-center shadow-lg shadow-turtle-teal-300/50"
-        >
-          <ArrowLeft size={24} color="#1A1F16" />
-        </TouchableOpacity>
-      )}
+      <KeyboardAvoidingView 
+        className="flex-1" 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        {step > 1 && (
+          <TouchableOpacity
+            onPress={() => setStep(step - 1)}
+            className="mt-4 ml-6 w-12 h-12 bg-turtle-cream-100 border border-turtle-teal-300 rounded-full items-center justify-center shadow-lg shadow-turtle-teal-300/50"
+          >
+            <ArrowLeft size={24} color="#1A1F16" />
+          </TouchableOpacity>
+        )}
 
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          className="flex-1 px-6" 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
         {/* Progress indicator */}
         <View className="flex-row justify-center mb-8 mt-4">
           {[1, 2, 3, 4, 5].map((stepNum) => (
@@ -367,7 +377,8 @@ export default function Onboarding() {
           </Text>
           {!loading && <ArrowRight size={20} color="white" />}
         </TouchableOpacity>
-      </View>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

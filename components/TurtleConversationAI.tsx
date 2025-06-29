@@ -69,7 +69,7 @@ export default function TurtleConversationAI({
       await conversation.startSession({
         agentId: process.env.EXPO_PUBLIC_ELEVENLABS_AGENT_ID || 'YOUR_AGENT_ID', // Replace with your agent ID
         dynamicVariables: {
-          patient_name: patientName,
+          user_name: patientName,
           mobility_level: mobilityLevel.toString(),
           recovery_goals: recoveryGoals.join(', '),
           stroke_type: strokeType,
@@ -100,11 +100,11 @@ export default function TurtleConversationAI({
   const getStatusText = () => {
     switch (connectionStatus) {
       case 'connecting':
-        return 'Connecting to your turtle...';
+        return 'Connecting to Shelly...';
       case 'connected':
-        return 'Your turtle is listening...';
+        return 'Shelly is listening...';
       default:
-        return 'Tap to start talking with your turtle';
+        return 'Tap to start talking with Shelly';
     }
   };
 
@@ -170,7 +170,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24
+    padding: 24,
+    backgroundColor: '#F8F6F0'
   },
   content: {
     alignItems: 'center',
@@ -191,10 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 24,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8

@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import TurtleAvatar from '@/components/TurtleAvatar';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
@@ -36,8 +35,17 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-chalk">
-      <View className="flex-1 px-6">
+    <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right', 'bottom']}>
+      <KeyboardAvoidingView 
+        className="flex-1" 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <ScrollView 
+          className="flex-1 px-6 pb-2"
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
         <TouchableOpacity
           onPress={() => router.back()}
           className="mt-4 mb-8 w-12 h-12 bg-turtle-cream-100 border border-turtle-teal-300 rounded-full items-center justify-center shadow-lg shadow-turtle-teal-300/50"
@@ -46,7 +54,7 @@ export default function Login() {
         </TouchableOpacity>
 
         <View className="items-center mb-8">
-          <TurtleCompanion 
+          <TurtleCompanion
             size={140}
             mood="hi"
             message="Welcome back! I'm so happy to see you again. Ready to continue our journey together?"
@@ -101,7 +109,8 @@ export default function Login() {
             Don't have an account? <Text className="font-inter-semibold">Sign Up</Text>
           </Text>
         </TouchableOpacity>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
