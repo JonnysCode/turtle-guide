@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Award, Calendar, Heart, Smile, Target, TrendingUp } from 'lucide-react-native';
+import { Award, Smile, Target, TrendingUp } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
 import { supabase } from '@/lib/supabase';
-import { achievementDefinitions, getUserStats, getAchievementProgress } from '@/lib/achievementSystem';
+import { achievementDefinitions, getAchievementProgress, getUserStats } from '@/lib/achievementSystem';
 
 interface ProgressData {
   date: string;
@@ -89,7 +89,7 @@ export default function Progress() {
 
       if (achievementData) {
         setAchievements(achievementData);
-        
+
         // Calculate total points
         const points = achievementData.reduce((total, achievement) => {
           const def = achievementDefinitions.find(a => a.id === achievement.achievement_type);
@@ -139,16 +139,16 @@ export default function Progress() {
   const getFullWeekData = () => {
     const today = new Date();
     const weekData = [];
-    
+
     // Generate the last 7 days (including today)
     for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
       const dateString = date.toISOString().split('T')[0];
-      
+
       // Find existing data for this date
       const existingData = progressData.find(d => d.date === dateString);
-      
+
       weekData.push({
         date: dateString,
         exercises_completed: existingData?.exercises_completed || 0,
@@ -157,7 +157,7 @@ export default function Progress() {
         dayNumber: date.getDate()
       });
     }
-    
+
     return weekData;
   };
 
@@ -174,8 +174,8 @@ export default function Progress() {
           <View className="h-20 justify-end mb-2">
             <View
               className={`rounded-t-lg w-6 min-h-[4px] ${
-                data.exercises_completed > 0 
-                  ? 'bg-royal-palm' 
+                data.exercises_completed > 0
+                  ? 'bg-royal-palm'
                   : 'bg-gray-300'
               } ${isToday ? 'border-2 border-tropical-indigo' : ''}`}
               style={{ height: Math.max(height, 4) }}
@@ -191,9 +191,6 @@ export default function Progress() {
           }`}>
             {data.exercises_completed}
           </Text>
-          {isToday && (
-            <View className="w-1 h-1 bg-tropical-indigo rounded-full mt-1" />
-          )}
         </View>
       );
     });
@@ -215,8 +212,18 @@ export default function Progress() {
   const getProgressLevel = () => {
     if (totalPoints < 50) return { level: 1, title: 'Beginner', color: '#10B981', progress: totalPoints / 50 };
     if (totalPoints < 150) return { level: 2, title: 'Explorer', color: '#3B82F6', progress: (totalPoints - 50) / 100 };
-    if (totalPoints < 300) return { level: 3, title: 'Achiever', color: '#8B5CF6', progress: (totalPoints - 150) / 150 };
-    if (totalPoints < 500) return { level: 4, title: 'Champion', color: '#EC4899', progress: (totalPoints - 300) / 200 };
+    if (totalPoints < 300) return {
+      level: 3,
+      title: 'Achiever',
+      color: '#8B5CF6',
+      progress: (totalPoints - 150) / 150
+    };
+    if (totalPoints < 500) return {
+      level: 4,
+      title: 'Champion',
+      color: '#EC4899',
+      progress: (totalPoints - 300) / 200
+    };
     return { level: 5, title: 'Master', color: '#F59E0B', progress: 1 };
   };
 
@@ -234,8 +241,8 @@ export default function Progress() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView 
-        className="flex-1 px-6" 
+      <ScrollView
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
@@ -261,7 +268,7 @@ export default function Progress() {
           <Card variant="elevated" className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50">
             <View className="items-center">
               <View className="flex-row items-center mb-4">
-                <View 
+                <View
                   className="w-12 h-12 rounded-full items-center justify-center mr-3"
                   style={{ backgroundColor: levelInfo.color }}
                 >
@@ -278,19 +285,19 @@ export default function Progress() {
                   </Text>
                 </View>
               </View>
-              
+
               <View className="w-full bg-blue-glass rounded-full h-3 mb-2">
-                <View 
+                <View
                   className="h-3 rounded-full"
-                  style={{ 
+                  style={{
                     width: `${levelInfo.progress * 100}%`,
-                    backgroundColor: levelInfo.color 
+                    backgroundColor: levelInfo.color
                   }}
                 />
               </View>
-              
+
               <Text className="text-royal-palm font-inter text-sm">
-                {levelInfo.level < 5 
+                {levelInfo.level < 5
                   ? `${Math.round((1 - levelInfo.progress) * 100)}% to next level`
                   : 'Maximum level achieved! 🏆'
                 }
@@ -399,15 +406,17 @@ export default function Progress() {
                     const unlockedData = achievements.find(a => a.achievement_type === achievement.id);
                     const unlockedDate = unlockedData ? new Date(unlockedData.unlocked_at).toLocaleDateString() : '';
                     const badgeImage = badgeImages[achievement.id as keyof typeof badgeImages];
-                    
+
                     return (
-                      <View key={achievement.id} className="bg-white rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center border-2 border-royal-palm shadow-xl">
+                      <View key={achievement.id}
+                            className="bg-turtle-cream-200 rounded-xl px-4 pb-4 pt-4 flex-1 min-w-[45%] max-w-[48%] items-center border-2 border-royal-palm shadow-xl">
                         {/* Earned Badge with Enhanced Visibility */}
                         <View className="relative mb-3">
                           {/* Glow effect */}
-                          <View className="absolute -inset-2 bg-royal-palm/20 rounded-full blur-sm" />
-                          <View className="w-20 h-20 items-center justify-center relative">
-                            <Image 
+                          <View className="absolute -inset-2 rounded-full "
+                                style={{ backgroundColor: categoryColors[achievement.category] }} />
+                          <View className="w-16 h-16 items-center justify-center relative">
+                            <Image
                               source={badgeImage}
                               style={{
                                 width: 64,
@@ -419,16 +428,16 @@ export default function Progress() {
                             />
                           </View>
                         </View>
-                        
+
                         <Text className="font-inter-bold text-earie-black text-center mb-1 text-base">
                           {achievement.title}
                         </Text>
                         <Text className="text-earie-black/80 font-inter text-xs text-center mb-3 leading-tight">
                           {achievement.description}
                         </Text>
-                        
+
                         <View className="flex-row items-center gap-2 mb-2">
-                          <View 
+                          <View
                             className="px-3 py-1 rounded-full"
                             style={{ backgroundColor: categoryColors[achievement.category] }}
                           >
@@ -442,7 +451,7 @@ export default function Progress() {
                             </Text>
                           </View>
                         </View>
-                        
+
                         <Text className="text-earie-black/60 font-inter text-xs">
                           {unlockedDate}
                         </Text>
@@ -463,12 +472,13 @@ export default function Progress() {
                   {getLockedAchievements().slice(0, 4).map((achievement) => {
                     const badgeImage = badgeImages[achievement.id as keyof typeof badgeImages];
                     const progressPercent = Math.round(achievement.progress * 100);
-                    
+
                     return (
-                      <View key={achievement.id} className="bg-gray-100 rounded-xl p-4 flex-1 min-w-[45%] max-w-[48%] items-center border border-gray-300">
-                        <View className="w-20 h-20 mb-3 items-center justify-center relative">
+                      <View key={achievement.id}
+                            className="bg-turtle-cream-200 rounded-xl px-4 pb-4 pt-2 flex-1 min-w-[45%] max-w-[48%] items-center border border-turtle-teal-300">
+                        <View className="w-20 h-20 mb-1 items-center justify-center relative">
                           {/* Badge image with light opacity overlay */}
-                          <Image 
+                          <Image
                             source={badgeImage}
                             style={{
                               width: 64,
@@ -487,7 +497,7 @@ export default function Progress() {
                             </View>
                           </View>
                         </View>
-                        
+
                         <Text className="font-inter-bold text-gray-800 text-center mb-1 text-base">
                           {achievement.title}
                         </Text>
@@ -497,16 +507,16 @@ export default function Progress() {
                         <Text className="text-gray-600 font-inter-semibold text-xs text-center mb-3">
                           {achievement.requirement}
                         </Text>
-                        
+
                         {/* Progress bar for locked achievements */}
                         {progressPercent > 0 && (
                           <View className="w-full mb-3">
                             <View className="w-full bg-gray-300 rounded-full h-2 mb-1">
-                              <View 
+                              <View
                                 className="h-2 rounded-full"
-                                style={{ 
+                                style={{
                                   width: `${progressPercent}%`,
-                                  backgroundColor: categoryColors[achievement.category] 
+                                  backgroundColor: categoryColors[achievement.category]
                                 }}
                               />
                             </View>
@@ -515,12 +525,12 @@ export default function Progress() {
                             </Text>
                           </View>
                         )}
-                        
-                        <View 
+
+                        <View
                           className="px-3 py-1 rounded-full"
                           style={{ backgroundColor: `${categoryColors[achievement.category]}20` }}
                         >
-                          <Text 
+                          <Text
                             className="font-inter-bold text-xs"
                             style={{ color: categoryColors[achievement.category] }}
                           >
