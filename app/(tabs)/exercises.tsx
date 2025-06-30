@@ -51,7 +51,7 @@ const exercises: Exercise[] = [
     benefits: 'Improves fine motor control and hand strength'
   },
   {
-    id: 'breathing-exercise',
+    id: 'deep-breathing',
     name: 'Calm Breathing',
     category: 'cognitive',
     difficulty: 1,
@@ -67,7 +67,7 @@ const exercises: Exercise[] = [
     benefits: 'Reduces anxiety and improves concentration'
   },
   {
-    id: 'speech-sounds',
+    id: 'speech-practice',
     name: 'Sound Practice',
     category: 'speech',
     difficulty: 2,
@@ -99,7 +99,7 @@ const exercises: Exercise[] = [
     benefits: 'Improves blood flow and ankle flexibility'
   },
   {
-    id: 'memory-game',
+    id: 'memory-games',
     name: 'Simple Memory',
     category: 'cognitive',
     difficulty: 2,

@@ -53,7 +53,7 @@ const exercises: Exercise[] = [
     benefits: 'Improves fine motor control and hand strength'
   },
   {
-    id: 'breathing-exercise',
+    id: 'deep-breathing',
     name: 'Calm Breathing',
     category: 'cognitive',
     difficulty: 1,
@@ -69,7 +69,7 @@ const exercises: Exercise[] = [
     benefits: 'Reduces anxiety and improves concentration'
   },
   {
-    id: 'speech-sounds',
+    id: 'speech-practice',
     name: 'Sound Practice',
     category: 'speech',
     difficulty: 2,
@@ -101,7 +101,7 @@ const exercises: Exercise[] = [
     benefits: 'Improves blood flow and ankle flexibility'
   },
   {
-    id: 'memory-game',
+    id: 'memory-games',
     name: 'Simple Memory',
     category: 'cognitive',
     difficulty: 2,
@@ -185,7 +185,7 @@ export default function ExerciseDetail() {
 
   const showCompletionMessage = (achievements: string[] = []) => {
     const hasNewAchievements = achievements.length > 0;
-    const message = hasNewAchievements 
+    const message = hasNewAchievements
       ? `You completed the exercise and earned ${achievements.length} new badge${achievements.length > 1 ? 's' : ''}! 🏆`
       : 'You completed the exercise! I\'m so proud of your dedication.';
 
@@ -333,11 +333,11 @@ export default function ExerciseDetail() {
                 animate={true}
               />
             </View>
-            
+
             <Text className="text-2xl font-inter-bold text-earie-black text-center mb-4">
               Excellent Work! 🎉
             </Text>
-            
+
             <Text className="text-earie-black font-inter text-center text-lg mb-6 leading-relaxed">
               You completed the exercise! I'm so proud of your dedication to your recovery journey.
             </Text>
@@ -348,12 +348,12 @@ export default function ExerciseDetail() {
                   🏆 New Badge{newAchievements.length > 1 ? 's' : ''} Earned!
                 </Text>
                 <Text className="text-earie-black font-inter text-center">
-                  You earned {newAchievements.length} new achievement{newAchievements.length > 1 ? 's' : ''}! 
+                  You earned {newAchievements.length} new achievement{newAchievements.length > 1 ? 's' : ''}!
                   Check your progress page to see your badges.
                 </Text>
               </View>
             )}
-            
+
             <Button
               onPress={handleCompletionModalClose}
               variant="primary"
@@ -410,9 +410,9 @@ export default function ExerciseDetail() {
             size={120}
             mood={isPerforming ? 'excited' : isCompleted ? 'great' : 'meditation'}
             message={
-              isPerforming 
-                ? 'You\'re doing amazing! Keep going strong!' 
-                : isCompleted 
+              isPerforming
+                ? 'You\'re doing amazing! Keep going strong!'
+                : isCompleted
                   ? 'Fantastic work! You completed this exercise today!'
                   : 'Take your time and breathe. I believe in you!'
             }
@@ -420,9 +420,9 @@ export default function ExerciseDetail() {
             animate={true}
           />
           <Text className="text-royal-palm font-inter mt-4 text-center text-lg">
-            {isPerforming 
-              ? 'You\'re doing great! Keep going!' 
-              : isCompleted 
+            {isPerforming
+              ? 'You\'re doing great! Keep going!'
+              : isCompleted
                 ? 'Already completed today! Great job!'
                 : exercise.description
             }

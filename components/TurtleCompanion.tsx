@@ -85,6 +85,7 @@ export default function TurtleCompanion({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messageVisible, setMessageVisible] = useState(showMessage);
   const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+  const [hasManuallyStoppedVoice, setHasManuallyStoppedVoice] = useState(false);
 
   // Create audio player for voice asset
   const audioPlayer = useAudioPlayer(voiceAsset || null);
@@ -158,6 +159,8 @@ export default function TurtleCompanion({
         useNativeDriver: true
       }).start();
     } else {
+      // Reset manual stop flag when message is hidden
+      setHasManuallyStoppedVoice(false);
       Animated.spring(messageAnim, {
         toValue: 0,
         tension: 100,
@@ -192,12 +195,26 @@ export default function TurtleCompanion({
   // Monitor audio player playing state
   useEffect(() => {
     setIsPlayingVoice(audioPlayer.playing);
-  }, [audioPlayer.playing]);
+    
+    // Additional check for web compatibility
+    const checkPlayingState = () => {
+      if (audioPlayer) {
+        setIsPlayingVoice(audioPlayer.playing);
+      }
+    };
+    
+    // Check state periodically for web compatibility
+    const interval = setInterval(checkPlayingState, 100);
+    
+    return () => clearInterval(interval);
+  }, [audioPlayer.playing, audioPlayer]);
 
   const playVoiceAsset = useCallback(() => {
     if (!voiceAsset || !audioPlayer) return;
 
     try {
+      // Reset manual stop flag when manually playing
+      setHasManuallyStoppedVoice(false);
       // Reset to beginning and play
       audioPlayer.seekTo(0);
       audioPlayer.play();
@@ -206,22 +223,42 @@ export default function TurtleCompanion({
     }
   }, [voiceAsset, audioPlayer]);
 
-  const stopVoiceAsset = useCallback(() => {
-    if (audioPlayer && audioPlayer.playing) {
+  const stopVoiceAsset = useCallback(async () => {
+    if (audioPlayer) {
       try {
-        audioPlayer.pause();
+        // Mark as manually stopped to prevent auto-restart
+        setHasManuallyStoppedVoice(true);
+        
+        // For web compatibility, try multiple methods to stop audio
+        if (audioPlayer.playing) {
+          audioPlayer.pause();
+        }
+        // Reset to beginning to ensure it stops completely
+        await audioPlayer.seekTo(0);
+        // Force update the state for web compatibility
+        setIsPlayingVoice(false);
       } catch (error) {
         console.error('Error stopping voice asset:', error);
+        // Fallback: try to recreate the audio player to force stop
+        try {
+          if (audioPlayer.playing) {
+            audioPlayer.remove();
+          }
+        } catch (fallbackError) {
+          console.error('Fallback stop method failed:', fallbackError);
+        }
+        // Ensure state is updated even if stop fails
+        setIsPlayingVoice(false);
       }
     }
   }, [audioPlayer]);
 
   // Handle voice asset playback - must be after playVoiceAsset is defined
   useEffect(() => {
-    if (autoPlayVoice && voiceAsset && showMessage && !isPlayingVoice) {
+    if (autoPlayVoice && voiceAsset && showMessage && !isPlayingVoice && !hasManuallyStoppedVoice) {
       playVoiceAsset();
     }
-  }, [showMessage, autoPlayVoice, voiceAsset, isPlayingVoice, playVoiceAsset]);
+  }, [showMessage, autoPlayVoice, voiceAsset, isPlayingVoice, hasManuallyStoppedVoice, playVoiceAsset]);
 
   const handlePress = () => {
     if (minimal) return; // Don't handle press in minimal mode
