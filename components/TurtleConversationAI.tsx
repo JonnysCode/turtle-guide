@@ -242,7 +242,7 @@ export default function TurtleConversationAI({
 
       // Start the conversation with enhanced context
       await conversation.startSession({
-        agentId: process.env.EXPO_PUBLIC_ELEVENLABS_AGENT_ID || 'YOUR_AGENT_ID',
+        agentId: 'agent_01jz10176ke5c9qpzr1e05k9hb',
         dynamicVariables: patientContext,
         clientTools: clientTools
       });
