@@ -188,8 +188,8 @@ export default function Exercises() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView 
-        className="flex-1 px-6" 
+      <ScrollView
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
       >
@@ -235,7 +235,7 @@ export default function Exercises() {
             </Text>
             <View className="flex-row flex-wrap gap-3">
               {getCategoryStats().map((stat) => (
-                <View 
+                <View
                   key={stat.category}
                   className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-xl p-4 flex-1 min-w-[45%]"
                 >
@@ -249,11 +249,11 @@ export default function Exercises() {
                     {stat.completed}/{stat.total} completed
                   </Text>
                   <View className="bg-turtle-cream-200 rounded-full h-2 mt-2">
-                    <View 
+                    <View
                       className="h-2 rounded-full"
-                      style={{ 
+                      style={{
                         width: `${(stat.completed / stat.total) * 100}%`,
-                        backgroundColor: stat.color 
+                        backgroundColor: stat.color
                       }}
                     />
                   </View>
@@ -346,7 +346,7 @@ export default function Exercises() {
                           <CheckCircle size={28} color="#F6F4F1" />
                         </View>
                       ) : (
-                        <View 
+                        <View
                           className="w-16 h-16 rounded-full items-center justify-center shadow-lg"
                           style={{ backgroundColor: categoryColor }}
                         >
@@ -361,7 +361,7 @@ export default function Exercises() {
           </View>
 
           {/* Motivational Message */}
-          <View className="bg-turtle-indigo-50 border border-turtle-indigo-200 rounded-3xl px-6 py-5 mt-8">
+          <View className="bg-turtle-indigo-50 border border-turtle-indigo-400 rounded-3xl px-6 py-5 mt-8">
             <View className="flex-row items-start">
               <Text className="text-3xl mr-3">🐢</Text>
               <View className="flex-1">
@@ -369,7 +369,8 @@ export default function Exercises() {
                   Turtle Wisdom
                 </Text>
                 <Text className="text-turtle-indigo-700 font-inter text-base leading-relaxed italic">
-                  "Remember, progress isn't about speed - it's about consistency. Even the smallest movement forward is a victory worth celebrating!"
+                  "Remember, progress isn't about speed - it's about consistency. Even the smallest movement forward is
+                  a victory worth celebrating!"
                 </Text>
               </View>
             </View>

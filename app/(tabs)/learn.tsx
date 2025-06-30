@@ -2,7 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { BookOpen, Brain, CircleCheck as CheckCircle, ChevronRight, Clock, Heart, Moon, Play } from 'lucide-react-native';
+import {
+  BookOpen,
+  Brain,
+  ChevronRight,
+  CircleCheck as CheckCircle,
+  Clock,
+  Heart,
+  Moon,
+  Play
+} from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import { supabase } from '@/lib/supabase';
@@ -110,8 +119,8 @@ export default function Learn() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView 
-        className="flex-1 px-6" 
+      <ScrollView
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
       >
@@ -186,7 +195,7 @@ export default function Learn() {
                         <View className="flex-row items-center bg-blue-glass px-2 py-1 rounded mr-3">
                           <Clock size={12} color="#418D84" />
                           <Text className="text-royal-palm font-inter text-xs ml-1">
-                             {lesson.duration} min
+                            {lesson.duration} min
                           </Text>
                         </View>
                         <View
@@ -233,7 +242,7 @@ export default function Learn() {
           </View>
 
           <View
-            className="bg-turtle-indigo-50 border border-turtle-indigo-200 rounded-3xl px-6 py-4 mt-8">
+            className="bg-turtle-indigo-50 border border-turtle-indigo-400 rounded-3xl px-6 py-4 mt-8">
             <View className="flex-row items-start mb-2">
               <View className="flex-1">
                 <Text className="text-turtle-indigo-700 font-inter-bold text-lg ml-1">

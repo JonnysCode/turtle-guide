@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TurtleCompanion, { TurtleCompanionPresets } from '@/components/TurtleCompanion';
+import TurtleCompanion from '@/components/TurtleCompanion';
 
 export default function Welcome() {
   console.log('Welcome page rendering...');
@@ -16,19 +16,21 @@ export default function Welcome() {
           <TurtleCompanion 
             size={160}
             mood="wave-left"
-            message="Welcome to TurtleGuide! I'm here to be your gentle companion on this recovery journey. Together, we'll take it one step at a time."
+            message="Hello! I'm Shelly, your AI-powered stroke recovery companion. I'm here to support you with gentle guidance, personalized exercises, and encouraging conversations every step of the way."
             showMessage={true}
             animate={true}
             className="mb-6"
+            voiceAsset={require('@/assets/audio/shelly/shelly-welcome.mp3')}
+            autoPlayVoice={true}
           />
         </View>
         
         <Text className="text-4xl font-inter-bold text-earie-black text-center mb-4">
-          Welcome to TurtleGuide
+          Meet Shelly
         </Text>
         
         <Text className="text-lg font-inter text-royal-palm text-center mb-12">
-          Your gentle companion for stroke recovery
+          Your AI-powered stroke recovery companion
         </Text>
 
         <View className="w-full max-w-sm gap-4">

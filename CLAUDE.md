@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 
-This is a React Native app built with Expo Router for stroke recovery guidance, featuring a turtle mascot theme.
+Shelly is a React Native app built with Expo Router that provides AI-powered stroke recovery support. The app features Shelly, an encouraging turtle companion that uses ElevenLabs conversational AI to provide personalized guidance, exercises, and emotional support for stroke recovery patients.
 
 ### Core Structure
 - **Expo Router**: File-based routing with `app/` directory structure
@@ -22,13 +22,14 @@ This is a React Native app built with Expo Router for stroke recovery guidance, 
 
 ### Key Components
 - `TurtleStartupScreen` - App startup animation/loading
-- `TurtleIntroduction` - User onboarding with turtle mascot
-- `TurtleAvatar` - Reusable turtle character component
+- `TurtleIntroduction` - User onboarding with Shelly the turtle companion
+- `TurtleCompanion` - Main Shelly character component with animations and moods
+- `TurtleConversationAI` - ElevenLabs integration for AI conversations with Shelly
 
 ### Authentication Flow
 1. Root layout wraps app in `AuthProvider` and `UserProvider`
 2. Auth state determines routing between `(auth)` and `(tabs)` groups
-3. Turtle introduction shows on successful sign-in via `showTurtleIntro` flag
+3. Shelly introduction shows on successful sign-in via `showTurtleIntro` flag
 4. Supabase handles authentication with environment variables
 
 ### Styling System
@@ -43,7 +44,14 @@ This is a React Native app built with Expo Router for stroke recovery guidance, 
 - **Progress** - User progress tracking
 - **Profile** - User profile and settings
 
+### AI Integration
+- **ElevenLabs Conversational AI**: Powers Shelly's voice conversations
+- **Client Tools**: Allow Shelly to suggest exercises and learning modules with actionable buttons
+- **Contextual Intelligence**: Personalized responses based on patient data and progress
+
 ### Environment Setup
 Requires these environment variables:
 - `EXPO_PUBLIC_SUPABASE_URL`
 - `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+- `EXPO_PUBLIC_ELEVENLABS_AGENT_ID`
+- `EXPO_PUBLIC_ELEVENLABS_API_KEY`

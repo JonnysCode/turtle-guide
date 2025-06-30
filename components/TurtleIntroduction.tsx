@@ -357,10 +357,10 @@ export default function TurtleIntroduction({ onComplete, isStartupScreen = false
               style={{ opacity: fadeAnim }}
             >
               <Text className="text-3xl font-inter-bold text-turtle-slate">
-                TurtleGuide
+                Shelly
               </Text>
               <Text className="text-turtle-slate/70 font-inter text-sm mt-1">
-                {isStartupScreen ? 'Welcome Back!' : 'Your Recovery Companion'}
+                {isStartupScreen ? 'Welcome Back!' : 'Your AI Recovery Companion'}
               </Text>
             </Animated.View>
 

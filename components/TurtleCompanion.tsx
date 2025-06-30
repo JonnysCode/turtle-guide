@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Image, ImageSourcePropType, Text, TouchableOpacity, View } from 'react-native';
 import { MessageCircle, Volume2, VolumeX } from 'lucide-react-native';
+import { useAudioPlayer } from 'expo-audio';
 
 interface TurtleCompanionProps {
   size?: number;
@@ -13,6 +14,8 @@ interface TurtleCompanionProps {
   enableSpeech?: boolean;
   className?: string;
   minimal?: boolean; // New prop to display only the turtle without interactive elements
+  voiceAsset?: any; // Audio asset to play when speech bubble appears
+  autoPlayVoice?: boolean; // Whether to automatically play voice when speech bubble shows
 }
 
 export type TurtleMood =
@@ -74,11 +77,17 @@ export default function TurtleCompanion({
                                           showMessage = false,
                                           enableSpeech = false,
                                           className = '',
-                                          minimal = false
+                                          minimal = false,
+                                          voiceAsset,
+                                          autoPlayVoice = false
                                         }: TurtleCompanionProps) {
   const [isPressed, setIsPressed] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messageVisible, setMessageVisible] = useState(showMessage);
+  const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+
+  // Create audio player for voice asset
+  const audioPlayer = useAudioPlayer(voiceAsset || null);
 
   // Animation refs
   const bounceAnim = useRef(new Animated.Value(0)).current;
@@ -180,6 +189,40 @@ export default function TurtleCompanion({
     }
   }, [isSpeaking, speechAnim]);
 
+  // Monitor audio player playing state
+  useEffect(() => {
+    setIsPlayingVoice(audioPlayer.playing);
+  }, [audioPlayer.playing]);
+
+  const playVoiceAsset = useCallback(() => {
+    if (!voiceAsset || !audioPlayer) return;
+
+    try {
+      // Reset to beginning and play
+      audioPlayer.seekTo(0);
+      audioPlayer.play();
+    } catch (error) {
+      console.error('Error playing voice asset:', error);
+    }
+  }, [voiceAsset, audioPlayer]);
+
+  const stopVoiceAsset = useCallback(() => {
+    if (audioPlayer && audioPlayer.playing) {
+      try {
+        audioPlayer.pause();
+      } catch (error) {
+        console.error('Error stopping voice asset:', error);
+      }
+    }
+  }, [audioPlayer]);
+
+  // Handle voice asset playback - must be after playVoiceAsset is defined
+  useEffect(() => {
+    if (autoPlayVoice && voiceAsset && showMessage && !isPlayingVoice) {
+      playVoiceAsset();
+    }
+  }, [showMessage, autoPlayVoice, voiceAsset, isPlayingVoice, playVoiceAsset]);
+
   const handlePress = () => {
     if (minimal) return; // Don't handle press in minimal mode
 
@@ -264,11 +307,15 @@ export default function TurtleCompanion({
         <Animated.View
           style={{
             opacity: messageOpacity,
-            transform: [{ scale: messageScale }]
+            transform: [{ scale: messageScale }],
+            elevation: 8
           }}
-          className="mb-4 max-w-xs z-7"
+          className="mb-4 max-w-xs"
         >
-          <View className="z-7 bg-chalk border-2 border-royal-palm rounded-2xl px-4 py-3 shadow-lg">
+          <View className="bg-chalk border-2 border-royal-palm rounded-2xl px-4 py-3 shadow-lg"
+                style={{
+                  elevation: 8
+                }}>
             <Text className="text-earie-black font-inter text-base leading-relaxed text-center">
               {currentMessage}
             </Text>
@@ -339,6 +386,20 @@ export default function TurtleCompanion({
                 <Volume2 size={16} color="#F6F4F1" />
               )}
             </Animated.View>
+          </TouchableOpacity>
+        )}
+
+        {/* Voice asset control button */}
+        {voiceAsset && (
+          <TouchableOpacity
+            onPress={isPlayingVoice ? stopVoiceAsset : playVoiceAsset}
+            className="absolute -bottom-2 -left-2 w-8 h-8 bg-turtle-indigo-500 rounded-full items-center justify-center shadow-lg"
+          >
+            {isPlayingVoice ? (
+              <VolumeX size={16} color="#F6F4F1" />
+            ) : (
+              <Volume2 size={16} color="#F6F4F1" />
+            )}
           </TouchableOpacity>
         )}
 

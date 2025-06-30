@@ -546,7 +546,7 @@ export default function Progress() {
           </Card>
 
           {/* Motivational Message */}
-          <Card variant="flat" className="bg-turtle-indigo-50 border-turtle-indigo-200">
+          <Card variant="flat" className="bg-turtle-indigo-50 border-turtle-indigo-400">
             <View className="flex-row items-start">
               <Text className="text-3xl mr-3">🐢</Text>
               <View className="flex-1">

@@ -89,6 +89,8 @@ export default function Onboarding() {
                 message="Nice to meet you! I'm so happy you're here. Let's start with your name so I can personalize your recovery journey."
                 showMessage={true}
                 animate={true}
+                voiceAsset={require('@/assets/audio/shelly/shelly-register-2.mp3')}
+                autoPlayVoice={true}
               />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 Nice to Meet You!
@@ -140,6 +142,8 @@ export default function Onboarding() {
                 message={patientName ? `Hello ${patientName}! To help me support you better, could you tell me what type of stroke brought us together?` : 'Let\'s get to know each other better. What type of stroke brought us together?'}
                 showMessage={true}
                 animate={true}
+                voiceAsset={require('@/assets/audio/shelly/shelly-register-3.mp3')}
+                autoPlayVoice={true}
               />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 {patientName ? `Hello ${patientName}!` : 'Let\'s Get to Know Each Other'}
@@ -186,6 +190,8 @@ export default function Onboarding() {
                 message="Now, help me understand your current mobility level on a scale of 1-10. This helps me suggest the right exercises for you. Remember, every level is perfect - we're just starting where you are!"
                 showMessage={true}
                 animate={true}
+                voiceAsset={require('@/assets/audio/shelly/shelly-register-4.mp3')}
+                autoPlayVoice={true}
               />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 Your Mobility Level
@@ -238,6 +244,8 @@ export default function Onboarding() {
                 message="What matters most to you in your recovery? Choose any goals that resonate with you - these will help me personalize your experience and celebrate your progress!"
                 showMessage={true}
                 animate={true}
+                voiceAsset={require('@/assets/audio/shelly/shelly-register-5.mp3')}
+                autoPlayVoice={true}
               />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 What Are Your Goals?
@@ -280,6 +288,8 @@ export default function Onboarding() {
                 message={`Perfect! I'm ${turtleName}, and I'm so honored to be your companion, cheerleader, and guide. Together, we'll take recovery one step at a time - just like a wise turtle should! ${patientName}, I believe in you completely.`}
                 showMessage={true}
                 animate={true}
+                voiceAsset={require('@/assets/audio/shelly/shelly-register-6.mp3')}
+                autoPlayVoice={true}
               />
               <Text className="text-2xl font-inter-bold text-earie-black mt-4 text-center">
                 Perfect! I'm {turtleName}
@@ -331,8 +341,8 @@ export default function Onboarding() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk">
-      <KeyboardAvoidingView 
-        className="flex-1" 
+      <KeyboardAvoidingView
+        className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
@@ -345,38 +355,38 @@ export default function Onboarding() {
           </TouchableOpacity>
         )}
 
-        <ScrollView 
-          className="flex-1 px-6" 
+        <ScrollView
+          className="flex-1 px-6"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
         >
-        {/* Progress indicator */}
-        <View className="flex-row justify-center mb-8 mt-4">
-          {[1, 2, 3, 4, 5].map((stepNum) => (
-            <View
-              key={stepNum}
-              className={`w-3 h-3 rounded-full mx-1 ${
-                stepNum <= step ? 'bg-royal-palm' : 'bg-blue-glass'
-              }`}
-            />
-          ))}
-        </View>
+          {/* Progress indicator */}
+          <View className="flex-row justify-center mb-8 mt-4">
+            {[1, 2, 3, 4, 5].map((stepNum) => (
+              <View
+                key={stepNum}
+                className={`w-3 h-3 rounded-full mx-1 ${
+                  stepNum <= step ? 'bg-royal-palm' : 'bg-blue-glass'
+                }`}
+              />
+            ))}
+          </View>
 
-        {renderStepContent()}
-      </ScrollView>
+          {renderStepContent()}
+        </ScrollView>
 
-      <View className="px-6 pb-6 mt-2">
-        <TouchableOpacity
-          onPress={step === 5 ? handleComplete : () => setStep(step + 1)}
-          disabled={loading || (step === 1 && !patientName.trim()) || (step === 2 && !strokeType) || (step === 4 && selectedGoals.length === 0)}
-          className="bg-royal-palm py-4 px-8 rounded-2xl shadow-lg disabled:opacity-50 flex-row items-center justify-center"
-        >
-          <Text className="text-chalk text-lg font-inter-semibold mr-2">
-            {loading ? 'Setting up...' : step === 5 ? 'Start My Journey!' : 'Continue'}
-          </Text>
-          {!loading && <ArrowRight size={20} color="white" />}
-        </TouchableOpacity>
+        <View className="px-6 pb-6 mt-2">
+          <TouchableOpacity
+            onPress={step === 5 ? handleComplete : () => setStep(step + 1)}
+            disabled={loading || (step === 1 && !patientName.trim()) || (step === 2 && !strokeType) || (step === 4 && selectedGoals.length === 0)}
+            className="bg-royal-palm py-4 px-8 rounded-2xl shadow-lg disabled:opacity-50 flex-row items-center justify-center"
+          >
+            <Text className="text-chalk text-lg font-inter-semibold mr-2">
+              {loading ? 'Setting up...' : step === 5 ? 'Start My Journey!' : 'Continue'}
+            </Text>
+            {!loading && <ArrowRight size={20} color="white" />}
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

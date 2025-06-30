@@ -221,7 +221,7 @@ export default function Profile() {
 
           {/* Turtle Message */}
           <View
-            className="bg-turtle-indigo-50 border border-turtle-indigo-200 rounded-3xl px-6 py-4 mt-4">
+            className="bg-turtle-indigo-50 border border-turtle-indigo-400 rounded-3xl px-6 py-4 mt-4">
             <View className="flex-row items-start mb-2">
               <View className="flex-1">
                 <Text className="text-turtle-indigo-700 font-inter-bold text-lg ml-1">
