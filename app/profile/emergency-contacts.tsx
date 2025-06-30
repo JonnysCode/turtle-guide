@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Linking, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, LocationEdit as Edit3, Mail, MapPin, Phone, Plus, Star, Trash2, User, X } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  LocationEdit as Edit3,
+  Mail,
+  MapPin,
+  Phone,
+  Plus,
+  Star,
+  Trash2,
+  User,
+  X
+} from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
@@ -231,8 +242,8 @@ export default function EmergencyContacts() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView 
-        className="flex-1 px-6" 
+      <ScrollView
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
@@ -281,7 +292,7 @@ export default function EmergencyContacts() {
                 </Text>
               </View>
             </View>
-            
+
             <TouchableOpacity
               onPress={() => makePhoneCall('911')}
               className="bg-red-600 py-4 rounded-xl shadow-lg"
@@ -342,7 +353,7 @@ export default function EmergencyContacts() {
                           {contact.relationship}
                         </Text>
                       </View>
-                      
+
                       <View className="flex-row gap-2">
                         <TouchableOpacity
                           onPress={() => startEdit(contact)}
@@ -373,7 +384,7 @@ export default function EmergencyContacts() {
 
                       {contact.phone_number_2 && (
                         <TouchableOpacity
-                          onPress={() => makePhoneCall(contact.phone_number_2)}
+                          onPress={() => makePhoneCall(contact.phone_number_2!)}
                           className="bg-tropical-indigo py-3 rounded-lg flex-row items-center justify-center"
                         >
                           <Phone size={18} color="white" />
@@ -511,9 +522,9 @@ export default function EmergencyContacts() {
                         : 'bg-turtle-cream-100 border-turtle-teal-300'
                     }`}
                   >
-                    <Star 
-                      size={20} 
-                      color={formData.is_primary ? 'white' : '#418D84'} 
+                    <Star
+                      size={20}
+                      color={formData.is_primary ? 'white' : '#418D84'}
                       fill={formData.is_primary ? 'white' : 'none'}
                     />
                     <View className="ml-3 flex-1">
@@ -560,7 +571,9 @@ export default function EmergencyContacts() {
                   Emergency Contact Tips
                 </Text>
                 <Text className="text-turtle-indigo-700 font-inter text-base leading-relaxed">
-                  "Keep your emergency contacts updated and make sure they know they're listed. Consider adding both local and distant family members, plus your medical team. Having multiple ways to reach people (phone, email) is always wise!"
+                  "Keep your emergency contacts updated and make sure they know they're listed. Consider adding both
+                  local and distant family members, plus your medical team. Having multiple ways to reach people (phone,
+                  email) is always wise!"
                 </Text>
               </View>
             </View>

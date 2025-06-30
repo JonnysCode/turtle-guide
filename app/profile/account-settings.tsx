@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
-import { Platform, ScrollView, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
+import { Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { 
-  ArrowLeft, 
-  LogOut, 
-  Mail, 
-  User, 
-  Key,
-  ChevronRight
-} from 'lucide-react-native';
+import { ArrowLeft, ChevronRight, Key, LogOut, Mail, User } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import Input from '@/components/Input';
-import Button from '@/components/Button';
 
 export default function AccountSettings() {
   const router = useRouter();
@@ -24,7 +16,7 @@ export default function AccountSettings() {
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [showEmailChange, setShowEmailChange] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
-  
+
   // Password change form
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -118,14 +110,14 @@ export default function AccountSettings() {
     }
   };
 
-  const SettingRow = ({ 
-    icon: Icon, 
-    title, 
-    description, 
-    onPress,
-    showChevron = true,
-    isDestructive = false
-  }: {
+  const SettingRow = ({
+                        icon: Icon,
+                        title,
+                        description,
+                        onPress,
+                        showChevron = true,
+                        isDestructive = false
+                      }: {
     icon: any;
     title: string;
     description?: string;
@@ -135,57 +127,63 @@ export default function AccountSettings() {
   }) => (
     <TouchableOpacity
       onPress={onPress}
-      style={styles.settingRow}
+      className="flex-row items-center py-3 px-4 bg-turtle-cream-200 rounded-lg my-0.5"
     >
-      <View style={[styles.iconContainer, isDestructive && styles.destructiveIcon]}>
-        <Icon size={20} color={isDestructive ? "#EF4444" : "#418D84"} />
+      <View className={`w-10 h-10 rounded-lg items-center justify-center mr-4 ${
+        isDestructive ? 'bg-red-500' : 'bg-blue-glass'
+      }`}>
+        <Icon size={20} color={isDestructive ? '#ffffff' : '#418D84'} />
       </View>
-      <View style={styles.settingContent}>
-        <Text style={[styles.settingTitle, isDestructive && styles.destructiveText]}>{title}</Text>
+      <View className="flex-1">
+        <Text className={`font-inter-semibold ${
+          isDestructive ? 'text-red-500' : 'text-earie-black'
+        }`}>{title}</Text>
         {description && (
-          <Text style={[styles.settingDescription, isDestructive && styles.destructiveDescription]}>
+          <Text className={`text-sm font-inter ${
+            isDestructive ? 'text-red-400' : 'text-royal-palm'
+          }`}>
             {description}
           </Text>
         )}
       </View>
       {showChevron && (
-        <ChevronRight size={20} color={isDestructive ? "#EF4444" : "#418D84"} />
+        <ChevronRight size={20} color={isDestructive ? '#EF4444' : '#418D84'} />
       )}
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
       {/* Sign Out Confirmation Modal */}
       {showSignOutModal && (
-        <View style={styles.modalOverlay}>
-          <View style={styles.modal}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalIcon}>
+        <View className="absolute inset-0 bg-black/50 z-50 items-center justify-center">
+          <View className="bg-chalk rounded-3xl p-8 mx-6 max-w-md w-full shadow-2xl">
+            <View className="items-center mb-6">
+              <View className="w-16 h-16 bg-red-100 rounded-full items-center justify-center mb-4">
                 <LogOut size={32} color="#EF4444" />
               </View>
-              <Text style={styles.modalTitle}>
+              <Text className="text-2xl font-inter-bold text-earie-black text-center mb-2">
                 Sign Out
               </Text>
-              <Text style={styles.modalMessage}>
+              <Text className="text-earie-black font-inter text-center leading-6">
                 Are you sure you want to sign out of your account?
               </Text>
             </View>
-            
-            <View style={styles.modalButtons}>
+
+            <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setShowSignOutModal(false)}
-                style={[styles.modalButton, styles.cancelButton]}
+                className="flex-1 py-4 px-6 rounded-2xl border-2 border-royal-palm items-center justify-center min-h-14"
                 disabled={isSigningOut}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text className="text-royal-palm font-inter-semibold text-lg">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleSignOut}
-                style={[styles.modalButton, styles.signOutButton]}
+                className="flex-1 py-4 px-6 rounded-2xl bg-red-500 items-center justify-center min-h-14"
                 disabled={isSigningOut}
               >
-                <Text style={styles.signOutButtonText}>
+                <Text className="text-chalk font-inter-semibold text-lg">
                   {isSigningOut ? 'Signing Out...' : 'Sign Out'}
                 </Text>
               </TouchableOpacity>
@@ -196,18 +194,18 @@ export default function AccountSettings() {
 
       {/* Password Change Modal */}
       {showPasswordChange && (
-        <View style={styles.modalOverlay}>
-          <View style={styles.modal}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalIconBlue}>
+        <View className="absolute inset-0 bg-black/50 z-50 items-center justify-center">
+          <View className="bg-chalk rounded-3xl p-8 mx-6 max-w-md w-full shadow-2xl">
+            <View className="items-center mb-6">
+              <View className="w-16 h-16 bg-blue-glass rounded-full items-center justify-center mb-4">
                 <Key size={32} color="#418D84" />
               </View>
-              <Text style={styles.modalTitle}>
+              <Text className="text-2xl font-inter-bold text-earie-black text-center">
                 Change Password
               </Text>
             </View>
-            
-            <View style={styles.formContainer}>
+
+            <View className="gap-4 mb-6">
               <Input
                 label="Current Password"
                 value={passwordForm.currentPassword}
@@ -230,22 +228,22 @@ export default function AccountSettings() {
                 isPassword
               />
             </View>
-            
-            <View style={styles.modalButtons}>
+
+            <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => {
                   setShowPasswordChange(false);
                   setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
                 }}
-                style={[styles.modalButton, styles.cancelButton]}
+                className="flex-1 py-4 px-6 rounded-2xl border-2 border-royal-palm items-center justify-center min-h-14"
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text className="text-royal-palm font-inter-semibold text-lg">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={changePassword}
-                style={[styles.modalButton, styles.primaryButton]}
+                className="flex-1 py-4 px-6 rounded-2xl bg-royal-palm items-center justify-center min-h-14"
               >
-                <Text style={styles.primaryButtonText}>Update</Text>
+                <Text className="text-chalk font-inter-semibold text-lg">Update</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -254,18 +252,18 @@ export default function AccountSettings() {
 
       {/* Email Change Modal */}
       {showEmailChange && (
-        <View style={styles.modalOverlay}>
-          <View style={styles.modal}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalIconBlue}>
+        <View className="absolute inset-0 bg-black/50 z-50 items-center justify-center">
+          <View className="bg-chalk rounded-3xl p-8 mx-6 max-w-md w-full shadow-2xl">
+            <View className="items-center mb-6">
+              <View className="w-16 h-16 bg-blue-glass rounded-full items-center justify-center mb-4">
                 <Mail size={32} color="#418D84" />
               </View>
-              <Text style={styles.modalTitle}>
+              <Text className="text-2xl font-inter-bold text-earie-black text-center">
                 Change Email
               </Text>
             </View>
-            
-            <View style={styles.formContainer}>
+
+            <View className="gap-4 mb-6">
               <Input
                 label="New Email Address"
                 value={emailForm.newEmail}
@@ -282,54 +280,54 @@ export default function AccountSettings() {
                 isPassword
               />
             </View>
-            
-            <View style={styles.modalButtons}>
+
+            <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => {
                   setShowEmailChange(false);
                   setEmailForm({ newEmail: '', password: '' });
                 }}
-                style={[styles.modalButton, styles.cancelButton]}
+                className="flex-1 py-4 px-6 rounded-2xl border-2 border-royal-palm items-center justify-center min-h-14"
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text className="text-royal-palm font-inter-semibold text-lg">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={changeEmail}
-                style={[styles.modalButton, styles.primaryButton]}
+                className="flex-1 py-4 px-6 rounded-2xl bg-royal-palm items-center justify-center min-h-14"
               >
-                <Text style={styles.primaryButtonText}>Update</Text>
+                <Text className="text-chalk font-inter-semibold text-lg">Update</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       )}
 
-      <ScrollView 
-        style={styles.scrollView}
+      <ScrollView
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <View style={styles.content}>
+        <View className="py-6">
           {/* Header */}
-          <View style={styles.header}>
+          <View className="flex-row items-center mb-6">
             <TouchableOpacity
               onPress={() => router.back()}
-              style={styles.backButton}
+              className="w-12 h-12 bg-turtle-cream-100 border border-turtle-teal-300 rounded-3xl items-center justify-center mr-4"
             >
               <ArrowLeft size={24} color="#1A1F16" />
             </TouchableOpacity>
-            <View style={styles.headerContent}>
-              <Text style={styles.headerTitle}>
+            <View className="flex-1">
+              <Text className="text-2xl font-inter-bold text-earie-black">
                 Account Settings
               </Text>
-              <Text style={styles.headerSubtitle}>
+              <Text className="text-royal-palm font-inter">
                 Manage your account details
               </Text>
             </View>
           </View>
 
           {/* Turtle Companion */}
-          <View style={styles.turtleContainer}>
+          <View className="items-center mb-6">
             <TurtleCompanion
               size={120}
               mood="writing"
@@ -340,25 +338,26 @@ export default function AccountSettings() {
           </View>
 
           {/* Account Information */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
+          <View
+            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+            <Text className="text-lg font-inter-bold text-earie-black mb-4">
               Account Information
             </Text>
-            
+
             <SettingRow
               icon={User}
               title="Profile Name"
               description={profile?.patient_name || 'Not set'}
               showChevron={false}
             />
-            
+
             <SettingRow
               icon={Mail}
               title="Email Address"
               description={user?.email || 'Not available'}
               onPress={() => setShowEmailChange(true)}
             />
-            
+
             <SettingRow
               icon={Key}
               title="Change Password"
@@ -368,11 +367,12 @@ export default function AccountSettings() {
           </View>
 
           {/* Account Actions */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
+          <View
+            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+            <Text className="text-lg font-inter-bold text-earie-black mb-4">
               Account Actions
             </Text>
-            
+
             <SettingRow
               icon={LogOut}
               title="Sign Out"
@@ -383,15 +383,16 @@ export default function AccountSettings() {
           </View>
 
           {/* Turtle Message */}
-          <View style={styles.turtleMessage}>
-            <View style={styles.turtleMessageContent}>
-              <Text style={styles.turtleEmoji}>🐢</Text>
-              <View style={styles.turtleMessageText}>
-                <Text style={styles.turtleMessageTitle}>
+          <View className="bg-blue-50 border border-blue-300 rounded-2xl p-4 mt-4">
+            <View className="flex-row items-start">
+              <Text className="text-2xl mr-3">🐢</Text>
+              <View className="flex-1">
+                <Text className="text-blue-800 font-inter-bold text-lg mb-2">
                   Security Tip from {profile?.turtle_name || 'Shelly'}
                 </Text>
-                <Text style={styles.turtleMessageBody}>
-                  "Keep your account secure by using a strong password and updating your email if needed. I'm here to help protect your recovery journey data!"
+                <Text className="text-blue-800 font-inter text-base leading-6 italic">
+                  "Keep your account secure by using a strong password and updating your email if needed. I'm here to
+                  help protect your recovery journey data!"
                 </Text>
               </View>
             </View>
@@ -401,251 +402,3 @@ export default function AccountSettings() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F6F4F1',
-  },
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    zIndex: 1000,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modal: {
-    backgroundColor: '#F6F4F1',
-    borderRadius: 24,
-    padding: 32,
-    marginHorizontal: 24,
-    maxWidth: 400,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 16,
-  },
-  modalContent: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  modalIcon: {
-    width: 64,
-    height: 64,
-    backgroundColor: '#FEF2F2',
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  modalIconBlue: {
-    width: 64,
-    height: 64,
-    backgroundColor: '#B8DCDC',
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1A1F16',
-    textAlign: 'center',
-    marginBottom: 8,
-    fontFamily: 'Inter-Bold',
-  },
-  modalMessage: {
-    color: '#1A1F16',
-    textAlign: 'center',
-    lineHeight: 24,
-    fontFamily: 'Inter-Regular',
-  },
-  formContainer: {
-    gap: 16,
-    marginBottom: 24,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 56,
-  },
-  cancelButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: '#418D84',
-  },
-  cancelButtonText: {
-    color: '#418D84',
-    fontWeight: '600',
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-  },
-  signOutButton: {
-    backgroundColor: '#EF4444',
-  },
-  signOutButtonText: {
-    color: '#F6F4F1',
-    fontWeight: '600',
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-  },
-  primaryButton: {
-    backgroundColor: '#418D84',
-  },
-  primaryButtonText: {
-    color: '#F6F4F1',
-    fontWeight: '600',
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 24,
-  },
-  scrollContent: {
-    paddingBottom: 120,
-  },
-  content: {
-    paddingVertical: 24,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  backButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#FEF7ED',
-    borderWidth: 1,
-    borderColor: '#14B8A6',
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1A1F16',
-    fontFamily: 'Inter-Bold',
-  },
-  headerSubtitle: {
-    color: '#418D84',
-    fontFamily: 'Inter-Regular',
-  },
-  turtleContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  section: {
-    backgroundColor: '#FEF7ED',
-    borderWidth: 1,
-    borderColor: '#14B8A6',
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 24,
-    shadowColor: '#14B8A6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1A1F16',
-    marginBottom: 16,
-    fontFamily: 'Inter-Bold',
-  },
-  settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    backgroundColor: 'rgba(0,0,0,0.02)',
-    borderRadius: 8,
-    marginVertical: 2,
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#B8DCDC',
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  destructiveIcon: {
-    backgroundColor: '#FEF2F2',
-  },
-  settingContent: {
-    flex: 1,
-  },
-  settingTitle: {
-    color: '#1A1F16',
-    fontWeight: '600',
-    fontFamily: 'Inter-SemiBold',
-  },
-  settingDescription: {
-    color: '#418D84',
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-  },
-  destructiveText: {
-    color: '#EF4444',
-  },
-  destructiveDescription: {
-    color: '#F87171',
-  },
-  turtleMessage: {
-    backgroundColor: '#F0F9FF',
-    borderWidth: 1,
-    borderColor: '#93C5FD',
-    borderRadius: 24,
-    padding: 16,
-    marginTop: 16,
-  },
-  turtleMessageContent: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  turtleEmoji: {
-    fontSize: 24,
-    marginRight: 12,
-  },
-  turtleMessageText: {
-    flex: 1,
-  },
-  turtleMessageTitle: {
-    color: '#1E40AF',
-    fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 8,
-    fontFamily: 'Inter-Bold',
-  },
-  turtleMessageBody: {
-    color: '#1E40AF',
-    fontSize: 16,
-    lineHeight: 24,
-    fontStyle: 'italic',
-    fontFamily: 'Inter-Regular',
-  },
-});

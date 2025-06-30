@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Alert, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Calendar, Heart, LocationEdit as Edit3, Phone, Settings, User, Activity, Pill, ChevronRight } from 'lucide-react-native';
+import { Activity, ChevronRight, LocationEdit as Edit3, Phone, Pill, Settings, User } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'expo-router';
@@ -35,8 +35,8 @@ export default function Profile() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView 
-        className="flex-1 px-6" 
+      <ScrollView
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
       >
@@ -127,7 +127,7 @@ export default function Profile() {
             </Text>
 
             <TouchableOpacity
-              onPress={() => router.push('/medication-reminders')}
+              onPress={() => router.push('/profile/medication-reminders')}
               className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
             >
               <View className="w-10 h-10 bg-tropical-indigo/10 rounded-lg items-center justify-center mr-4">
@@ -143,7 +143,7 @@ export default function Profile() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => router.push('/health-tracking')}
+              onPress={() => router.push('/profile/health-tracking')}
               className="flex-row items-center py-4"
             >
               <View className="w-10 h-10 bg-blue-glass rounded-lg items-center justify-center mr-4">
@@ -167,7 +167,7 @@ export default function Profile() {
             </Text>
 
             <TouchableOpacity
-              onPress={() => router.push('/emergency-contacts')}
+              onPress={() => router.push('/profile/emergency-contacts')}
               className="flex-row items-center py-4"
             >
               <View className="w-10 h-10 bg-red-100 rounded-lg items-center justify-center mr-4">
@@ -190,8 +190,8 @@ export default function Profile() {
               App Settings
             </Text>
 
-            <TouchableOpacity 
-              onPress={() => router.push('/preferences')}
+            <TouchableOpacity
+              onPress={() => router.push('/profile/preferences')}
               className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
             >
               <Settings size={20} color="#418D84" />
@@ -204,8 +204,8 @@ export default function Profile() {
               <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              onPress={() => router.push('/account-settings')}
+            <TouchableOpacity
+              onPress={() => router.push('/profile/account-settings')}
               className="flex-row items-center py-4"
             >
               <User size={20} color="#418D84" />
