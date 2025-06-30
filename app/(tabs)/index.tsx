@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { BookOpen, Calendar, Frown, Heart, Meh, Smile, Target, TrendingUp } from 'lucide-react-native';
@@ -8,6 +8,7 @@ import { useUser } from '@/contexts/UserContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
 import TurtleIntroduction from '@/components/TurtleIntroduction';
 import { supabase } from '@/lib/supabase';
+import { checkAndAwardAchievements } from '@/lib/achievementSystem';
 
 interface DailyProgress {
   date: string;
@@ -93,7 +94,7 @@ export default function Home() {
     try {
       const { data } = await supabase
         .from('daily_progress')
-        .select('date')
+        .select('date, exercises_completed')
         .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(30);
@@ -111,7 +112,8 @@ export default function Home() {
         const expectedDate = new Date(today);
         expectedDate.setDate(today.getDate() - i);
 
-        if (progressDate.toDateString() === expectedDate.toDateString()) {
+        if (progressDate.toDateString() === expectedDate.toDateString() &&
+          data[i].exercises_completed > 0) {
           currentStreak++;
         } else {
           break;
@@ -138,14 +140,16 @@ export default function Home() {
           date: today,
           mood_rating: rating,
           exercises_completed: todayProgress?.exercises_completed || 0
-        }, { 
-          onConflict: 'user_id,date' 
+        }, {
+          onConflict: 'user_id,date'
         });
 
       if (error) {
         Alert.alert('Error', 'Failed to save mood. Please try again.');
         console.error('Error updating mood:', error);
       } else {
+        // Check for achievements after mood update
+        await checkAndAwardAchievements(user.id);
         fetchTodayProgress();
       }
     } catch (error) {
@@ -197,8 +201,18 @@ export default function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView 
-        className="flex-1 px-6" 
+      {/* Bolt.new Badge */}
+      <View className="absolute top-4 right-4 z-10 rounded-full border-2 border-turtle-indigo-500">
+        <Image
+          source={require('@/assets/images/bolt.png')}
+          className="w-16 h-16"
+          resizeMode="contain"
+          style={{ height: 80, width: 80 }}
+        />
+      </View>
+
+      <ScrollView
+        className="flex-1 px-6 pt-16"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
       >
@@ -224,11 +238,12 @@ export default function Home() {
         </View>
 
         {/* Compact Mood Check-in */}
-        <View className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-4 mb-6 shadow-lg shadow-turtle-teal-300/50">
+        <View
+          className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-4 mb-6 shadow-lg shadow-turtle-teal-300/50">
           <Text className="text-base font-inter-bold text-earie-black mb-3">
             How are you feeling today?
           </Text>
-          
+
           {/* Compact horizontal layout for all screen sizes */}
           <View className="flex-row justify-between items-center">
             {moodIcons.map(({ rating, icon: Icon, color, label }) => (
@@ -243,7 +258,7 @@ export default function Home() {
                   size={24}
                   color={selectedMood === rating ? '#418D84' : color}
                 />
-                <Text 
+                <Text
                   className={`text-xs font-inter mt-1 text-center ${
                     selectedMood === rating ? 'text-royal-palm font-inter-semibold' : 'text-earie-black'
                   }`}
@@ -257,7 +272,7 @@ export default function Home() {
               </TouchableOpacity>
             ))}
           </View>
-          
+
           {/* Show selected mood description */}
           {selectedMood && (
             <Text className="text-royal-palm/80 font-inter text-sm text-center mt-2">
@@ -267,7 +282,8 @@ export default function Home() {
         </View>
 
         {/* Today's Progress */}
-        <View className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+        <View
+          className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
           <Text className="text-lg font-inter-bold text-earie-black mb-4">
             Today's Progress
           </Text>
@@ -285,7 +301,7 @@ export default function Home() {
             </View>
 
             <View className="items-center flex-1">
-              <View className="w-12 h-12 bg-tropical-indigo rounded-xl items-center justify-center mb-2">
+              <View className="w-12 h-12 bg-turtle-indigo-500 rounded-xl items-center justify-center mb-2">
                 <TrendingUp size={24} color="#F6F4F1" />
               </View>
               <Text className="text-2xl font-inter-bold text-earie-black">{streak}</Text>
@@ -332,7 +348,7 @@ export default function Home() {
               onPress={() => router.push('/(tabs)/learn')}
               className="flex-1 bg-turtle-cream-100 border border-turtle-teal-300 p-4 rounded-xl shadow-lg shadow-turtle-teal-300/50 flex-row items-center"
             >
-              <View className="w-10 h-10 bg-tropical-indigo rounded-lg items-center justify-center mr-3">
+              <View className="w-10 h-10 bg-turtle-indigo-500 rounded-lg items-center justify-center mr-3">
                 <BookOpen size={20} color="#F6F4F1" />
               </View>
               <View className="flex-1">

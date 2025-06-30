@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Alert, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Calendar, Heart, LocationEdit as Edit3, LogOut, Phone, Settings, User } from 'lucide-react-native';
+import { Activity, ChevronRight, LocationEdit as Edit3, Phone, Pill, Settings, User } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useRouter } from 'expo-router';
@@ -24,51 +24,9 @@ const recoveryGoalLabels = {
 };
 
 export default function Profile() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { profile } = useUser();
   const router = useRouter();
-  const [showEmergencyContacts, setShowEmergencyContacts] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
-
-  const handleSignOut = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setIsSigningOut(true);
-              console.log('Profile: Starting sign out process...');
-
-              await signOut();
-
-              // Additional fallback for web - if the context doesn't handle it
-              if (Platform.OS === 'web') {
-                setTimeout(() => {
-                  if (typeof window !== 'undefined') {
-                    window.location.href = '/';
-                  }
-                }, 500);
-              } else {
-                // On native platforms, manually navigate
-                router.replace('/(auth)/welcome');
-              }
-
-            } catch (error) {
-              console.error('Sign out failed:', error);
-              Alert.alert('Error', 'Failed to sign out. Please try again.');
-            } finally {
-              setIsSigningOut(false);
-            }
-          }
-        }
-      ]
-    );
-  };
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'Not specified';
@@ -77,8 +35,8 @@ export default function Profile() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView 
-        className="flex-1 px-6" 
+      <ScrollView
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
       >
@@ -161,16 +119,56 @@ export default function Profile() {
             </View>
           </View>
 
-          {/* Quick Actions */}
+          {/* Health & Wellness Tools */}
           <View
             className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
             <Text className="text-lg font-inter-bold text-earie-black mb-4">
-              Quick Actions
+              Health & Wellness Tools
             </Text>
 
             <TouchableOpacity
-              onPress={() => setShowEmergencyContacts(!showEmergencyContacts)}
-              className="flex-row items-center py-4 border-b border-gray-100"
+              onPress={() => router.push('/profile/medication-reminders')}
+              className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
+            >
+              <View className="w-10 h-10 bg-tropical-indigo/10 rounded-lg items-center justify-center mr-4">
+                <Pill size={20} color="#9381FF" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-earie-black font-inter-semibold">Medication Reminders</Text>
+                <Text className="text-royal-palm font-inter text-sm">
+                  Set up daily medication alerts and track adherence
+                </Text>
+              </View>
+              <ChevronRight size={20} color="#418D84" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => router.push('/profile/health-tracking')}
+              className="flex-row items-center py-4"
+            >
+              <View className="w-10 h-10 bg-blue-glass rounded-lg items-center justify-center mr-4">
+                <Activity size={20} color="#418D84" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-earie-black font-inter-semibold">Health Tracking</Text>
+                <Text className="text-royal-palm font-inter text-sm">
+                  Log vital signs, symptoms, and health metrics
+                </Text>
+              </View>
+              <ChevronRight size={20} color="#418D84" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Emergency & Support */}
+          <View
+            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+            <Text className="text-lg font-inter-bold text-earie-black mb-4">
+              Emergency & Support
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => router.push('/profile/emergency-contacts')}
+              className="flex-row items-center py-4"
             >
               <View className="w-10 h-10 bg-red-100 rounded-lg items-center justify-center mr-4">
                 <Phone size={20} color="#EF4444" />
@@ -178,49 +176,10 @@ export default function Profile() {
               <View className="flex-1">
                 <Text className="text-earie-black font-inter-semibold">Emergency Contacts</Text>
                 <Text className="text-royal-palm font-inter text-sm">
-                  Quick access to important numbers
+                  Manage family, friends, and medical team contacts
                 </Text>
               </View>
-            </TouchableOpacity>
-
-            {showEmergencyContacts && (
-              <View className="bg-red-50 p-4 rounded-lg mt-2 border border-red-200">
-                <Text className="text-red-800 font-inter-semibold mb-2">
-                  🚨 Emergency Services
-                </Text>
-                <TouchableOpacity className="bg-red-600 py-3 rounded-lg mb-3">
-                  <Text className="text-white font-inter-bold text-center text-lg">
-                    Call 911
-                  </Text>
-                </TouchableOpacity>
-                <Text className="text-red-700 font-inter text-sm text-center">
-                  For immediate medical emergencies
-                </Text>
-              </View>
-            )}
-
-            <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-100">
-              <View className="w-10 h-10 bg-tropical-indigo/10 rounded-lg items-center justify-center mr-4">
-                <Calendar size={20} color="#9381FF" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-earie-black font-inter-semibold">Medication Reminders</Text>
-                <Text className="text-royal-palm font-inter text-sm">
-                  Set up daily medication alerts
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="flex-row items-center py-4">
-              <View className="w-10 h-10 bg-blue-glass rounded-lg items-center justify-center mr-4">
-                <Heart size={20} color="#418D84" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-earie-black font-inter-semibold">Health Tracking</Text>
-                <Text className="text-royal-palm font-inter text-sm">
-                  Log symptoms and vital signs
-                </Text>
-              </View>
+              <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
           </View>
 
@@ -231,17 +190,24 @@ export default function Profile() {
               App Settings
             </Text>
 
-            <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-100">
+            <TouchableOpacity
+              onPress={() => router.push('/profile/preferences')}
+              className="flex-row items-center py-4 border-b border-turtle-cream-300/70"
+            >
               <Settings size={20} color="#418D84" />
               <View className="flex-1 ml-4">
                 <Text className="text-earie-black font-inter-semibold">Preferences</Text>
                 <Text className="text-royal-palm font-inter text-sm">
-                  Customize your experience
+                  Customize your app experience
                 </Text>
               </View>
+              <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-100">
+            <TouchableOpacity
+              onPress={() => router.push('/profile/account-settings')}
+              className="flex-row items-center py-4"
+            >
               <User size={20} color="#418D84" />
               <View className="flex-1 ml-4">
                 <Text className="text-earie-black font-inter-semibold">Account Settings</Text>
@@ -249,28 +215,93 @@ export default function Profile() {
                   Manage your account details
                 </Text>
               </View>
+              <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
+          </View>
 
-            <TouchableOpacity
-              onPress={handleSignOut}
-              disabled={isSigningOut}
-              className="flex-row items-center py-4"
-            >
-              <LogOut size={20} color="#EF4444" />
-              <View className="flex-1 ml-4">
-                <Text className="text-red-600 font-inter-semibold">
-                  {isSigningOut ? 'Signing Out...' : 'Sign Out'}
-                </Text>
-                <Text className="text-royal-palm font-inter text-sm">
-                  Sign out of your account
-                </Text>
+          {/* Powered by Section */}
+          <View
+            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+            <Text className="text-lg font-inter-bold text-earie-black mb-4 text-center">
+              Powered by
+            </Text>
+            <View className="flex-row flex-wrap justify-center items-center" style={{ gap: 12 }}>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/anthropic.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
               </View>
-            </TouchableOpacity>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/bolt-powered.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/elevenlabs.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/netlify.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/supabase.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
           </View>
 
           {/* Turtle Message */}
           <View
-            className="bg-turtle-indigo-50 border border-turtle-indigo-200 rounded-3xl px-6 py-4 mt-4">
+            className="bg-turtle-indigo-50 border border-turtle-indigo-400 rounded-3xl px-6 py-4 mt-4">
             <View className="flex-row items-start mb-2">
               <View className="flex-1">
                 <Text className="text-turtle-indigo-700 font-inter-bold text-lg ml-1">

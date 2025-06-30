@@ -114,12 +114,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Starting sign out process...');
       
-      // Clear local state immediately
+      // Clear local state immediately for better UX
       setUser(null);
       setShowTurtleIntro(false);
       setLoading(true);
       
-      // Sign out from Supabase - this will also clear AsyncStorage
+      // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -131,22 +131,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Platform-specific cleanup
       if (Platform.OS === 'web') {
-        // Clear any cached data and force navigation
-        if (typeof window !== 'undefined') {
-          // Clear localStorage/sessionStorage if needed
-          try {
+        // Clear any cached data
+        try {
+          if (typeof window !== 'undefined') {
             localStorage.clear();
             sessionStorage.clear();
-          } catch (e) {
-            console.warn('Could not clear storage:', e);
           }
-          
-          // Force navigation to welcome page
-          window.location.replace('/');
+        } catch (e) {
+          console.warn('Could not clear storage:', e);
         }
-      } else {
-        // On mobile, Supabase should have cleared AsyncStorage automatically
-        console.log('Mobile sign out completed');
       }
       
     } catch (error) {
@@ -154,10 +147,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Even if there's an error, ensure local state is cleared
       setUser(null);
       setShowTurtleIntro(false);
-      
-      if (Platform.OS === 'web' && typeof window !== 'undefined') {
-        window.location.replace('/');
-      }
     } finally {
       setLoading(false);
     }

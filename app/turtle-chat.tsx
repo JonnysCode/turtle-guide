@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Heart, MessageCircle } from 'lucide-react-native';
@@ -85,20 +85,23 @@ export default function TurtleChat() {
       <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
         <View className="flex-1">
           {/* Header */}
-          <View className="px-6 pt-4 bg-chalk border-b border-turtle-teal-300">
-            <View className="flex-row items-start">
+          <View className="px-6 pt-4 pb-3 bg-chalk border-b border-turtle-teal-300">
+            <View className="flex-row items-center">
               <TouchableOpacity
                 onPress={() => setIsConversationActive(false)}
-                className="w-12 h-12 bg-turtle-cream-100 border border-turtle-teal-300 rounded-full items-center justify-center"
+                className="w-12 h-12 bg-turtle-cream-100 border border-turtle-teal-300 rounded-full items-center justify-center mr-4"
               >
                 <ArrowLeft size={24} color="#1A1F16" />
               </TouchableOpacity>
-              <Image
-                source={require('@/assets/images/turtle/turtle-wave-right.png')}
-                className="w-36 h-44 mr-3 "
-                resizeMode="contain"
-              />
-              <View className="flex-1 mt-6">
+              <View className="mr-4">
+                <TurtleCompanion
+                  size={80}
+                  mood="wave-right"
+                  animate={true}
+                  minimal={true}
+                />
+              </View>
+              <View className="flex-1">
                 <Text className="text-lg font-inter-bold text-earie-black">
                   Chatting with {profile?.turtle_name || 'Shelly'}
                 </Text>
@@ -112,15 +115,15 @@ export default function TurtleChat() {
           {/* Conversational AI Component */}
           <View className="flex-1 bg-turtle-cream-50">
             <TurtleConversationAI
-              dom={{ 
-                style: { 
-                  flex: 1, 
-                  display: 'flex', 
-                  alignItems: 'center', 
+              dom={{
+                style: {
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
                   justifyContent: 'center',
                   width: '100%',
                   height: '100%'
-                } 
+                }
               }}
               patientName={profile?.patient_name || 'friend'}
               mobilityLevel={profile?.mobility_level || 5}

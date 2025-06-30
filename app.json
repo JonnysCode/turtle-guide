@@ -1,20 +1,23 @@
 {
   "expo": {
-    "name": "TurtleGuide",
-    "slug": "turtle-guide-stroke-recovery",
+    "name": "Shelly - Your Stroke Recovery Companion",
+    "slug": "shelly-stroke-recovery-companion",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "turtleguide",
+    "scheme": "shelly",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "description": "Meet Shelly, your AI-powered turtle companion for stroke recovery. Get personalized exercises, learning resources, and encouraging support on your healing journey.",
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.shelly.strokerecovery",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "This app uses the microphone to have voice conversations with your AI turtle companion for stroke recovery support."
+        "NSMicrophoneUsageDescription": "Shelly uses the microphone to have voice conversations with you for personalized stroke recovery support and guidance."
       }
     },
     "android": {
+      "package": "com.shelly.strokerecovery",
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"

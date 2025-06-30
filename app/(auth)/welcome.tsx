@@ -1,34 +1,46 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TurtleCompanion, { TurtleCompanionPresets } from '@/components/TurtleCompanion';
+import TurtleCompanion from '@/components/TurtleCompanion';
 
 export default function Welcome() {
   console.log('Welcome page rendering...');
-  
+
   const router = useRouter();
 
   return (
     <SafeAreaView className="flex-1 bg-chalk">
-      <View className="flex-1 justify-center items-center px-6">
+      {/* Bolt.new Badge */}
+      <View className="absolute top-4 right-4 z-10 rounded-full border-2 border-turtle-indigo-500">
+        <Image
+          source={require('@/assets/images/bolt.png')}
+          className="w-16 h-16"
+          resizeMode="contain"
+          style={{ height: 120, width: 120 }}
+        />
+      </View>
+
+      <View className="flex-1 justify-center items-center px-6 mt-8">
         <View className="items-center mb-8">
-          <TurtleCompanion 
+          <TurtleCompanion
             size={160}
             mood="wave-left"
-            message="Welcome to TurtleGuide! I'm here to be your gentle companion on this recovery journey. Together, we'll take it one step at a time."
+            message="Hello! I'm Shelly, your AI-powered stroke recovery companion. I'm here to support you with gentle guidance, personalized exercises, and encouraging conversations every step of the way."
             showMessage={true}
             animate={true}
             className="mb-6"
+            voiceAsset={require('@/assets/audio/shelly/shelly-welcome.mp3')}
+            autoPlayVoice={true}
           />
         </View>
-        
+
         <Text className="text-4xl font-inter-bold text-earie-black text-center mb-4">
-          Welcome to TurtleGuide
+          Meet Shelly
         </Text>
-        
+
         <Text className="text-lg font-inter text-royal-palm text-center mb-12">
-          Your gentle companion for stroke recovery
+          Your AI-powered stroke recovery companion
         </Text>
 
         <View className="w-full max-w-sm gap-4">

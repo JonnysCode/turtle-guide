@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Award, Smile, Target, TrendingUp } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/contexts/UserContext';
 import TurtleCompanion from '@/components/TurtleCompanion';
+import Card from '@/components/Card';
 import { supabase } from '@/lib/supabase';
+import { achievementDefinitions, getAchievementProgress, getUserStats } from '@/lib/achievementSystem';
 
 interface ProgressData {
   date: string;
@@ -18,30 +21,89 @@ interface Achievement {
   unlocked_at: string;
 }
 
-const achievementTypes = {
-  'first_exercise': { icon: '🎯', title: 'First Steps', description: 'Completed your first exercise' },
-  'week_streak': { icon: '🔥', title: 'Week Warrior', description: '7 days in a row' },
-  'month_streak': { icon: '💎', title: 'Consistency Champion', description: '30 days in a row' },
-  'exercise_master': { icon: '💪', title: 'Exercise Master', description: '50 exercises completed' },
-  'learning_lover': { icon: '📚', title: 'Learning Lover', description: 'Completed 5 lessons' },
-  'mood_tracker': { icon: '😊', title: 'Self-Aware', description: 'Tracked mood for 10 days' }
+const badgeImages = {
+  'first_exercise': require('@/assets/images/badges/badge-1.png'),
+  'exercise_streak_3': require('@/assets/images/badges/badge-2.png'),
+  'exercise_streak_7': require('@/assets/images/badges/badge-3.png'),
+  'exercise_master_10': require('@/assets/images/badges/badge-4.png'),
+  'exercise_master_25': require('@/assets/images/badges/badge-5.png'),
+  'exercise_master_50': require('@/assets/images/badges/badge-6.png'),
+  'learning_enthusiast': require('@/assets/images/badges/badge-1.png'),
+  'learning_master': require('@/assets/images/badges/badge-5.png'),
+  'mood_tracker_7': require('@/assets/images/badges/badge-6.png'),
+  'weekly_warrior': require('@/assets/images/badges/badge-3.png')
+};
+
+const moodIcons = [
+  { rating: 1, icon: '😢', color: '#EF4444', label: 'Tough' },
+  { rating: 2, icon: '😕', color: '#F97316', label: 'Hard' },
+  { rating: 3, icon: '😐', color: '#F59E0B', label: 'Okay' },
+  { rating: 4, icon: '🙂', color: '#10B981', label: 'Good' },
+  { rating: 5, icon: '😊', color: '#14B8A6', label: 'Great' }
+];
+
+const categoryColors = {
+  exercise: '#14B8A6',
+  consistency: '#9381FF',
+  learning: '#F59E0B',
+  milestone: '#EC4899',
+  mood: '#8B5CF6',
+  special: '#10B981'
 };
 
 export default function Progress() {
   const { user } = useAuth();
+  const { profile } = useUser();
   const [progressData, setProgressData] = useState<ProgressData[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [totalExercises, setTotalExercises] = useState(0);
+  const [achievementProgress, setAchievementProgress] = useState<any[]>([]);
+  const [userStats, setUserStats] = useState<any>(null);
   const [averageMood, setAverageMood] = useState(0);
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'all'>('week');
+  const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
     if (user) {
-      fetchProgressData();
-      fetchAchievements();
-      fetchTotalExercises();
+      fetchAllData();
     }
   }, [user, selectedPeriod]);
+
+  const fetchAllData = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch user stats
+      const stats = await getUserStats(user.id);
+      setUserStats(stats);
+
+      // Fetch achievement progress
+      const progress = await getAchievementProgress(user.id);
+      setAchievementProgress(progress);
+
+      // Fetch achievements
+      const { data: achievementData } = await supabase
+        .from('achievements')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('unlocked_at', { ascending: false });
+
+      if (achievementData) {
+        setAchievements(achievementData);
+
+        // Calculate total points
+        const points = achievementData.reduce((total, achievement) => {
+          const def = achievementDefinitions.find(a => a.id === achievement.achievement_type);
+          return total + (def?.points || 0);
+        }, 0);
+        setTotalPoints(points);
+      }
+
+      // Fetch progress data for charts
+      await fetchProgressData();
+    } catch (error) {
+      console.error('Error fetching progress data:', error);
+    }
+  };
 
   const fetchProgressData = async () => {
     if (!user) return;
@@ -74,76 +136,60 @@ export default function Progress() {
     }
   };
 
-  const fetchAchievements = async () => {
-    if (!user) return;
-
-    const { data } = await supabase
-      .from('achievements')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('unlocked_at', { ascending: false });
-
-    if (data) {
-      setAchievements(data);
-    }
-  };
-
-  const fetchTotalExercises = async () => {
-    if (!user) return;
-
-    const { count } = await supabase
-      .from('exercise_sessions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('completed', true);
-
-    setTotalExercises(count || 0);
-  };
-
-  const getCurrentStreak = () => {
-    if (progressData.length === 0) return 0;
-
-    let streak = 0;
+  const getFullWeekData = () => {
     const today = new Date();
+    const weekData = [];
 
-    // Sort data by date descending
-    const sortedData = [...progressData].sort((a, b) =>
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    // Generate the last 7 days (including today)
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dateString = date.toISOString().split('T')[0];
 
-    for (let i = 0; i < sortedData.length; i++) {
-      const progressDate = new Date(sortedData[i].date);
-      const expectedDate = new Date(today);
-      expectedDate.setDate(today.getDate() - i);
+      // Find existing data for this date
+      const existingData = progressData.find(d => d.date === dateString);
 
-      if (progressDate.toDateString() === expectedDate.toDateString()) {
-        streak++;
-      } else {
-        break;
-      }
+      weekData.push({
+        date: dateString,
+        exercises_completed: existingData?.exercises_completed || 0,
+        mood_rating: existingData?.mood_rating || null,
+        dayName: date.toLocaleDateString('en', { weekday: 'short' }),
+        dayNumber: date.getDate()
+      });
     }
 
-    return streak;
+    return weekData;
   };
 
   const getExerciseChart = () => {
-    const screenWidth = Dimensions.get('window').width;
-    const chartWidth = screenWidth - 48; // Account for padding
-    const maxExercises = Math.max(...progressData.map(d => d.exercises_completed), 1);
+    const weekData = getFullWeekData();
+    const maxExercises = Math.max(...weekData.map(d => d.exercises_completed), 1);
 
-    return progressData.map((data, index) => {
-      const height = (data.exercises_completed / maxExercises) * 100;
-      const date = new Date(data.date);
-      const dayLabel = date.getDate().toString();
+    return weekData.map((data, index) => {
+      const height = maxExercises > 0 ? (data.exercises_completed / maxExercises) * 80 : 4;
+      const isToday = data.date === new Date().toISOString().split('T')[0];
 
       return (
         <View key={index} className="items-center flex-1">
-          <View
-            className="bg-royal-palm rounded-t-lg w-6 min-h-[4px]"
-            style={{ height: Math.max(height, 4) }}
-          />
-          <Text className="text-royal-palm font-inter text-xs mt-2">
-            {dayLabel}
+          <View className="h-20 justify-end mb-2">
+            <View
+              className={`rounded-t-lg w-6 min-h-[4px] ${
+                data.exercises_completed > 0
+                  ? 'bg-royal-palm'
+                  : 'bg-gray-300'
+              } ${isToday ? 'border-2 border-tropical-indigo' : ''}`}
+              style={{ height: Math.max(height, 4) }}
+            />
+          </View>
+          <Text className={`font-inter text-xs ${
+            isToday ? 'text-tropical-indigo font-inter-bold' : 'text-royal-palm'
+          }`}>
+            {data.dayName}
+          </Text>
+          <Text className={`font-inter-bold text-xs ${
+            data.exercises_completed > 0 ? 'text-earie-black' : 'text-gray-400'
+          }`}>
+            {data.exercises_completed}
           </Text>
         </View>
       );
@@ -151,21 +197,57 @@ export default function Progress() {
   };
 
   const getMoodEmoji = (rating: number) => {
-    if (rating >= 4.5) return '😊';
-    if (rating >= 3.5) return '🙂';
-    if (rating >= 2.5) return '😐';
-    if (rating >= 1.5) return '😕';
-    return '😢';
+    const mood = moodIcons.find(m => m.rating === Math.round(rating));
+    return mood?.icon || '😐';
   };
+
+  const getUnlockedAchievements = () => {
+    return achievementProgress.filter(a => a.isUnlocked);
+  };
+
+  const getLockedAchievements = () => {
+    return achievementProgress.filter(a => !a.isUnlocked);
+  };
+
+  const getProgressLevel = () => {
+    if (totalPoints < 50) return { level: 1, title: 'Beginner', color: '#10B981', progress: totalPoints / 50 };
+    if (totalPoints < 150) return { level: 2, title: 'Explorer', color: '#3B82F6', progress: (totalPoints - 50) / 100 };
+    if (totalPoints < 300) return {
+      level: 3,
+      title: 'Achiever',
+      color: '#8B5CF6',
+      progress: (totalPoints - 150) / 150
+    };
+    if (totalPoints < 500) return {
+      level: 4,
+      title: 'Champion',
+      color: '#EC4899',
+      progress: (totalPoints - 300) / 200
+    };
+    return { level: 5, title: 'Master', color: '#F59E0B', progress: 1 };
+  };
+
+  const levelInfo = getProgressLevel();
+
+  if (!userStats) {
+    return (
+      <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-earie-black font-inter text-lg">Loading progress...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
-      <ScrollView 
-        className="flex-1 px-6" 
+      <ScrollView
+        className="flex-1 px-6"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
         <View className="py-6">
+          {/* Header */}
           <View className="items-center mb-6">
             <TurtleCompanion
               size={140}
@@ -178,66 +260,84 @@ export default function Progress() {
               Your Progress
             </Text>
             <Text className="text-royal-palm font-inter text-center mt-1">
-              Look how far you've come!
+              Every step forward is a victory! 🌟
             </Text>
           </View>
 
-          {/* Period Selection */}
-          <View
-            className="bg-turtle-teal-50 border border-turtle-teal-300 rounded-2xl p-2 mb-6 shadow-lg shadow-turtle-teal-300/50">
-            <View className="flex-row">
-              {(['week', 'month', 'all'] as const).map((period) => (
-                <TouchableOpacity
-                  key={period}
-                  onPress={() => setSelectedPeriod(period)}
-                  className={`flex-1 py-3 rounded-xl mx-1 ${
-                    selectedPeriod === period ? 'bg-royal-palm' : 'bg-blue-glass'
-                  }`}
+          {/* Level Progress */}
+          <Card variant="elevated" className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50">
+            <View className="items-center">
+              <View className="flex-row items-center mb-4">
+                <View
+                  className="w-12 h-12 rounded-full items-center justify-center mr-3"
+                  style={{ backgroundColor: levelInfo.color }}
                 >
-                  <Text className={`text-center font-inter-semibold ${
-                    selectedPeriod === period ? 'text-chalk' : 'text-earie-black'
-                  }`}>
-                    {period === 'week' ? 'Week' : period === 'month' ? 'Month' : 'All Time'}
+                  <Text className="text-white font-inter-bold text-lg">
+                    {levelInfo.level}
                   </Text>
-                </TouchableOpacity>
-              ))}
+                </View>
+                <View className="flex-1">
+                  <Text className="text-xl font-inter-bold text-earie-black">
+                    Level {levelInfo.level} - {levelInfo.title}
+                  </Text>
+                  <Text className="text-royal-palm font-inter">
+                    {totalPoints} points earned
+                  </Text>
+                </View>
+              </View>
+
+              <View className="w-full bg-blue-glass rounded-full h-3 mb-2">
+                <View
+                  className="h-3 rounded-full"
+                  style={{
+                    width: `${levelInfo.progress * 100}%`,
+                    backgroundColor: levelInfo.color
+                  }}
+                />
+              </View>
+
+              <Text className="text-royal-palm font-inter text-sm">
+                {levelInfo.level < 5
+                  ? `${Math.round((1 - levelInfo.progress) * 100)}% to next level`
+                  : 'Maximum level achieved! 🏆'
+                }
+              </Text>
             </View>
-          </View>
+          </Card>
 
           {/* Key Stats */}
-          <View
-            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+          <Card variant="elevated" className="mb-6">
             <Text className="text-lg font-inter-bold text-earie-black mb-4">
               Key Statistics
             </Text>
             <View className="flex-row justify-between">
-              <View className="items-center">
-                <View className="w-12 h-12 bg-royal-palm/20 rounded-xl items-center justify-center mb-2">
-                  <Target size={24} color="#418D84" />
+              <View className="items-center flex-1">
+                <View className="w-14 h-14 bg-royal-palm/20 rounded-xl items-center justify-center mb-2">
+                  <Target size={28} color="#418D84" />
                 </View>
                 <Text className="text-2xl font-inter-bold text-earie-black">
-                  {totalExercises}
+                  {userStats.totalExercises}
                 </Text>
                 <Text className="text-royal-palm font-inter text-sm text-center">
                   Total{'\n'}Exercises
                 </Text>
               </View>
 
-              <View className="items-center">
-                <View className="w-12 h-12 bg-tropical-indigo/20 rounded-xl items-center justify-center mb-2">
-                  <TrendingUp size={24} color="#9381FF" />
+              <View className="items-center flex-1">
+                <View className="w-14 h-14 bg-tropical-indigo/20 rounded-xl items-center justify-center mb-2">
+                  <TrendingUp size={28} color="#9381FF" />
                 </View>
                 <Text className="text-2xl font-inter-bold text-earie-black">
-                  {getCurrentStreak()}
+                  {userStats.currentStreak}
                 </Text>
                 <Text className="text-royal-palm font-inter text-sm text-center">
                   Current{'\n'}Streak
                 </Text>
               </View>
 
-              <View className="items-center">
-                <View className="w-12 h-12 bg-flaxseed rounded-xl items-center justify-center mb-2">
-                  <Smile size={24} color="#418D84" />
+              <View className="items-center flex-1">
+                <View className="w-14 h-14 bg-flaxseed rounded-xl items-center justify-center mb-2">
+                  <Smile size={28} color="#418D84" />
                 </View>
                 <Text className="text-2xl font-inter-bold text-earie-black">
                   {averageMood > 0 ? averageMood : '-'}
@@ -246,84 +346,222 @@ export default function Progress() {
                   Average{'\n'}Mood {averageMood > 0 && getMoodEmoji(averageMood)}
                 </Text>
               </View>
-            </View>
-          </View>
 
-          {/* Exercise Chart */}
-          {progressData.length > 0 && (
-            <View
-              className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
-              <Text className="text-lg font-inter-bold text-earie-black mb-4">
-                Daily Exercise Activity
-              </Text>
-              <View className="flex-row items-end justify-between h-32 mb-4">
-                {getExerciseChart()}
+              <View className="items-center flex-1">
+                <View className="w-14 h-14 bg-blue-glass rounded-xl items-center justify-center mb-2">
+                  <Award size={28} color="#418D84" />
+                </View>
+                <Text className="text-2xl font-inter-bold text-earie-black">
+                  {achievements.length}
+                </Text>
+                <Text className="text-royal-palm font-inter text-sm text-center">
+                  Badges{'\n'}Earned
+                </Text>
               </View>
-              <Text className="text-royal-palm font-inter text-center text-sm">
-                Exercises completed per day
-              </Text>
             </View>
-          )}
+          </Card>
 
-          {/* Achievements */}
-          <View
-            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+          {/* Exercise Chart - Always show full week */}
+          <Card variant="elevated" className="mb-6">
             <Text className="text-lg font-inter-bold text-earie-black mb-4">
-              Achievements Unlocked
+              Weekly Exercise Activity
             </Text>
-            {achievements.length > 0 ? (
-              <View className="gap-3">
-                {achievements.slice(0, 5).map((achievement, index) => {
-                  const achievementInfo = achievementTypes[achievement.achievement_type as keyof typeof achievementTypes];
-                  const unlockedDate = new Date(achievement.unlocked_at).toLocaleDateString();
+            <View className="flex-row items-end justify-between mb-4">
+              {getExerciseChart()}
+            </View>
+            <View className="flex-row justify-between items-center">
+              <Text className="text-royal-palm font-inter text-sm">
+                Last 7 days • Today highlighted
+              </Text>
+              <View className="flex-row items-center">
+                <View className="w-3 h-3 bg-royal-palm rounded mr-2" />
+                <Text className="text-royal-palm font-inter text-xs mr-3">Active</Text>
+                <View className="w-3 h-3 bg-gray-300 rounded mr-2" />
+                <Text className="text-gray-500 font-inter text-xs">Rest</Text>
+              </View>
+            </View>
+          </Card>
 
-                  return (
-                    <View key={achievement.id} className="flex-row items-center bg-flaxseed p-4 rounded-xl">
-                      <Text className="text-3xl mr-4">{achievementInfo?.icon || '🏆'}</Text>
-                      <View className="flex-1">
-                        <Text className="font-inter-semibold text-earie-black">
-                          {achievementInfo?.title || 'Achievement'}
+          {/* Achievements Section */}
+          <Card variant="elevated" className="mb-6">
+            <View className="flex-row items-center justify-between mb-4">
+              <Text className="text-lg font-inter-bold text-earie-black">
+                Achievements
+              </Text>
+              <View className="bg-royal-palm px-3 py-1 rounded-full">
+                <Text className="text-chalk font-inter-semibold text-sm">
+                  {achievements.length}/{achievementDefinitions.length}
+                </Text>
+              </View>
+            </View>
+
+            {/* Unlocked Achievements */}
+            {getUnlockedAchievements().length > 0 && (
+              <View className="mb-6">
+                <Text className="text-royal-palm font-inter-bold mb-3">
+                  🏆 Earned Badges
+                </Text>
+                <View className="flex-row flex-wrap gap-3">
+                  {getUnlockedAchievements().map((achievement) => {
+                    const unlockedData = achievements.find(a => a.achievement_type === achievement.id);
+                    const unlockedDate = unlockedData ? new Date(unlockedData.unlocked_at).toLocaleDateString() : '';
+                    const badgeImage = badgeImages[achievement.id as keyof typeof badgeImages];
+
+                    return (
+                      <View key={achievement.id}
+                            className="bg-turtle-cream-200 rounded-xl px-4 pb-4 pt-4 flex-1 min-w-[45%] max-w-[48%] items-center border-2 border-royal-palm shadow-xl">
+                        {/* Earned Badge with Enhanced Visibility */}
+                        <View className="relative mb-3">
+                          {/* Glow effect */}
+                          <View className="absolute -inset-2 rounded-full "
+                                style={{ backgroundColor: categoryColors[achievement.category] }} />
+                          <View className="w-16 h-16 items-center justify-center relative">
+                            <Image
+                              source={badgeImage}
+                              style={{
+                                width: 64,
+                                height: 64,
+                                maxWidth: 64,
+                                maxHeight: 64
+                              }}
+                              resizeMode="contain"
+                            />
+                          </View>
+                        </View>
+
+                        <Text className="font-inter-bold text-earie-black text-center mb-1 text-base">
+                          {achievement.title}
                         </Text>
-                        <Text className="text-royal-palm font-inter text-sm">
-                          {achievementInfo?.description || 'Great job!'}
+                        <Text className="text-earie-black/80 font-inter text-xs text-center mb-3 leading-tight">
+                          {achievement.description}
                         </Text>
-                        <Text className="text-royal-palm/70 font-inter text-xs mt-1">
-                          Unlocked {unlockedDate}
+
+                        <View className="flex-row items-center gap-2 mb-2">
+                          <View
+                            className="px-3 py-1 rounded-full"
+                            style={{ backgroundColor: categoryColors[achievement.category] }}
+                          >
+                            <Text className="text-white font-inter-bold text-xs">
+                              +{achievement.points} pts
+                            </Text>
+                          </View>
+                          <View className="bg-emerald-100 px-2 py-1 rounded-full">
+                            <Text className="text-emerald-700 font-inter-bold text-xs">
+                              ✓ EARNED
+                            </Text>
+                          </View>
+                        </View>
+
+                        <Text className="text-earie-black/60 font-inter text-xs">
+                          {unlockedDate}
                         </Text>
                       </View>
-                      <Award size={20} color="#418D84" />
-                    </View>
-                  );
-                })}
-              </View>
-            ) : (
-              <View className="items-center py-8">
-                <Text className="text-6xl mb-2">🏆</Text>
-                <Text className="text-royal-palm font-inter text-center">
-                  Your achievements will appear here{'\n'}as you make progress!
-                </Text>
+                    );
+                  })}
+                </View>
               </View>
             )}
-          </View>
 
-          {/* Turtle Encouragement */}
-          <View
-            className="bg-turtle-indigo-50 border border-turtle-indigo-200 rounded-3xl px-6 py-4 mt-4">
-            <View className="flex-row items-start mb-2">
+            {/* Locked Achievements */}
+            {getLockedAchievements().length > 0 && (
+              <View>
+                <Text className="text-royal-palm font-inter-bold mb-3">
+                  🎯 Available Badges
+                </Text>
+                <View className="flex-row flex-wrap gap-3">
+                  {getLockedAchievements().slice(0, 4).map((achievement) => {
+                    const badgeImage = badgeImages[achievement.id as keyof typeof badgeImages];
+                    const progressPercent = Math.round(achievement.progress * 100);
+
+                    return (
+                      <View key={achievement.id}
+                            className="bg-turtle-cream-200 rounded-xl px-4 pb-4 pt-2 flex-1 min-w-[45%] max-w-[48%] items-center border border-turtle-teal-300">
+                        <View className="w-20 h-20 mb-1 items-center justify-center relative">
+                          {/* Badge image with light opacity overlay */}
+                          <Image
+                            source={badgeImage}
+                            style={{
+                              width: 64,
+                              height: 64,
+                              maxWidth: 64,
+                              maxHeight: 64,
+                              opacity: 0.3
+                            }}
+                            resizeMode="contain"
+                          />
+                          <View className="absolute inset-0 items-center justify-center">
+                            <View className="bg-gray-600/80 px-2 py-1 rounded">
+                              <Text className="text-white font-inter-bold text-xs">
+                                LOCKED
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+
+                        <Text className="font-inter-bold text-gray-800 text-center mb-1 text-base">
+                          {achievement.title}
+                        </Text>
+                        <Text className="text-gray-700 font-inter text-xs text-center mb-3 leading-tight">
+                          {achievement.description}
+                        </Text>
+                        <Text className="text-gray-600 font-inter-semibold text-xs text-center mb-3">
+                          {achievement.requirement}
+                        </Text>
+
+                        {/* Progress bar for locked achievements */}
+                        {progressPercent > 0 && (
+                          <View className="w-full mb-3">
+                            <View className="w-full bg-gray-300 rounded-full h-2 mb-1">
+                              <View
+                                className="h-2 rounded-full"
+                                style={{
+                                  width: `${progressPercent}%`,
+                                  backgroundColor: categoryColors[achievement.category]
+                                }}
+                              />
+                            </View>
+                            <Text className="text-gray-700 font-inter text-xs text-center">
+                              {progressPercent}% complete
+                            </Text>
+                          </View>
+                        )}
+
+                        <View
+                          className="px-3 py-1 rounded-full"
+                          style={{ backgroundColor: `${categoryColors[achievement.category]}20` }}
+                        >
+                          <Text
+                            className="font-inter-bold text-xs"
+                            style={{ color: categoryColors[achievement.category] }}
+                          >
+                            +{achievement.points} pts
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+          </Card>
+
+          {/* Motivational Message */}
+          <Card variant="flat" className="bg-turtle-indigo-50 border-turtle-indigo-400">
+            <View className="flex-row items-start">
+              <Text className="text-3xl mr-3">🐢</Text>
               <View className="flex-1">
-                <Text className="text-turtle-indigo-700 font-inter-bold text-lg ml-1">
-                  🐢 Progress Reflection
+                <Text className="text-turtle-indigo-700 font-inter-bold text-lg mb-2">
+                  Progress Reflection from {profile?.turtle_name || 'Shelly'}
+                </Text>
+                <Text className="text-turtle-indigo-700 font-inter text-base leading-relaxed italic">
+                  {userStats.totalExercises > 0
+                    ? `"Look at all you've accomplished! ${userStats.totalExercises} exercises completed and ${achievements.length} badges earned shows your incredible dedication. Every small step forward is a victory worth celebrating. I'm so proud of your commitment to recovery!"`
+                    : '"Every journey begins with a single step. You\'re here, you\'re learning, and that\'s already progress! I\'m excited to celebrate many achievements with you in the days ahead."'
+                  }
                 </Text>
               </View>
             </View>
-            <Text
-              className="text-turtle-indigo-700 font-inter text-base leading-relaxed italic">
-              {totalExercises > 0
-                ? `"Look at all you've accomplished! ${totalExercises} exercises completed shows your incredible dedication. Every small step forward is a victory worth celebrating. I'm so proud of your commitment to recovery!"`
-                : '"Every journey begins with a single step. You\'re here, you\'re learning, and that\'s already progress! I\'m excited to celebrate many achievements with you in the days ahead."'
-              }
-            </Text>
-          </View>
+          </Card>
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Easing, Image, ImageSourcePropType, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Image, ImageSourcePropType, Text, TouchableOpacity, View } from 'react-native';
 import { MessageCircle, Volume2, VolumeX } from 'lucide-react-native';
-
-const { width: screenWidth } = Dimensions.get('window');
+import { useAudioPlayer } from 'expo-audio';
 
 interface TurtleCompanionProps {
   size?: number;
@@ -14,6 +13,9 @@ interface TurtleCompanionProps {
   showMessage?: boolean;
   enableSpeech?: boolean;
   className?: string;
+  minimal?: boolean; // New prop to display only the turtle without interactive elements
+  voiceAsset?: any; // Audio asset to play when speech bubble appears
+  autoPlayVoice?: boolean; // Whether to automatically play voice when speech bubble shows
 }
 
 export type TurtleMood =
@@ -74,11 +76,19 @@ export default function TurtleCompanion({
                                           animate = true,
                                           showMessage = false,
                                           enableSpeech = false,
-                                          className = ''
+                                          className = '',
+                                          minimal = false,
+                                          voiceAsset,
+                                          autoPlayVoice = false
                                         }: TurtleCompanionProps) {
   const [isPressed, setIsPressed] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messageVisible, setMessageVisible] = useState(showMessage);
+  const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+  const [hasManuallyStoppedVoice, setHasManuallyStoppedVoice] = useState(false);
+
+  // Create audio player for voice asset
+  const audioPlayer = useAudioPlayer(voiceAsset || null);
 
   // Animation refs
   const bounceAnim = useRef(new Animated.Value(0)).current;
@@ -149,6 +159,8 @@ export default function TurtleCompanion({
         useNativeDriver: true
       }).start();
     } else {
+      // Reset manual stop flag when message is hidden
+      setHasManuallyStoppedVoice(false);
       Animated.spring(messageAnim, {
         toValue: 0,
         tension: 100,
@@ -180,7 +192,77 @@ export default function TurtleCompanion({
     }
   }, [isSpeaking, speechAnim]);
 
+  // Monitor audio player playing state
+  useEffect(() => {
+    setIsPlayingVoice(audioPlayer.playing);
+    
+    // Additional check for web compatibility
+    const checkPlayingState = () => {
+      if (audioPlayer) {
+        setIsPlayingVoice(audioPlayer.playing);
+      }
+    };
+    
+    // Check state periodically for web compatibility
+    const interval = setInterval(checkPlayingState, 100);
+    
+    return () => clearInterval(interval);
+  }, [audioPlayer.playing, audioPlayer]);
+
+  const playVoiceAsset = useCallback(() => {
+    if (!voiceAsset || !audioPlayer) return;
+
+    try {
+      // Reset manual stop flag when manually playing
+      setHasManuallyStoppedVoice(false);
+      // Reset to beginning and play
+      audioPlayer.seekTo(0);
+      audioPlayer.play();
+    } catch (error) {
+      console.error('Error playing voice asset:', error);
+    }
+  }, [voiceAsset, audioPlayer]);
+
+  const stopVoiceAsset = useCallback(async () => {
+    if (audioPlayer) {
+      try {
+        // Mark as manually stopped to prevent auto-restart
+        setHasManuallyStoppedVoice(true);
+        
+        // For web compatibility, try multiple methods to stop audio
+        if (audioPlayer.playing) {
+          audioPlayer.pause();
+        }
+        // Reset to beginning to ensure it stops completely
+        await audioPlayer.seekTo(0);
+        // Force update the state for web compatibility
+        setIsPlayingVoice(false);
+      } catch (error) {
+        console.error('Error stopping voice asset:', error);
+        // Fallback: try to recreate the audio player to force stop
+        try {
+          if (audioPlayer.playing) {
+            audioPlayer.remove();
+          }
+        } catch (fallbackError) {
+          console.error('Fallback stop method failed:', fallbackError);
+        }
+        // Ensure state is updated even if stop fails
+        setIsPlayingVoice(false);
+      }
+    }
+  }, [audioPlayer]);
+
+  // Handle voice asset playback - must be after playVoiceAsset is defined
+  useEffect(() => {
+    if (autoPlayVoice && voiceAsset && showMessage && !isPlayingVoice && !hasManuallyStoppedVoice) {
+      playVoiceAsset();
+    }
+  }, [showMessage, autoPlayVoice, voiceAsset, isPlayingVoice, hasManuallyStoppedVoice, playVoiceAsset]);
+
   const handlePress = () => {
+    if (minimal) return; // Don't handle press in minimal mode
+
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 150);
 
@@ -230,6 +312,31 @@ export default function TurtleCompanion({
 
   const currentMessage = message || defaultMessages[mood];
 
+  // If minimal mode, just return the turtle image without any interactive elements
+  if (minimal) {
+    return (
+      <View className={`items-center ${className}`}>
+        <Animated.View
+          style={{
+            transform: [
+              { translateY: animate ? bounceTransform : 0 },
+              { scale: animate ? pulseAnim : 1 }
+            ]
+          }}
+        >
+          <Image
+            source={turtleImages[mood]}
+            style={{
+              width: imageWidth,
+              height: imageHeight
+            }}
+            resizeMode="contain"
+          />
+        </Animated.View>
+      </View>
+    );
+  }
+
   return (
     <View className={`items-center ${className}`}>
       {/* Speech bubble */}
@@ -237,11 +344,15 @@ export default function TurtleCompanion({
         <Animated.View
           style={{
             opacity: messageOpacity,
-            transform: [{ scale: messageScale }]
+            transform: [{ scale: messageScale }],
+            elevation: 8
           }}
           className="mb-4 max-w-xs"
         >
-          <View className="bg-chalk border-2 border-royal-palm rounded-2xl px-4 py-3 shadow-lg">
+          <View className="bg-chalk border-2 border-royal-palm rounded-2xl px-4 py-3 shadow-lg"
+                style={{
+                  elevation: 8
+                }}>
             <Text className="text-earie-black font-inter text-base leading-relaxed text-center">
               {currentMessage}
             </Text>
@@ -285,7 +396,7 @@ export default function TurtleCompanion({
                   zIndex: -1
                 }}
               />
-              
+
               <Image
                 source={turtleImages[mood]}
                 style={{
@@ -312,6 +423,20 @@ export default function TurtleCompanion({
                 <Volume2 size={16} color="#F6F4F1" />
               )}
             </Animated.View>
+          </TouchableOpacity>
+        )}
+
+        {/* Voice asset control button */}
+        {voiceAsset && (
+          <TouchableOpacity
+            onPress={isPlayingVoice ? stopVoiceAsset : playVoiceAsset}
+            className="absolute -bottom-2 -left-2 w-8 h-8 bg-turtle-indigo-500 rounded-full items-center justify-center shadow-lg"
+          >
+            {isPlayingVoice ? (
+              <VolumeX size={16} color="#F6F4F1" />
+            ) : (
+              <Volume2 size={16} color="#F6F4F1" />
+            )}
           </TouchableOpacity>
         )}
 

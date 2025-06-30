@@ -1,5 +1,5 @@
 {
-  "name": "turtle-guide-stroke-recovery",
+  "name": "shelly-stroke-recovery-companion",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "private": true,
@@ -60,6 +60,8 @@
     "@babel/core": "^7.25.2",
     "@types/react": "^19.0.0",
     "babel-plugin-module-resolver": "^5.0.2",
-    "typescript": "~5.8.3"
+    "typescript": "~5.8.3",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~9.2.0"
   }
 }

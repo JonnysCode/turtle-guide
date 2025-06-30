@@ -8,6 +8,7 @@ import TurtleCompanion from '@/components/TurtleCompanion';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import { supabase } from '@/lib/supabase';
+import { checkAndAwardAchievements } from '@/lib/achievementSystem';
 
 interface Exercise {
   id: string;
@@ -52,7 +53,7 @@ const exercises: Exercise[] = [
     benefits: 'Improves fine motor control and hand strength'
   },
   {
-    id: 'breathing-exercise',
+    id: 'deep-breathing',
     name: 'Calm Breathing',
     category: 'cognitive',
     difficulty: 1,
@@ -68,7 +69,7 @@ const exercises: Exercise[] = [
     benefits: 'Reduces anxiety and improves concentration'
   },
   {
-    id: 'speech-sounds',
+    id: 'speech-practice',
     name: 'Sound Practice',
     category: 'speech',
     difficulty: 2,
@@ -100,7 +101,7 @@ const exercises: Exercise[] = [
     benefits: 'Improves blood flow and ankle flexibility'
   },
   {
-    id: 'memory-game',
+    id: 'memory-games',
     name: 'Simple Memory',
     category: 'cognitive',
     difficulty: 2,
@@ -132,12 +133,16 @@ export default function ExerciseDetail() {
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [isPerforming, setIsPerforming] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [newAchievements, setNewAchievements] = useState<string[]>([]);
 
   useEffect(() => {
     const foundExercise = exercises.find(ex => ex.id === id);
     if (foundExercise) {
       setExercise(foundExercise);
       setTimeRemaining(foundExercise.duration);
+      checkIfCompletedToday(foundExercise.id);
     }
   }, [id]);
 
@@ -153,10 +158,62 @@ export default function ExerciseDetail() {
     return () => clearInterval(interval);
   }, [isPerforming, timeRemaining]);
 
+  const checkIfCompletedToday = async (exerciseId: string) => {
+    if (!user) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    const { data } = await supabase
+      .from('exercise_sessions')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('exercise_type', exerciseId)
+      .eq('completed', true)
+      .gte('created_at', today)
+      .lt('created_at', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+      .limit(1);
+
+    if (data && data.length > 0) {
+      setIsCompleted(true);
+    }
+  };
+
   const startExercise = () => {
     if (!exercise) return;
     setTimeRemaining(exercise.duration);
     setIsPerforming(true);
+  };
+
+  const showCompletionMessage = (achievements: string[] = []) => {
+    const hasNewAchievements = achievements.length > 0;
+    const message = hasNewAchievements
+      ? `You completed the exercise and earned ${achievements.length} new badge${achievements.length > 1 ? 's' : ''}! 🏆`
+      : 'You completed the exercise! I\'m so proud of your dedication.';
+
+    if (Platform.OS === 'web') {
+      // On web, show our custom modal instead of Alert
+      setNewAchievements(achievements);
+      setShowCompletionModal(true);
+    } else {
+      // On native platforms, use Alert
+      Alert.alert(
+        'Excellent Work! 🎉',
+        message,
+        [
+          {
+            text: 'Continue',
+            onPress: () => {
+              router.back();
+            }
+          }
+        ]
+      );
+    }
+  };
+
+  const handleCompletionModalClose = () => {
+    setShowCompletionModal(false);
+    setNewAchievements([]);
+    router.back();
   };
 
   const completeExercise = async () => {
@@ -164,51 +221,76 @@ export default function ExerciseDetail() {
 
     setIsPerforming(false);
 
-    // Record exercise session
-    const { error } = await supabase
-      .from('exercise_sessions')
-      .insert({
-        user_id: user.id,
-        exercise_type: exercise.id,
-        duration: exercise.duration,
-        difficulty_level: exercise.difficulty,
-        completed: true
-      });
+    try {
+      console.log('Starting exercise completion process...');
 
-    if (error) {
-      Alert.alert('Error', 'Failed to record exercise completion');
-      return;
-    }
+      // Record exercise session FIRST
+      const { error: sessionError } = await supabase
+        .from('exercise_sessions')
+        .insert({
+          user_id: user.id,
+          exercise_type: exercise.id,
+          duration: exercise.duration,
+          difficulty_level: exercise.difficulty,
+          completed: true
+        });
 
-    // Update daily progress
-    const today = new Date().toISOString().split('T')[0];
-    const { data: existingProgress } = await supabase
-      .from('daily_progress')
-      .select('exercises_completed')
-      .eq('user_id', user.id)
-      .eq('date', today)
-      .single();
-
-    await supabase
-      .from('daily_progress')
-      .upsert({
-        user_id: user.id,
-        date: today,
-        exercises_completed: (existingProgress?.exercises_completed || 0) + 1
-      }, {
-        onConflict: 'user_id,date'
-      });
-
-    Alert.alert(
-      'Excellent Work! 🎉',
-      'You completed the exercise! I\'m so proud of your dedication.',
-      [
-        {
-          text: 'Back to Exercises',
-          onPress: () => router.back()
+      if (sessionError) {
+        console.error('Error recording exercise session:', sessionError);
+        if (Platform.OS === 'web') {
+          setShowCompletionModal(true);
+        } else {
+          Alert.alert('Error', 'Failed to record exercise completion');
         }
-      ]
-    );
+        return;
+      }
+
+      console.log('Exercise session recorded successfully');
+
+      // Update daily progress SECOND
+      const today = new Date().toISOString().split('T')[0];
+      const { data: existingProgress } = await supabase
+        .from('daily_progress')
+        .select('exercises_completed')
+        .eq('user_id', user.id)
+        .eq('date', today)
+        .single();
+
+      const { error: progressError } = await supabase
+        .from('daily_progress')
+        .upsert({
+          user_id: user.id,
+          date: today,
+          exercises_completed: (existingProgress?.exercises_completed || 0) + 1
+        }, {
+          onConflict: 'user_id,date'
+        });
+
+      if (progressError) {
+        console.error('Error updating daily progress:', progressError);
+      } else {
+        console.log('Daily progress updated successfully');
+      }
+
+      // Check for new achievements THIRD - after all data is saved
+      console.log('Checking for achievements...');
+      const newAchievements = await checkAndAwardAchievements(user.id);
+      console.log('Achievement check complete, new achievements:', newAchievements);
+
+      // Mark as completed locally
+      setIsCompleted(true);
+
+      // Show success message with achievements
+      showCompletionMessage(newAchievements);
+
+    } catch (error) {
+      console.error('Error in completeExercise:', error);
+      if (Platform.OS === 'web') {
+        setShowCompletionModal(true);
+      } else {
+        Alert.alert('Error', 'Failed to record exercise completion. Please try again.');
+      }
+    }
   };
 
   const stopExercise = () => {
@@ -238,6 +320,53 @@ export default function ExerciseDetail() {
 
   return (
     <SafeAreaView className="flex-1 bg-turtle-cream-50" edges={['top', 'left', 'right', 'bottom']}>
+      {/* Completion Modal for Web */}
+      {showCompletionModal && Platform.OS === 'web' && (
+        <View className="absolute inset-0 bg-black/50 z-50 items-center justify-center">
+          <View className="bg-chalk rounded-3xl p-8 mx-6 max-w-md w-full shadow-2xl">
+            <View className="items-center mb-6">
+              <TurtleCompanion
+                size={120}
+                mood="great"
+                message="Excellent work! You completed the exercise!"
+                showMessage={false}
+                animate={true}
+              />
+            </View>
+
+            <Text className="text-2xl font-inter-bold text-earie-black text-center mb-4">
+              Excellent Work! 🎉
+            </Text>
+
+            <Text className="text-earie-black font-inter text-center text-lg mb-6 leading-relaxed">
+              You completed the exercise! I'm so proud of your dedication to your recovery journey.
+            </Text>
+
+            {newAchievements.length > 0 && (
+              <View className="bg-flaxseed rounded-xl p-4 mb-6">
+                <Text className="text-royal-palm font-inter-bold text-center mb-2">
+                  🏆 New Badge{newAchievements.length > 1 ? 's' : ''} Earned!
+                </Text>
+                <Text className="text-earie-black font-inter text-center">
+                  You earned {newAchievements.length} new achievement{newAchievements.length > 1 ? 's' : ''}!
+                  Check your progress page to see your badges.
+                </Text>
+              </View>
+            )}
+
+            <Button
+              onPress={handleCompletionModalClose}
+              variant="primary"
+              size="lg"
+              className="w-full"
+              style={{ backgroundColor: categoryColor }}
+            >
+              Continue
+            </Button>
+          </View>
+        </View>
+      )}
+
       {/* Header with back button */}
       <View className="px-6 py-4 border-b border-turtle-teal-300">
         <View className="flex-row items-center">
@@ -255,15 +384,22 @@ export default function ExerciseDetail() {
               {exercise.category.replace('-', ' ')} Exercise
             </Text>
           </View>
-          <View
-            className="w-12 h-12 rounded-full items-center justify-center"
-            style={{ backgroundColor: categoryColor }}
-          >
-            <Text className="text-white text-xl">
-              {exercise.category === 'mobility' ? '🚶' :
-                exercise.category === 'speech' ? '💬' :
-                  exercise.category === 'cognitive' ? '🧠' : '✋'}
-            </Text>
+          <View className="flex-row items-center">
+            {isCompleted && (
+              <View className="w-10 h-10 bg-royal-palm rounded-full items-center justify-center mr-3">
+                <CheckCircle size={20} color="#F6F4F1" />
+              </View>
+            )}
+            <View
+              className="w-12 h-12 rounded-full items-center justify-center"
+              style={{ backgroundColor: categoryColor }}
+            >
+              <Text className="text-white text-xl">
+                {exercise.category === 'mobility' ? '🚶' :
+                  exercise.category === 'speech' ? '💬' :
+                    exercise.category === 'cognitive' ? '🧠' : '✋'}
+              </Text>
+            </View>
           </View>
         </View>
       </View>
@@ -272,13 +408,24 @@ export default function ExerciseDetail() {
         <View className="items-center mb-8">
           <TurtleCompanion
             size={120}
-            mood={isPerforming ? 'excited' : 'meditation'}
-            message={isPerforming ? 'You\'re doing amazing! Keep going strong!' : 'Take your time and breathe. I believe in you!'}
-            showMessage={isPerforming}
+            mood={isPerforming ? 'excited' : isCompleted ? 'great' : 'meditation'}
+            message={
+              isPerforming
+                ? 'You\'re doing amazing! Keep going strong!'
+                : isCompleted
+                  ? 'Fantastic work! You completed this exercise today!'
+                  : 'Take your time and breathe. I believe in you!'
+            }
+            showMessage={isPerforming || isCompleted}
             animate={true}
           />
           <Text className="text-royal-palm font-inter mt-4 text-center text-lg">
-            {isPerforming ? 'You\'re doing great! Keep going!' : exercise.description}
+            {isPerforming
+              ? 'You\'re doing great! Keep going!'
+              : isCompleted
+                ? 'Already completed today! Great job!'
+                : exercise.description
+            }
           </Text>
         </View>
 
@@ -289,6 +436,20 @@ export default function ExerciseDetail() {
                 {formatTime(timeRemaining)}
               </Text>
               <Text className="text-earie-black font-inter-semibold text-lg">Time remaining</Text>
+            </View>
+          </Card>
+        )}
+
+        {isCompleted && (
+          <Card variant="elevated" className="mb-8 bg-emerald-50 border-emerald-300">
+            <View className="items-center">
+              <CheckCircle size={48} color="#10B981" />
+              <Text className="text-emerald-700 font-inter-bold text-xl mt-3 mb-2">
+                Exercise Completed!
+              </Text>
+              <Text className="text-emerald-600 font-inter text-center">
+                You've already completed this exercise today. Great work on staying consistent!
+              </Text>
             </View>
           </Card>
         )}
@@ -330,18 +491,33 @@ export default function ExerciseDetail() {
       {!isPerforming ? (
         <View
           className="px-6 pt-4 bg-turtle-cream-50 border-t border-turtle-teal-300"
+          style={{
+            paddingBottom: Platform.OS === 'android' ? Math.max(24, insets.bottom + 16) : 24
+          }}
         >
           <View className="flex-row gap-4">
-            <Button
-              onPress={startExercise}
-              variant="primary"
-              size="lg"
-              className="flex-1"
-              leftIcon={<Play size={20} color="white" />}
-              style={{ backgroundColor: categoryColor }}
-            >
-              Start Exercise
-            </Button>
+            {!isCompleted ? (
+              <Button
+                onPress={startExercise}
+                variant="primary"
+                size="lg"
+                className="flex-1"
+                leftIcon={<Play size={20} color="white" />}
+                style={{ backgroundColor: categoryColor }}
+              >
+                Start Exercise
+              </Button>
+            ) : (
+              <Button
+                onPress={startExercise}
+                variant="outline"
+                size="lg"
+                className="flex-1"
+                leftIcon={<Play size={20} color={categoryColor} />}
+              >
+                Do Again
+              </Button>
+            )}
           </View>
         </View>
       ) : (
