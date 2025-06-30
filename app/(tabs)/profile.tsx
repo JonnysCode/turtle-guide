@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Activity, ChevronRight, LocationEdit as Edit3, Phone, Pill, Settings, User } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -217,6 +217,86 @@ export default function Profile() {
               </View>
               <ChevronRight size={20} color="#418D84" />
             </TouchableOpacity>
+          </View>
+
+          {/* Powered by Section */}
+          <View
+            className="bg-turtle-cream-100 border border-turtle-teal-300 rounded-2xl p-6 mb-6 shadow-lg shadow-turtle-teal-300/50">
+            <Text className="text-lg font-inter-bold text-earie-black mb-4 text-center">
+              Powered by
+            </Text>
+            <View className="flex-row flex-wrap justify-center items-center" style={{ gap: 12 }}>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/anthropic.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/bolt-powered.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/elevenlabs.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/netlify.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View className="bg-turtle-teal-500 rounded-xl" style={{
+                padding: 12,
+                minWidth: 120,
+                alignItems: 'center'
+              }}>
+                <Image
+                  source={require('@/assets/images/partners/supabase.png')}
+                  style={{
+                    width: 84,
+                    height: 36
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
           </View>
 
           {/* Turtle Message */}

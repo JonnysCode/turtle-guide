@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { BookOpen, Calendar, Frown, Heart, Meh, Smile, Target, TrendingUp } from 'lucide-react-native';
@@ -201,8 +201,18 @@ export default function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-chalk" edges={['top', 'left', 'right']}>
+      {/* Bolt.new Badge */}
+      <View className="absolute top-4 right-4 z-10 rounded-full border-2 border-turtle-indigo-500">
+        <Image
+          source={require('@/assets/images/bolt.png')}
+          className="w-16 h-16"
+          resizeMode="contain"
+          style={{ height: 80, width: 80 }}
+        />
+      </View>
+
       <ScrollView
-        className="flex-1 px-6"
+        className="flex-1 px-6 pt-16"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Add padding for tab bar
       >
