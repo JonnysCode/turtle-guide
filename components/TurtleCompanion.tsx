@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Easing, Image, ImageSourcePropType, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Easing, Image, ImageSourcePropType, Text, TouchableOpacity, View } from 'react-native';
 import { MessageCircle, Volume2, VolumeX } from 'lucide-react-native';
-
-const { width: screenWidth } = Dimensions.get('window');
 
 interface TurtleCompanionProps {
   size?: number;
@@ -14,6 +12,7 @@ interface TurtleCompanionProps {
   showMessage?: boolean;
   enableSpeech?: boolean;
   className?: string;
+  minimal?: boolean; // New prop to display only the turtle without interactive elements
 }
 
 export type TurtleMood =
@@ -74,7 +73,8 @@ export default function TurtleCompanion({
                                           animate = true,
                                           showMessage = false,
                                           enableSpeech = false,
-                                          className = ''
+                                          className = '',
+                                          minimal = false
                                         }: TurtleCompanionProps) {
   const [isPressed, setIsPressed] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -181,6 +181,8 @@ export default function TurtleCompanion({
   }, [isSpeaking, speechAnim]);
 
   const handlePress = () => {
+    if (minimal) return; // Don't handle press in minimal mode
+
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 150);
 
@@ -229,6 +231,31 @@ export default function TurtleCompanion({
   });
 
   const currentMessage = message || defaultMessages[mood];
+
+  // If minimal mode, just return the turtle image without any interactive elements
+  if (minimal) {
+    return (
+      <View className={`items-center ${className}`}>
+        <Animated.View
+          style={{
+            transform: [
+              { translateY: animate ? bounceTransform : 0 },
+              { scale: animate ? pulseAnim : 1 }
+            ]
+          }}
+        >
+          <Image
+            source={turtleImages[mood]}
+            style={{
+              width: imageWidth,
+              height: imageHeight
+            }}
+            resizeMode="contain"
+          />
+        </Animated.View>
+      </View>
+    );
+  }
 
   return (
     <View className={`items-center ${className}`}>
@@ -285,7 +312,7 @@ export default function TurtleCompanion({
                   zIndex: -1
                 }}
               />
-              
+
               <Image
                 source={turtleImages[mood]}
                 style={{
